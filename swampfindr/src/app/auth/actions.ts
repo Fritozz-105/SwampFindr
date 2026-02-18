@@ -59,13 +59,16 @@ export async function signup(formData: FormData): Promise<AuthResult> {
 
   // Normalize email to lowercase and trim whitespace
   const normalizedEmail = parsed.data.email.toLowerCase().trim();
+  
+  // Sanitize full name - trim and normalize whitespace
+  const sanitizedFullName = parsed.data.fullName.trim().replace(/\s+/g, ' ');
 
   const { error } = await supabase.auth.signUp({
     email: normalizedEmail,
     password: parsed.data.password,
     options: {
       data: {
-        full_name: parsed.data.fullName,
+        full_name: sanitizedFullName,
       },
     },
   });
@@ -125,6 +128,13 @@ export async function updatePassword(formData: FormData): Promise<AuthResult> {
   const parsed = updatePasswordSchema.safeParse(rawData);
   if (!parsed.success) {
     return { error: parsed.error.issues[0].message };
+  }
+
+  // Verify user is authenticated before updating password
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  
+  if (userError || !user) {
+    return { error: "You must be logged in to update your password" };
   }
 
   const { error } = await supabase.auth.updateUser({

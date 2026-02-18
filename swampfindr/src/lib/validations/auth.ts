@@ -4,22 +4,27 @@ import { validation } from "@/data/validation";
 export const passwordSchema = z
   .string()
   .min(8, validation.password.minLength)
+  .max(128, "Password is too long")
   .regex(/[A-Z]/, validation.password.uppercase)
   .regex(/[a-z]/, validation.password.lowercase)
   .regex(/[0-9]/, validation.password.number)
   .regex(/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/, validation.password.specialChar);
 
 export const loginSchema = z.object({
-  email: z.string().email(validation.email.invalid),
-  password: z.string().min(1, validation.password.required),
+  email: z.string().email(validation.email.invalid).max(255, "Email is too long"),
+  password: z.string().min(1, validation.password.required).max(128, "Password is too long"),
 });
 
 export const signupSchema = z
   .object({
-    email: z.string().email(validation.email.invalid),
+    email: z.string().email(validation.email.invalid).max(255, "Email is too long"),
     password: passwordSchema,
     confirmPassword: z.string(),
-    fullName: z.string().min(2, validation.fullName.minLength).max(100, validation.fullName.maxLength),
+    fullName: z
+      .string()
+      .min(2, validation.fullName.minLength)
+      .max(100, validation.fullName.maxLength)
+      .regex(/^[a-zA-Z\s'-]+$/, "Name can only contain letters, spaces, hyphens, and apostrophes"),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: validation.password.mismatch,
