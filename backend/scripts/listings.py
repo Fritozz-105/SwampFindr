@@ -8,7 +8,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))) 
 from models import ListingModel, UnitModel
 from langchain_ollama import OllamaLLM
 from pymongo import MongoClient
-
+from helpers import extract_amenities_description
 load_dotenv() 
 
 headers = {
@@ -39,6 +39,7 @@ for prop in all_listings:
     if not prop["units"] or not prop["description"]["sqft_max"] or not prop["description"]["sqft_min"] or not prop["description"]["baths_max"] or not prop["description"]["baths_min"] or not prop["description"]["beds_max"] or not prop["list_price_max"] or not prop["list_price_min"] or not prop["description"]["beds_min"]:
         skip+=1
         continue
+    prop["amenities_description"] = extract_amenities_description(prop)
     mongo_listings.append(ListingModel.from_dict(prop))
     mongo_units.extend([UnitModel.from_dict(unit,prop["listing_id"],prop["property_id"]) for unit in prop["units"]])
 
