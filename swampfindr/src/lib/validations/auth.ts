@@ -24,7 +24,8 @@ export const signupSchema = z
       .string()
       .min(2, validation.fullName.minLength)
       .max(100, validation.fullName.maxLength)
-      .regex(/^[a-zA-Z\s'-]+$/, "Name can only contain letters, spaces, hyphens, and apostrophes"),
+      .trim()
+      .regex(/^[a-zA-Z]([a-zA-Z\s'-]*[a-zA-Z])?$/, "Name must start and end with a letter and can only contain letters, spaces, hyphens, and apostrophes"),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: validation.password.mismatch,

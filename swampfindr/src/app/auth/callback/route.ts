@@ -40,7 +40,13 @@ export async function GET(request: Request) {
   } catch (error) {
     // Log error for debugging but don't expose details to user
     console.error("Auth callback error:", error);
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "";
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+    
+    if (!appUrl) {
+      // Return error response instead of attempting invalid redirect
+      return new NextResponse("Configuration error", { status: 500 });
+    }
+    
     return NextResponse.redirect(
       `${appUrl}/auth/login?error=${encodeURIComponent("Authentication failed")}`,
     );

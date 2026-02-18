@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { loginSchema, signupSchema, updatePasswordSchema } from "@/lib/validations/auth";
 import { headers } from "next/headers";
 import { errors } from "@/data/errors";
+import { normalizeEmail, sanitizeName, isValidEmail } from "@/lib/utils/sanitization";
 
 export type AuthResult = {
   error?: string;
@@ -26,7 +27,7 @@ export async function login(formData: FormData): Promise<AuthResult> {
   }
 
   // Normalize email to lowercase to prevent case-sensitivity issues
-  const normalizedEmail = parsed.data.email.toLowerCase().trim();
+  const normalizedEmail = normalizeEmail(parsed.data.email);
 
   const { error } = await supabase.auth.signInWithPassword({
     email: normalizedEmail,
@@ -58,10 +59,10 @@ export async function signup(formData: FormData): Promise<AuthResult> {
   }
 
   // Normalize email to lowercase and trim whitespace
-  const normalizedEmail = parsed.data.email.toLowerCase().trim();
+  const normalizedEmail = normalizeEmail(parsed.data.email);
   
   // Sanitize full name - trim and normalize whitespace
-  const sanitizedFullName = parsed.data.fullName.trim().replace(/\s+/g, ' ');
+  const sanitizedFullName = sanitizeName(parsed.data.fullName);
 
   const { error } = await supabase.auth.signUp({
     email: normalizedEmail,
@@ -158,11 +159,10 @@ export async function resetPassword(formData: FormData): Promise<AuthResult> {
   }
 
   // Normalize email
-  const email = rawEmail.toLowerCase().trim();
+  const email = normalizeEmail(rawEmail);
 
   // Validate email format
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
+  if (!isValidEmail(email)) {
     return { error: "Please enter a valid email address" };
   }
 
