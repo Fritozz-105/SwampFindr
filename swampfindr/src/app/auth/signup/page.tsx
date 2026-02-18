@@ -9,7 +9,6 @@ import {
   Alert,
   FormField,
   PasswordInput,
-  PasswordStrength,
   SubmitButton,
   FormDivider,
   GoogleOAuthButton,
@@ -21,7 +20,6 @@ export default function SignupPage() {
     {},
   );
 
-  const [password, setPassword] = useState("");
   const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
 
   function validatePassword(value: string) {
@@ -96,13 +94,9 @@ export default function SignupPage() {
               label={auth.labels.password}
               placeholder={auth.placeholders.createPassword}
               required
-              aria-describedby="password-strength password-errors"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              aria-describedby="password-errors"
               onBlur={(e) => validatePassword(e.target.value)}
             />
-
-            <PasswordStrength password={password} />
 
             {passwordErrors.length > 0 && (
               <ul

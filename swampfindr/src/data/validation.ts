@@ -8,6 +8,7 @@ export const validation = {
     uppercase: "Password must contain at least one uppercase letter",
     lowercase: "Password must contain at least one lowercase letter",
     number: "Password must contain at least one number",
+    specialChar: "Password must contain at least one special character",
     mismatch: "Passwords do not match",
   },
   fullName: {

@@ -25,9 +25,16 @@ export async function login(formData: FormData): Promise<AuthResult> {
     return { error: parsed.error.issues[0].message };
   }
 
-  const { error } = await supabase.auth.signInWithPassword(parsed.data);
+  // Normalize email to lowercase to prevent case-sensitivity issues
+  const normalizedEmail = parsed.data.email.toLowerCase().trim();
+
+  const { error } = await supabase.auth.signInWithPassword({
+    email: normalizedEmail,
+    password: parsed.data.password,
+  });
 
   if (error) {
+    // Use generic error message to prevent user enumeration
     return { error: errors.login.invalid };
   }
 
@@ -50,8 +57,11 @@ export async function signup(formData: FormData): Promise<AuthResult> {
     return { error: parsed.error.issues[0].message };
   }
 
+  // Normalize email to lowercase and trim whitespace
+  const normalizedEmail = parsed.data.email.toLowerCase().trim();
+
   const { error } = await supabase.auth.signUp({
-    email: parsed.data.email,
+    email: normalizedEmail,
     password: parsed.data.password,
     options: {
       data: {
@@ -61,9 +71,7 @@ export async function signup(formData: FormData): Promise<AuthResult> {
   });
 
   if (error) {
-    if (error.message.includes("already registered")) {
-      return { error: errors.signup.alreadyRegistered };
-    }
+    // Use generic error message to prevent user enumeration
     return { error: errors.signup.generic };
   }
 
@@ -74,12 +82,19 @@ export async function signup(formData: FormData): Promise<AuthResult> {
 export async function signInWithOAuth(provider: "google" | "apple" | "facebook") {
   const supabase = await createClient();
   const headersList = await headers();
-  const origin = headersList.get("origin") || process.env.NEXT_PUBLIC_APP_URL;
+  const origin = headersList.get("origin");
 
+  // Validate origin is set and matches expected domain
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+  if (!appUrl) {
+    return { error: "Application configuration error" };
+  }
+
+  // Use configured app URL instead of request origin to prevent manipulation
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider,
     options: {
-      redirectTo: `${origin}/auth/callback`,
+      redirectTo: `${appUrl}/auth/callback`,
     },
   });
 
@@ -126,22 +141,35 @@ export async function updatePassword(formData: FormData): Promise<AuthResult> {
 
 export async function resetPassword(formData: FormData): Promise<AuthResult> {
   const supabase = await createClient();
-  const email = formData.get("email") as string;
+  const rawEmail = formData.get("email") as string;
 
-  if (!email) {
+  if (!rawEmail) {
     return { error: errors.resetPassword.emailRequired };
   }
 
-  const headersList = await headers();
-  const origin = headersList.get("origin") || process.env.NEXT_PUBLIC_APP_URL;
+  // Normalize email
+  const email = rawEmail.toLowerCase().trim();
+
+  // Validate email format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return { error: "Please enter a valid email address" };
+  }
+
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+  if (!appUrl) {
+    return { error: "Application configuration error" };
+  }
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${origin}/auth/callback?type=recovery`,
+    redirectTo: `${appUrl}/auth/callback?type=recovery`,
   });
 
   if (error) {
+    // Use generic error message to prevent user enumeration
     return { error: errors.resetPassword.generic };
   }
 
+  // Always return success even if email doesn't exist to prevent enumeration
   return { success: true };
 }

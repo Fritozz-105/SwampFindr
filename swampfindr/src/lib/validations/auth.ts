@@ -6,7 +6,8 @@ export const passwordSchema = z
   .min(8, validation.password.minLength)
   .regex(/[A-Z]/, validation.password.uppercase)
   .regex(/[a-z]/, validation.password.lowercase)
-  .regex(/[0-9]/, validation.password.number);
+  .regex(/[0-9]/, validation.password.number)
+  .regex(/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/, validation.password.specialChar);
 
 export const loginSchema = z.object({
   email: z.string().email(validation.email.invalid),
