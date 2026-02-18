@@ -76,8 +76,47 @@ class ListingList(Resource):
                 'count': 0
             }, 500
     
-
-
+@api.route('/units')
+class UnitList(Resource):
+    """Unit collection endpoint."""
+    
+    @api.doc('list_units')
+    @api.marshal_with(unit_response)
+    @api.doc(params={
+        'listing_id': 'Filter units by listing ID'
+    })
+    def get(self):
+        """Get all units with optional filters."""
+        try:
+            units_collection = get_units_collection()
+            
+            # Build query filter
+            query = {}
+            
+            # Filter by listing_id
+            listing_id = request.args.get('listing_id')
+            if listing_id:
+                query['listing_id'] = listing_id
+            
+            # Fetch units from MongoDB
+            units = list(units_collection.find(query).limit(100))
+            
+            # Convert ObjectId to string for JSON serialization
+            for unit in units:
+                unit['_id'] = str(unit['_id'])
+            
+            return {
+                'success': True,
+                'data': units,
+                'count': len(units)
+            }
+        except Exception as e:
+            return {
+                'success': False,
+                'error': str(e),
+                'data': [],
+                'count': 0
+            }, 500
 
 @api.route('/<string:listing_id>')
 @api.param('listing_id', 'The listing identifier')
