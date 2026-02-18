@@ -1,15 +1,15 @@
-#file that pulls listing data from the api and other sources and saves it to database. Runs as a cron job to update listings
-import http.client
-import json
-import os
+"""Script to fetch rental listings from the RapidAPI endpoint, process the data, and store it in MongoDB."""
 from dotenv import load_dotenv
+load_dotenv() 
 import sys
+import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))) # Add parent directory to path
-from models import ListingModel, UnitModel
-from langchain_ollama import OllamaLLM
+from app.models import ListingModel, UnitModel
+import http.client
 from pymongo import MongoClient
 from helpers import extract_amenities_description
-load_dotenv() 
+import json
+
 
 headers = {
     'x-rapidapi-key': os.getenv('RAPIDAPI_KEY'),
@@ -20,7 +20,9 @@ all_listings = []
 
 for page in range(1, 5):
     conn = http.client.HTTPSConnection("realtor16.p.rapidapi.com")
-    conn.request("GET", f"/search/forrent/coordinates?latitude=29.6502711&longitude=-82.3416219&radius=15&page={page}&type=apartment", headers=headers)
+    conn.request("GET",
+                  f"/search/forrent/coordinates?latitude=29.6502711&longitude=-82.3416219&radius=15&page={page}&type=apartment", 
+                  headers=headers)
     
     res = conn.getresponse()
     data = res.read()
@@ -50,17 +52,37 @@ print(f"Units extracted: {len(mongo_units)}")
 print(f"Listings skipped due to incomplete data: {skip}") 
 
 print("Connecting to MongoDB and inserting data...")
-client = MongoClient(os.getenv('URI'))
-db = client['Property']
-listings_collection = db['Listings']
-units_collection = db['Units']
+try:
+    client = MongoClient(os.getenv('URI'))
+    db = client['Property']
+    listings_collection = db['Listings']
+    units_collection = db['Units']
+except Exception as e:
+    #try again
+    client = MongoClient(os.getenv('URI'))
+    db = client['Property']
+    listings_collection = db['Listings']
+    units_collection = db['Units']
+    print("Connected to MongoDB on retry.")
+
 print("Connected to MongoDB. Clearing existing data and inserting new listings and units...")
 # Clear existing data
 listings_collection.delete_many({})
 units_collection.delete_many({})
 # Insert new data
-listings_collection.insert_many([listing.model_dump() for listing in mongo_listings])
-units_collection.insert_many([unit.model_dump() for unit in mongo_units])
+
+try:
+    listings_collection.insert_many([listing.model_dump() for listing in mongo_listings])
+    units_collection.insert_many([unit.model_dump() for unit in mongo_units])
+    print("Data insertion successful.")
+except Exception as e:
+    #try again
+    listings_collection.delete_many({})
+    units_collection.delete_many({})
+    listings_collection.insert_many([listing.model_dump() for listing in mongo_listings])
+    units_collection.insert_many([unit.model_dump() for unit in mongo_units])
+    print("Data insertion successful on retry.")
+
 
 
 

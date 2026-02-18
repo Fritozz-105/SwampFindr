@@ -30,12 +30,11 @@ backend/
 │   └── test_api.py
 ├── scripts/                 # Data Pipeline Scripts
 │   └── listings.py
+|   └── helpers.py           
 ├── run.py                   # Application entry point
 ├── pyproject.toml           # UV/Python dependencies
 └── README.md                # This file
 ```
-* I did not include models since we are using mongodb but of course this could be added later if necessary
-
 ## Setup
 
 ### Prerequisites

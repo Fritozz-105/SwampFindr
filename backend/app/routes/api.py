@@ -1,9 +1,7 @@
 """API endpoints for listings."""
 from flask import request, jsonify
 from flask_restx import Namespace, Resource, fields
-import sys
-sys.path.append('..')  # Allow import from parent directory
-from models import ListingModel, UnitModel
+from app.models import ListingModel, UnitModel
 from app.utils.pydantic_to_restx import pydantic_to_restx_model
 from app.database import get_listings_collection, get_units_collection
 
