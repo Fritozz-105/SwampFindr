@@ -25,9 +25,9 @@ agent = create_agent(
 )
 
 
-response = agent.invoke(
-    {"messages": [{"role": "user", "content": "what is the weather in sf"}]}
-)
+def run_agent(user_query: str) -> dict:
+    response = agent.invoke(
+        {"messages": [{"role": "user", "content": user_query}]}
+    )
+    return {"response": response["messages"][-1].content}
 
-
-print(response["messages"][-1].content)
