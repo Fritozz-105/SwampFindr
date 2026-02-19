@@ -1,8 +1,10 @@
 """API routes initialization."""
 from flask import Blueprint
 from flask_restx import Api
-from app.routes.api import api as api_namespace
-from app.routes.agent import agent
+from backend.app.routes.api import api as api_namespace
+from backend.app.routes.agent import agent
+from backend.app.routes.vectordb import vectordb
+
 
 # Create main blueprint
 api_bp = Blueprint('api', __name__, url_prefix='/api/v1')
@@ -19,6 +21,7 @@ api = Api(
 # Add namespaces
 api.add_namespace(api_namespace, path='/listings')
 api.add_namespace(agent, path="/chat")
+api.add_namespace(vectordb, path="/pinecone")
 
 
 def register_blueprints(app):
