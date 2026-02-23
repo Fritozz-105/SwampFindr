@@ -50,6 +50,9 @@ export async function signup(formData: FormData): Promise<AuthResult> {
     return { error: parsed.error.issues[0].message };
   }
 
+  const headersList = await headers();
+  const origin = headersList.get("origin") || process.env.NEXT_PUBLIC_APP_URL;
+
   const { error } = await supabase.auth.signUp({
     email: parsed.data.email,
     password: parsed.data.password,
@@ -57,6 +60,7 @@ export async function signup(formData: FormData): Promise<AuthResult> {
       data: {
         full_name: parsed.data.fullName,
       },
+      emailRedirectTo: `${origin}/auth/callback`,
     },
   });
 
