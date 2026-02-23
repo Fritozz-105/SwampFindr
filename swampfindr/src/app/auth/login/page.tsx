@@ -54,12 +54,15 @@ function LoginForm() {
         </p>
       </div>
 
-      {message && <Alert variant="success">{message}</Alert>}
-
-      {errorParam && (
-        <Alert variant="error" className="shake">
-          {errorParam}
-        </Alert>
+      {(message || errorParam) && (
+        <div style={{ marginBottom: 12 }}>
+          {message && <Alert variant="success">{message}</Alert>}
+          {errorParam && (
+            <Alert variant="error" className="shake">
+              {errorParam}
+            </Alert>
+          )}
+        </div>
       )}
 
       <GoogleOAuthButton onClick={() => signInWithOAuth("google")}>
