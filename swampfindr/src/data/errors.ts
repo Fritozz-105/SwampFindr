@@ -19,4 +19,8 @@ export const errors = {
   callback: {
     authFailed: "Could not authenticate. Please try again.",
   },
+  onboarding: {
+    submitFailed: "Could not save your profile. Please try again.",
+    networkError: "Could not connect to the server. Please try again later.",
+  },
 } as const;

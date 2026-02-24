@@ -1,1 +1,1 @@
-from backend.app.agents.agent import run_agent
+from app.agents.agent import run_agent

@@ -10,3 +10,8 @@ export { SubmitButton } from "./SubmitButton";
 export { FormDivider } from "./FormDivider";
 export { GoogleOAuthButton } from "./GoogleOAuthButton";
 export { PasswordStrength } from "./PasswordStrength";
+export { StepIndicator } from "./StepIndicator";
+export { SelectField } from "./SelectField";
+export { RangeInput } from "./RangeInput";
+export { CheckboxGroup } from "./CheckboxGroup";
+export { TextArea } from "./TextArea";

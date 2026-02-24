@@ -62,6 +62,31 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  // Onboarding redirect logic
+  if (user) {
+    const isOnboardingRoute = pathname === "/onboarding";
+    const onboardingCookie = request.cookies.get("onboarding_completed")?.value;
+
+    // If not on auth/landing/onboarding and onboarding not completed → redirect to onboarding
+    if (
+      !isOnboardingRoute &&
+      !isAuthRoute &&
+      !isLandingPage &&
+      onboardingCookie === "false"
+    ) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/onboarding";
+      return NextResponse.redirect(url);
+    }
+
+    // If on onboarding but already completed → redirect to dashboard
+    if (isOnboardingRoute && onboardingCookie === "true") {
+      const url = request.nextUrl.clone();
+      url.pathname = "/dashboard";
+      return NextResponse.redirect(url);
+    }
+  }
+
   return supabaseResponse;
 }
 

@@ -380,6 +380,81 @@ body {
   transform: translateY(-2px);
 }
 
+/* Step indicator */
+.step-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(155, 149, 184, 0.15);
+  color: var(--color-text-muted);
+  transition: all 0.3s ease;
+}
+
+.step-circle.active {
+  background: var(--gradient-primary);
+  color: white;
+}
+
+.step-line {
+  width: 48px;
+  height: 2px;
+  background: rgba(155, 149, 184, 0.2);
+  margin: 0 8px;
+  transition: background 0.3s ease;
+}
+
+.step-line.completed {
+  background: var(--color-primary);
+}
+
+/* Checkbox tag pills */
+.checkbox-tag {
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1.5px solid rgba(124, 92, 252, 0.15);
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(8px);
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.checkbox-tag:hover {
+  border-color: var(--color-primary-light);
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.checkbox-tag.selected {
+  background: var(--gradient-primary);
+  color: white;
+  border-color: transparent;
+}
+
+/* Secondary button */
+.btn-secondary {
+  padding: 14px 24px;
+  background: transparent;
+  color: var(--color-text-secondary);
+  border: 1.5px solid rgba(124, 92, 252, 0.2);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-secondary:hover {
+  border-color: var(--color-primary-light);
+  color: var(--color-primary);
+  background: rgba(124, 92, 252, 0.04);
+}
+
 /* Password visibility toggle */
 .password-toggle {
   position: absolute;

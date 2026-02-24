@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { errors } from "@/data/errors";
 
+const FLASK_API_URL = process.env.FLASK_API_URL ?? "http://localhost:5000";
+
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
@@ -19,7 +21,36 @@ export async function GET(request: Request) {
       if (type === "recovery") {
         return NextResponse.redirect(`${origin}/auth/update-password`);
       }
-      return NextResponse.redirect(`${origin}${redirectPath}`);
+
+      // Check onboarding status from backend
+      let onboardingCompleted = false;
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
+        if (session?.access_token) {
+          const res = await fetch(`${FLASK_API_URL}/api/v1/profiles/status`, {
+            headers: { Authorization: `Bearer ${session.access_token}` },
+          });
+          if (res.ok) {
+            const body = await res.json();
+            onboardingCompleted = body.onboarding_completed === true;
+          }
+        }
+      } catch {
+        // Backend unreachable — graceful degradation, let through to dashboard
+      }
+
+      const response = NextResponse.redirect(
+        `${origin}${onboardingCompleted ? redirectPath : "/onboarding"}`,
+      );
+      response.cookies.set("onboarding_completed", String(onboardingCompleted), {
+        path: "/",
+        maxAge: 60 * 60 * 24 * 365,
+        sameSite: "lax",
+      });
+      return response;
     }
   }
 

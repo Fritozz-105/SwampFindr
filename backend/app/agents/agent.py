@@ -2,8 +2,8 @@ from langchain.agents import create_agent
 from langchain_openai import ChatOpenAI
 import os
 from dotenv import load_dotenv
-from backend.app.agents.prompts import SYSTEM_PROMPT
-from backend.app.agents.tools import get_tools as tools
+from app.agents.prompts import SYSTEM_PROMPT
+from app.agents.tools import get_tools as tools
 
 
 load_dotenv()

@@ -21,9 +21,8 @@ class Config:
     # CORS Config
     CORS_HEADERS = 'Content-Type'
     
-    # Database Config (if needed later)
-    
-    # JWT Config (if needed later)
+    # Supabase JWT Config
+    SUPABASE_JWT_SECRET = os.getenv('SUPABASE_JWT_SECRET', '')
 
 
 class DevelopmentConfig(Config):

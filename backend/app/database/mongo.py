@@ -49,6 +49,12 @@ def get_units_collection() -> Collection:
     return db['Units']
 
 
+def get_profiles_collection() -> Collection:
+    """Get the Profiles collection."""
+    db = get_db()
+    return db['Profiles']
+
+
 def init_db(app):
     """Initialize database connection with Flask app."""
     with app.app_context():

@@ -1,6 +1,6 @@
 """All tools for the agent"""
 from langchain_core.tools import tool
-from backend.app.services.pinecone_service import query_records
+from app.services.pinecone_service import query_records
 
 
 def get_tools():
