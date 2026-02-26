@@ -13,9 +13,9 @@ export default function Home() {
           alt=""
           fill
           priority
-          style={{ objectFit: "cover", filter: "blur(6px)", transform: "scale(1.08)" }}
+          style={{ objectFit: "cover" }}
         />
-        <div style={{ position: "absolute", inset: 0, background: "rgba(10, 8, 28, 0.58)" }} />
+        <div style={{ position: "absolute", inset: 0, background: "rgba(0, 0, 0, 0.55)" }} />
       </div>
 
       {/* Content */}
@@ -27,9 +27,9 @@ export default function Home() {
             <div>
               <p
                 style={{
-                  fontSize: 12,
-                  fontWeight: 600,
-                  letterSpacing: "0.12em",
+                  fontSize: 11,
+                  fontWeight: 500,
+                  letterSpacing: "0.1em",
                   textTransform: "uppercase",
                   color: "rgba(255,255,255,0.5)",
                   marginBottom: 24,
@@ -41,19 +41,18 @@ export default function Home() {
               <h1
                 style={{
                   fontFamily: "var(--font-display)",
-                  fontSize: "clamp(36px, 5vw, 60px)",
+                  fontSize: "clamp(40px, 6vw, 72px)",
                   fontWeight: 800,
                   color: "white",
                   lineHeight: 1.08,
+                  letterSpacing: "-0.03em",
                   marginBottom: 22,
                 }}
               >
                 {branding.heading}{" "}
                 <span
                   style={{
-                    background: "var(--gradient-primary)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
+                    color: "var(--color-accent)",
                   }}
                 >
                   {branding.highlightWord}
@@ -63,8 +62,8 @@ export default function Home() {
               <p
                 style={{
                   fontSize: "clamp(16px, 2vw, 18px)",
-                  color: "rgba(255,255,255,0.68)",
-                  lineHeight: 1.7,
+                  color: "rgba(255,255,255,0.65)",
+                  lineHeight: 1.6,
                   marginBottom: 40,
                   maxWidth: 420,
                 }}
@@ -78,18 +77,27 @@ export default function Home() {
                   className="btn-primary"
                   style={{
                     width: "auto",
-                    padding: "15px 36px",
+                    padding: "14px 32px",
                     textDecoration: "none",
                     display: "inline-block",
-                    fontSize: 16,
                   }}
                 >
                   {landing.ctaPrimary}
                 </Link>
                 <Link
                   href="/auth/login"
-                  className="btn-outline-white"
-                  style={{ textDecoration: "none" }}
+                  style={{
+                    padding: "14px 32px",
+                    background: "rgba(255, 255, 255, 0.08)",
+                    border: "1px solid rgba(255, 255, 255, 0.25)",
+                    borderRadius: "var(--radius-sm)",
+                    fontFamily: "var(--font-display)",
+                    fontWeight: 600,
+                    fontSize: 15,
+                    color: "white",
+                    textDecoration: "none",
+                    display: "inline-block",
+                  }}
                 >
                   {landing.ctaSecondary}
                 </Link>
@@ -101,18 +109,22 @@ export default function Home() {
               {landing.features.map((f) => (
                 <div
                   key={f.title}
-                  className="glass"
                   style={{
-                    padding: "22px 26px",
+                    padding: "20px 24px",
                     borderRadius: "var(--radius-md)",
-                    borderLeft: "3px solid var(--color-primary)",
+                    background: "rgba(255, 255, 255, 0.06)",
+                    borderTop: "1px solid rgba(255, 255, 255, 0.1)",
+                    borderRight: "1px solid rgba(255, 255, 255, 0.1)",
+                    borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+                    borderLeft: "3px solid var(--color-accent)",
                   }}
                 >
                   <p
                     style={{
                       fontFamily: "var(--font-display)",
-                      fontWeight: 700,
+                      fontWeight: 600,
                       fontSize: 15,
+                      letterSpacing: "-0.01em",
                       color: "white",
                       marginBottom: 6,
                     }}

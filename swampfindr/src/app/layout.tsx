@@ -1,16 +1,19 @@
 import type { Metadata, Viewport } from "next";
-import { Outfit, DM_Sans } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
-const outfit = Outfit({
+const satoshi = localFont({
+  src: "../../public/fonts/Satoshi-Variable.woff2",
   variable: "--font-display",
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800"],
+  display: "swap",
+  weight: "300 900",
 });
 
-const dmSans = DM_Sans({
+const geist = localFont({
+  src: "../../public/fonts/GeistVF.woff2",
   variable: "--font-body",
-  subsets: ["latin"],
+  display: "swap",
+  weight: "100 900",
 });
 
 export const metadata: Metadata = {
@@ -31,7 +34,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${outfit.variable} ${dmSans.variable} antialiased`}>
+      <body className={`${satoshi.variable} ${geist.variable} antialiased`}>
         {children}
       </body>
     </html>

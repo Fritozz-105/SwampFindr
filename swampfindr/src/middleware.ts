@@ -58,7 +58,7 @@ export async function middleware(request: NextRequest) {
     !pathname.startsWith("/auth/update-password")
   ) {
     const url = request.nextUrl.clone();
-    url.pathname = "/dashboard";
+    url.pathname = "/home";
     return NextResponse.redirect(url);
   }
 
@@ -82,7 +82,7 @@ export async function middleware(request: NextRequest) {
     // If on onboarding but already completed → redirect to dashboard
     if (isOnboardingRoute && onboardingCookie === "true") {
       const url = request.nextUrl.clone();
-      url.pathname = "/dashboard";
+      url.pathname = "/home";
       return NextResponse.redirect(url);
     }
   }

@@ -20,6 +20,7 @@ export function PreferencesStep({ data, onChange, errors }: PreferencesStepProps
             fontSize: 22,
             fontWeight: 700,
             color: "var(--color-text)",
+            letterSpacing: "-0.015em",
           }}
         >
           {onboarding.steps.preferences.heading}

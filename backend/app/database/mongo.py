@@ -49,9 +49,15 @@ def get_units_collection() -> Collection:
     return db['Units']
 
 
+def get_userdata_db() -> Database:
+    """Get the UserData database."""
+    client = get_mongo_client()
+    return client['UserData']
+
+
 def get_profiles_collection() -> Collection:
-    """Get the Profiles collection."""
-    db = get_db()
+    """Get the Profiles collection from the UserData database."""
+    db = get_userdata_db()
     return db['Profiles']
 
 

@@ -1,0 +1,66 @@
+export const settings = {
+  heading: "Settings",
+  subtitle: "Manage your account and preferences",
+
+  sections: {
+    avatar: {
+      title: "Profile Photo",
+      description: "Upload a profile picture",
+      uploadButton: "Upload Photo",
+      removeButton: "Remove",
+      uploading: "Uploading...",
+      maxSize: "Max 5 MB. JPG, PNG, or WebP.",
+    },
+    profile: {
+      title: "Edit Profile",
+      description: "Update your username and phone number",
+      saveButton: "Save Changes",
+      saving: "Saving...",
+    },
+    preferences: {
+      title: "Housing Preferences",
+      description: "Update your housing search preferences",
+      saveButton: "Save Preferences",
+      saving: "Saving...",
+    },
+    password: {
+      title: "Change Password",
+      description: "Update your account password",
+      saveButton: "Update Password",
+      saving: "Updating...",
+      oauthMessage: "Password changes are not available for accounts signed in with Google.",
+    },
+    email: {
+      title: "Change Email",
+      description: "Update your email address",
+      saveButton: "Update Email",
+      saving: "Updating...",
+      currentLabel: "Current email",
+      newLabel: "New email",
+    },
+    mfa: {
+      title: "Two-Factor Authentication",
+      description: "Add an extra layer of security to your account",
+      enableButton: "Enable 2FA",
+      disableButton: "Disable 2FA",
+      verifyButton: "Verify",
+      enrolling: "Setting up...",
+      scanPrompt: "Scan this QR code with your authenticator app",
+      enterCode: "Enter the 6-digit code from your app",
+      enabled: "Two-factor authentication is enabled.",
+      disabled: "Two-factor authentication is not enabled.",
+    },
+  },
+
+  messages: {
+    profileUpdated: "Profile updated successfully",
+    preferencesUpdated: "Preferences updated. Recommendations will refresh.",
+    passwordUpdated: "Password updated successfully",
+    emailUpdated: "Confirmation email sent to your new address",
+    mfaEnabled: "Two-factor authentication enabled",
+    mfaDisabled: "Two-factor authentication disabled",
+    avatarUpdated: "Profile photo updated",
+    avatarRemoved: "Profile photo removed",
+    genericError: "Something went wrong. Please try again.",
+  },
+} as const;

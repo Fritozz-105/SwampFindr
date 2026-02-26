@@ -19,10 +19,10 @@ export function SelectField({ id, label, value, onChange, options, error }: Sele
         htmlFor={id}
         style={{
           display: "block",
-          fontSize: 14,
+          fontSize: 13,
           fontWeight: 500,
-          color: "var(--color-text)",
-          marginBottom: 6,
+          color: "var(--color-text-secondary)",
+          marginBottom: 4,
         }}
       >
         {label}
@@ -40,9 +40,7 @@ export function SelectField({ id, label, value, onChange, options, error }: Sele
           </option>
         ))}
       </select>
-      {error && (
-        <p style={{ color: "var(--color-accent)", fontSize: 13, marginTop: 4 }}>{error}</p>
-      )}
+      {error && <p style={{ color: "var(--color-error)", fontSize: 13, marginTop: 4 }}>{error}</p>}
     </div>
   );
 }

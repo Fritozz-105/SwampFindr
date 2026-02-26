@@ -21,9 +21,9 @@ export function CheckboxGroup({ label, options, selected, onChange }: CheckboxGr
       <label
         style={{
           display: "block",
-          fontSize: 14,
+          fontSize: 13,
           fontWeight: 500,
-          color: "var(--color-text)",
+          color: "var(--color-text-secondary)",
           marginBottom: 8,
         }}
       >

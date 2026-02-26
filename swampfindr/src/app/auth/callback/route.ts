@@ -8,10 +8,10 @@ export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
   const type = searchParams.get("type");
-  const next = searchParams.get("next") ?? "/dashboard";
+  const next = searchParams.get("next") ?? "/home";
 
   // Validate redirect path — only allow relative paths to prevent open redirects
-  const redirectPath = next.startsWith("/") && !next.startsWith("//") ? next : "/dashboard";
+  const redirectPath = next.startsWith("/") && !next.startsWith("//") ? next : "/home";
 
   if (code) {
     const supabase = await createClient();
@@ -23,7 +23,8 @@ export async function GET(request: Request) {
       }
 
       // Check onboarding status from backend
-      let onboardingCompleted = false;
+      // null = couldn't reach Flask, preserve existing cookie
+      let onboardingCompleted: boolean | null = null;
       try {
         const {
           data: { session },
@@ -39,13 +40,26 @@ export async function GET(request: Request) {
           }
         }
       } catch {
-        // Backend unreachable — graceful degradation, let through to dashboard
+        // Backend unreachable — preserve existing cookie below
       }
 
+      // If Flask was unreachable, fall back to the existing cookie value
+      const existingCookie = request.headers.get("cookie") ?? "";
+      const existingValue = existingCookie
+        .split(";")
+        .map((c) => c.trim())
+        .find((c) => c.startsWith("onboarding_completed="))
+        ?.split("=")[1];
+
+      const finalValue =
+        onboardingCompleted !== null
+          ? onboardingCompleted
+          : existingValue === "true";
+
       const response = NextResponse.redirect(
-        `${origin}${onboardingCompleted ? redirectPath : "/onboarding"}`,
+        `${origin}${finalValue ? redirectPath : "/onboarding"}`,
       );
-      response.cookies.set("onboarding_completed", String(onboardingCompleted), {
+      response.cookies.set("onboarding_completed", String(finalValue), {
         path: "/",
         maxAge: 60 * 60 * 24 * 365,
         sameSite: "lax",

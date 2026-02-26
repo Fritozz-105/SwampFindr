@@ -20,6 +20,7 @@ export function AmenitiesStep({ data, onChange, errors }: AmenitiesStepProps) {
             fontSize: 22,
             fontWeight: 700,
             color: "var(--color-text)",
+            letterSpacing: "-0.015em",
           }}
         >
           {onboarding.steps.amenities.heading}
@@ -36,7 +37,7 @@ export function AmenitiesStep({ data, onChange, errors }: AmenitiesStepProps) {
         onChange={(selected) => onChange("amenities", selected)}
       />
       {errors.amenities && (
-        <p style={{ color: "var(--color-accent)", fontSize: 13 }}>{errors.amenities}</p>
+        <p style={{ color: "var(--color-error)", fontSize: 13 }}>{errors.amenities}</p>
       )}
 
       <TextArea

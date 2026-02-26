@@ -15,3 +15,4 @@ export { SelectField } from "./SelectField";
 export { RangeInput } from "./RangeInput";
 export { CheckboxGroup } from "./CheckboxGroup";
 export { TextArea } from "./TextArea";
+export { SettingsCard } from "./SettingsCard";

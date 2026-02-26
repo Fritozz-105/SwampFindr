@@ -155,7 +155,7 @@ export function OnboardingForm() {
       // Success, clear storage, set cookie, redirect
       sessionStorage.removeItem(STORAGE_KEY);
       document.cookie = "onboarding_completed=true; path=/; max-age=31536000; SameSite=Lax";
-      router.push("/dashboard");
+      router.push("/home");
     } catch {
       setSubmitError(errorMessages.onboarding.networkError);
       setIsPending(false);
@@ -170,7 +170,7 @@ export function OnboardingForm() {
   })();
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
       <StepIndicator steps={STEPS} currentStep={currentStep} />
 
       {submitError && <Alert variant="error">{submitError}</Alert>}

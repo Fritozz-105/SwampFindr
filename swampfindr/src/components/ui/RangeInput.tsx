@@ -28,17 +28,24 @@ export function RangeInput({
       <label
         style={{
           display: "block",
-          fontSize: 14,
+          fontSize: 13,
           fontWeight: 500,
-          color: "var(--color-text)",
-          marginBottom: 6,
+          color: "var(--color-text-secondary)",
+          marginBottom: 4,
         }}
       >
         {label}
       </label>
       <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
         <div style={{ flex: 1 }}>
-          <span style={{ fontSize: 12, color: "var(--color-text-secondary)", marginBottom: 2, display: "block" }}>
+          <span
+            style={{
+              fontSize: 12,
+              color: "var(--color-text-muted)",
+              marginBottom: 2,
+              display: "block",
+            }}
+          >
             {minLabel}
           </span>
           <input
@@ -50,9 +57,16 @@ export function RangeInput({
             min={0}
           />
         </div>
-        <span style={{ color: "var(--color-text-muted)", marginTop: 18 }}>&ndash;</span>
+        <span style={{ color: "var(--color-border-strong)", marginTop: 18 }}>&ndash;</span>
         <div style={{ flex: 1 }}>
-          <span style={{ fontSize: 12, color: "var(--color-text-secondary)", marginBottom: 2, display: "block" }}>
+          <span
+            style={{
+              fontSize: 12,
+              color: "var(--color-text-muted)",
+              marginBottom: 2,
+              display: "block",
+            }}
+          >
             {maxLabel}
           </span>
           <input
@@ -65,9 +79,7 @@ export function RangeInput({
           />
         </div>
       </div>
-      {error && (
-        <p style={{ color: "var(--color-accent)", fontSize: 13, marginTop: 4 }}>{error}</p>
-      )}
+      {error && <p style={{ color: "var(--color-error)", fontSize: 13, marginTop: 4 }}>{error}</p>}
     </div>
   );
 }

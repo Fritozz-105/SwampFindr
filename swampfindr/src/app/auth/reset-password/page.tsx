@@ -23,6 +23,7 @@ export default function ResetPasswordPage() {
             fontSize: 28,
             fontWeight: 700,
             color: "var(--color-text)",
+            letterSpacing: "-0.02em",
             marginBottom: 8,
           }}
         >
@@ -74,7 +75,7 @@ export default function ResetPasswordPage() {
             href="/auth/login"
             style={{
               color: "var(--color-primary)",
-              fontWeight: 600,
+              fontWeight: 500,
               fontSize: 14,
               textDecoration: "none",
             }}
@@ -96,13 +97,9 @@ export default function ResetPasswordPage() {
                 required
               />
 
-              {state.error && (
-                <Alert variant="error">{state.error}</Alert>
-              )}
+              {state.error && <Alert variant="error">{state.error}</Alert>}
 
-              <SubmitButton isPending={isPending}>
-                {auth.resetPassword.submitLabel}
-              </SubmitButton>
+              <SubmitButton isPending={isPending}>{auth.resetPassword.submitLabel}</SubmitButton>
             </div>
           </form>
 
@@ -119,7 +116,7 @@ export default function ResetPasswordPage() {
               href="/auth/login"
               style={{
                 color: "var(--color-primary)",
-                fontWeight: 600,
+                fontWeight: 500,
                 textDecoration: "none",
               }}
             >

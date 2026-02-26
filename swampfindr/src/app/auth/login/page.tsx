@@ -34,6 +34,7 @@ function LoginForm() {
             fontSize: 26,
             fontWeight: 700,
             color: "var(--color-text)",
+            letterSpacing: "-0.02em",
             marginBottom: 6,
           }}
         >
@@ -45,7 +46,7 @@ function LoginForm() {
             href="/auth/signup"
             style={{
               color: "var(--color-primary)",
-              fontWeight: 600,
+              fontWeight: 500,
               textDecoration: "none",
             }}
           >
@@ -57,11 +58,7 @@ function LoginForm() {
       {(message || errorParam) && (
         <div style={{ marginBottom: 12 }}>
           {message && <Alert variant="success">{message}</Alert>}
-          {errorParam && (
-            <Alert variant="error" className="shake">
-              {errorParam}
-            </Alert>
-          )}
+          {errorParam && <Alert variant="error">{errorParam}</Alert>}
         </div>
       )}
 
@@ -96,7 +93,7 @@ function LoginForm() {
                 href="/auth/reset-password"
                 style={{
                   fontSize: 13,
-                  color: "var(--color-primary)",
+                  color: "var(--color-text-muted)",
                   textDecoration: "none",
                 }}
               >
@@ -111,9 +108,7 @@ function LoginForm() {
             </Alert>
           )}
 
-          <SubmitButton isPending={isPending}>
-            {auth.login.submitLabel}
-          </SubmitButton>
+          <SubmitButton isPending={isPending}>{auth.login.submitLabel}</SubmitButton>
         </div>
       </form>
     </div>

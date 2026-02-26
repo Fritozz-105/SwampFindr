@@ -10,7 +10,15 @@ type TextAreaProps = {
   error?: string;
 };
 
-export function TextArea({ id, label, value, onChange, placeholder, maxLength, error }: TextAreaProps) {
+export function TextArea({
+  id,
+  label,
+  value,
+  onChange,
+  placeholder,
+  maxLength,
+  error,
+}: TextAreaProps) {
   const remaining = maxLength - value.length;
   const isNearLimit = remaining <= 20;
 
@@ -20,10 +28,10 @@ export function TextArea({ id, label, value, onChange, placeholder, maxLength, e
         htmlFor={id}
         style={{
           display: "block",
-          fontSize: 14,
+          fontSize: 13,
           fontWeight: 500,
-          color: "var(--color-text)",
-          marginBottom: 6,
+          color: "var(--color-text-secondary)",
+          marginBottom: 4,
         }}
       >
         {label}
@@ -47,16 +55,14 @@ export function TextArea({ id, label, value, onChange, placeholder, maxLength, e
         <span
           style={{
             fontSize: 12,
-            color: isNearLimit ? "var(--color-accent)" : "var(--color-text-muted)",
+            color: isNearLimit ? "var(--color-error)" : "var(--color-text-muted)",
             fontWeight: isNearLimit ? 600 : 400,
           }}
         >
           {value.length}/{maxLength}
         </span>
       </div>
-      {error && (
-        <p style={{ color: "var(--color-accent)", fontSize: 13, marginTop: 2 }}>{error}</p>
-      )}
+      {error && <p style={{ color: "var(--color-error)", fontSize: 13, marginTop: 2 }}>{error}</p>}
     </div>
   );
 }

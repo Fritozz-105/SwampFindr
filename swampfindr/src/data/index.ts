@@ -5,3 +5,5 @@ export { validation } from "./validation";
 export { errors } from "./errors";
 export { dashboard } from "./dashboard";
 export { onboarding } from "./onboarding";
+export { settings } from "./settings";
+export { navigation } from "./navigation";

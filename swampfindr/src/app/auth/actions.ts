@@ -32,7 +32,7 @@ export async function login(formData: FormData): Promise<AuthResult> {
   }
 
   revalidatePath("/", "layout");
-  redirect("/dashboard");
+  redirect("/home");
 }
 
 export async function signup(formData: FormData): Promise<AuthResult> {

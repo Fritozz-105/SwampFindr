@@ -6,11 +6,17 @@ from flask_restx import Namespace, Resource, fields
 from pydantic import ValidationError
 
 from app.auth import require_auth
-from app.models.profile import OnboardingRequest
+from app.models.profile import (
+    OnboardingRequest,
+    ProfileUpdateRequest,
+    PreferencesUpdateRequest,
+)
 from app.services.profile_service import (
-  create_or_update_profile,
-  get_profile_by_user_id,
-  generate_preference_embedding,
+    create_or_update_profile,
+    get_profile_by_user_id,
+    generate_preference_embedding,
+    update_profile,
+    update_preferences,
 )
 
 logger = logging.getLogger(__name__)
@@ -20,14 +26,14 @@ profiles = Namespace("profiles", description="User profile operations")
 # Swagger Models for request/response validation and documentation
 
 preferences_model = profiles.model("UserPreferences", {
-  "bedrooms": fields.Integer(default=1),
-  "bathrooms": fields.Integer(default=1),
-  "price_min": fields.Integer(default=500),
-  "price_max": fields.Integer(default=2000),
-  "distance_from_campus": fields.String(default="any"),
-  "roommates": fields.Integer(default=0),
-  "amenities": fields.List(fields.String, default=[]),
-  "excerpt": fields.String(default=""),
+    "bedrooms": fields.Integer(default=1),
+    "bathrooms": fields.Integer(default=1),
+    "price_min": fields.Integer(default=500),
+    "price_max": fields.Integer(default=2000),
+    "distance_from_campus": fields.String(default="any"),
+    "roommates": fields.Integer(default=0),
+    "amenities": fields.List(fields.String, default=[]),
+    "excerpt": fields.String(default=""),
 })
 
 onboarding_request_model = profiles.model("OnboardingRequest", {
@@ -51,6 +57,23 @@ profile_response_model = profiles.model("ProfileResponse", {
 status_response_model = profiles.model("StatusResponse", {
     "success": fields.Boolean,
     "onboarding_completed": fields.Boolean,
+})
+
+profile_update_model = profiles.model("ProfileUpdateRequest", {
+    "username": fields.String(description="2-30 characters"),
+    "phone": fields.String(),
+    "avatar_url": fields.String(),
+})
+
+preferences_update_model = profiles.model("PreferencesUpdateRequest", {
+    "bedrooms": fields.Integer(default=1),
+    "bathrooms": fields.Integer(default=1),
+    "price_min": fields.Integer(default=500),
+    "price_max": fields.Integer(default=2000),
+    "distance_from_campus": fields.String(default="any"),
+    "roommates": fields.Integer(default=0),
+    "amenities": fields.List(fields.String, default=[]),
+    "excerpt": fields.String(default="", description="Max 200 characters"),
 })
 
 
@@ -84,6 +107,44 @@ class ProfileMe(Resource):
     def get(self):
         """Get the current user's full profile."""
         profile = get_profile_by_user_id(g.user_id)
+        if not profile:
+            return {"success": False, "error": "Profile not found"}, 404
+
+        return {"success": True, "data": profile}
+
+    @profiles.expect(profile_update_model)
+    @profiles.doc(security="Bearer")
+    @require_auth
+    def patch(self):
+        """Update profile fields (username, phone, avatar_url)."""
+        try:
+            data = ProfileUpdateRequest(**request.json)
+        except ValidationError as e:
+            return {"success": False, "error": e.errors()}, 400
+
+        profile = update_profile(g.user_id, data)
+        if not profile:
+            return {"success": False, "error": "Profile not found"}, 404
+
+        return {"success": True, "data": profile}
+
+
+@profiles.route("/me/preferences")
+class ProfilePreferences(Resource):
+    @profiles.expect(preferences_update_model)
+    @profiles.doc(security="Bearer")
+    @require_auth
+    def put(self):
+        """Replace all preferences and regenerate embedding."""
+        try:
+            data = PreferencesUpdateRequest(**request.json)
+        except ValidationError as e:
+            return {"success": False, "error": e.errors()}, 400
+
+        if data.price_max < data.price_min:
+            return {"success": False, "error": "price_max must be >= price_min"}, 400
+
+        profile = update_preferences(g.user_id, data)
         if not profile:
             return {"success": False, "error": "Profile not found"}, 404
 

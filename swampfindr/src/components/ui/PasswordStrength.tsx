@@ -23,16 +23,13 @@ export function PasswordStrength({ password }: PasswordStrengthProps) {
               flex: 1,
               height: 3,
               borderRadius: 2,
-              background:
-                level <= strength.score ? strength.color : "rgba(0,0,0,0.08)",
-              transition: "background 0.3s",
+              background: level <= strength.score ? strength.color : "rgba(0,0,0,0.08)",
+              transition: "background 0.15s ease",
             }}
           />
         ))}
       </div>
-      <span style={{ fontSize: 12, color: strength.color, fontWeight: 500 }}>
-        {strength.label}
-      </span>
+      <span style={{ fontSize: 12, color: strength.color, fontWeight: 500 }}>{strength.label}</span>
     </div>
   );
 }

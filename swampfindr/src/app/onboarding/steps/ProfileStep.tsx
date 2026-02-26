@@ -27,6 +27,7 @@ export function ProfileStep({ data, onChange, errors }: ProfileStepProps) {
             fontSize: 22,
             fontWeight: 700,
             color: "var(--color-text)",
+            letterSpacing: "-0.015em",
           }}
         >
           {onboarding.steps.profile.heading}

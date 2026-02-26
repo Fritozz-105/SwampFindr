@@ -37,12 +37,12 @@ export function PasswordInput({
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          marginBottom: 6,
+          marginBottom: 4,
         }}
       >
         <label
           htmlFor={id}
-          style={{ fontSize: 14, fontWeight: 500, color: "var(--color-text)" }}
+          style={{ fontSize: 13, fontWeight: 500, color: "var(--color-text-secondary)" }}
         >
           {label}
         </label>

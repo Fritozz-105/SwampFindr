@@ -24,13 +24,15 @@ export default async function OnboardingPage() {
       }}
     >
       <div
-        className="glass-strong animate-fade-up"
+        className="animate-fade-up"
         style={{
           width: "100%",
-          maxWidth: 600,
-          padding: "40px 36px",
-          borderRadius: "var(--radius-xl)",
-          boxShadow: "var(--shadow-lg)",
+          maxWidth: 520,
+          padding: "36px 32px",
+          borderRadius: "var(--radius-lg)",
+          boxShadow: "var(--shadow-md)",
+          background: "var(--color-surface)",
+          border: "1px solid var(--color-border)",
         }}
       >
         <div style={{ textAlign: "center", marginBottom: 32 }}>
@@ -40,6 +42,7 @@ export default async function OnboardingPage() {
               fontSize: 28,
               fontWeight: 700,
               color: "var(--color-text)",
+              letterSpacing: "-0.02em",
             }}
           >
             {onboarding.heading}

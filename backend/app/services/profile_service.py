@@ -4,7 +4,13 @@ from datetime import datetime, timezone
 from typing import Optional
 
 from app.database import get_profiles_collection
-from app.models.profile import ProfileModel, UserPreferences, OnboardingRequest
+from app.models.profile import (
+    ProfileModel,
+    UserPreferences,
+    OnboardingRequest,
+    ProfileUpdateRequest,
+    PreferencesUpdateRequest,
+)
 from app.services.pinecone_service import upsert_record
 
 logger = logging.getLogger(__name__)
@@ -51,6 +57,44 @@ def get_profile_by_user_id(user_id: str) -> Optional[dict]:
     """Fetch a profile by user_id. Returns None if not found."""
     collection = get_profiles_collection()
     profile = collection.find_one({"user_id": user_id}, {"_id": 0})
+    if profile:
+        for key in ("created_at", "updated_at"):
+            if isinstance(profile.get(key), datetime):
+                profile[key] = profile[key].isoformat()
+    return profile
+
+
+def update_profile(user_id: str, data: ProfileUpdateRequest) -> Optional[dict]:
+    """Partial update of profile fields (username, phone, avatar_url)."""
+    collection = get_profiles_collection()
+    updates = data.model_dump(exclude_none=True)
+    if not updates:
+        return get_profile_by_user_id(user_id)
+
+    updates["updated_at"] = datetime.now(timezone.utc)
+    result = collection.update_one({"user_id": user_id}, {"$set": updates})
+    if result.matched_count == 0:
+        return None
+
+    return get_profile_by_user_id(user_id)
+
+
+def update_preferences(user_id: str, data: PreferencesUpdateRequest) -> Optional[dict]:
+    """Replace preferences subdocument and regenerate embedding."""
+    collection = get_profiles_collection()
+    prefs = UserPreferences(**data.model_dump())
+    updates = {
+        "preferences": prefs.model_dump(),
+        "updated_at": datetime.now(timezone.utc),
+    }
+    result = collection.update_one({"user_id": user_id}, {"$set": updates})
+    if result.matched_count == 0:
+        return None
+
+    profile = get_profile_by_user_id(user_id)
+    if profile:
+        generate_preference_embedding(user_id, profile)
+
     return profile
 
 
