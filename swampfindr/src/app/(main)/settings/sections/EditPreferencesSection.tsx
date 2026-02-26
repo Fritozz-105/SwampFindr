@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { preferencesUpdateSchema } from "@/lib/validations/settings";
 import { settings } from "@/data/settings";
@@ -40,6 +40,12 @@ export function EditPreferencesSection({ preferences, onUpdate }: EditPreference
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  useEffect(() => {
+    if (preferences) {
+      setForm(preferences);
+    }
+  }, [preferences]);
 
   function handleChange(field: keyof UserPreferences, value: unknown) {
     setForm((prev) => ({ ...prev, [field]: value }));

@@ -10,6 +10,7 @@ type ChangePasswordSectionProps = {
 };
 
 export function ChangePasswordSection({ provider }: ChangePasswordSectionProps) {
+  const [currentPassword, setCurrentPassword] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [saving, setSaving] = useState(false);
@@ -30,6 +31,7 @@ export function ChangePasswordSection({ provider }: ChangePasswordSectionProps) 
     setSuccess("");
 
     const formData = new FormData();
+    formData.set("currentPassword", currentPassword);
     formData.set("password", password);
     formData.set("confirmPassword", confirmPassword);
 
@@ -39,6 +41,7 @@ export function ChangePasswordSection({ provider }: ChangePasswordSectionProps) 
       setError(result.error);
     } else {
       setSuccess(settings.messages.passwordUpdated);
+      setCurrentPassword("");
       setPassword("");
       setConfirmPassword("");
     }
@@ -47,6 +50,18 @@ export function ChangePasswordSection({ provider }: ChangePasswordSectionProps) 
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      <PasswordInput
+        id="settings-current-password"
+        name="currentPassword"
+        label="Current password"
+        placeholder="Enter current password"
+        value={currentPassword}
+        onChange={(e) => {
+          setCurrentPassword(e.target.value);
+          setSuccess("");
+        }}
+      />
+
       <div>
         <PasswordInput
           id="settings-password"
@@ -80,7 +95,7 @@ export function ChangePasswordSection({ provider }: ChangePasswordSectionProps) 
       <button
         type="button"
         className="btn-primary"
-        disabled={saving || !password || !confirmPassword}
+        disabled={saving || !currentPassword || !password || !confirmPassword}
         onClick={handleSubmit}
         style={{ alignSelf: "flex-start", width: "auto", padding: "10px 24px" }}
       >

@@ -124,10 +124,9 @@ export default function SignupPage() {
             )}
           </div>
 
-          <FormField
+          <PasswordInput
             id="confirmPassword"
             name="confirmPassword"
-            type="password"
             label={auth.labels.confirmPassword}
             placeholder={auth.placeholders.confirmPassword}
             required

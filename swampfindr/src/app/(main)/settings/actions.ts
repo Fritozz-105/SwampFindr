@@ -12,6 +12,7 @@ export type SettingsActionResult = {
 
 export async function changePassword(formData: FormData): Promise<SettingsActionResult> {
   const rawData = {
+    currentPassword: formData.get("currentPassword") as string,
     password: formData.get("password") as string,
     confirmPassword: formData.get("confirmPassword") as string,
   };
@@ -22,6 +23,23 @@ export async function changePassword(formData: FormData): Promise<SettingsAction
   }
 
   const supabase = await createClient();
+
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+  if (userError || !user?.email) {
+    return { error: errors.settings.passwordUpdateFailed };
+  }
+
+  const { error: signInError } = await supabase.auth.signInWithPassword({
+    email: user.email,
+    password: parsed.data.currentPassword,
+  });
+  if (signInError) {
+    return { error: errors.settings.wrongCurrentPassword };
+  }
+
   const { error } = await supabase.auth.updateUser({ password: parsed.data.password });
 
   if (error) {

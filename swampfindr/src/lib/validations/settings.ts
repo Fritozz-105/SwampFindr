@@ -30,6 +30,7 @@ export const preferencesUpdateSchema = z
 
 export const changePasswordSchema = z
   .object({
+    currentPassword: z.string().min(1, validation.password.currentRequired),
     password: z
       .string()
       .min(8, validation.password.minLength)

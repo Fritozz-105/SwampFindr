@@ -27,6 +27,7 @@ export const errors = {
     profileUpdateFailed: "Could not update profile. Please try again.",
     preferencesUpdateFailed: "Could not update preferences. Please try again.",
     passwordUpdateFailed: "Failed to update password. Please try again.",
+    wrongCurrentPassword: "Current password is incorrect. Please try again.",
     emailUpdateFailed: "Failed to update email. Please try again.",
     avatarUploadFailed: "Could not upload photo. Please try again.",
     mfaEnrollFailed: "Could not set up 2FA. Please try again.",

@@ -9,6 +9,7 @@ export const validation = {
     lowercase: "Password must contain at least one lowercase letter",
     number: "Password must contain at least one number",
     mismatch: "Passwords do not match",
+    currentRequired: "Current password is required",
   },
   fullName: {
     minLength: "Name must be at least 2 characters",
