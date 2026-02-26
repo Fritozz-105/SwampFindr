@@ -1,5 +1,6 @@
 """Profile API endpoints."""
 import logging
+import threading
 
 from flask import request, g
 from flask_restx import Namespace, Resource, fields
@@ -84,6 +85,8 @@ class Onboarding(Resource):
     @require_auth
     def post(self):
         """Submit onboarding data, creates profile and generates embedding."""
+        if not request.json:
+            return {"success": False, "error": "Request body must be JSON"}, 400
         try:
             data = OnboardingRequest(**request.json)
         except ValidationError as e:
@@ -94,8 +97,12 @@ class Onboarding(Resource):
 
         profile = create_or_update_profile(g.user_id, data)
 
-        # Generate embedding in the background, don't block onboarding
-        generate_preference_embedding(g.user_id, profile)
+        # Generate embedding in the background so it doesn't block the response
+        threading.Thread(
+            target=generate_preference_embedding,
+            args=(g.user_id, profile),
+            daemon=True,
+        ).start()
 
         return {"success": True, "data": profile}, 201
 
@@ -117,6 +124,8 @@ class ProfileMe(Resource):
     @require_auth
     def patch(self):
         """Update profile fields (username, phone, avatar_url)."""
+        if not request.json:
+            return {"success": False, "error": "Request body must be JSON"}, 400
         try:
             data = ProfileUpdateRequest(**request.json)
         except ValidationError as e:
@@ -136,6 +145,8 @@ class ProfilePreferences(Resource):
     @require_auth
     def put(self):
         """Replace all preferences and regenerate embedding."""
+        if not request.json:
+            return {"success": False, "error": "Request body must be JSON"}, 400
         try:
             data = PreferencesUpdateRequest(**request.json)
         except ValidationError as e:

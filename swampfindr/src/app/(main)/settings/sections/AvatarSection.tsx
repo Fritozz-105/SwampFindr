@@ -10,6 +10,11 @@ import { Alert } from "@/components/ui";
 const API_URL = process.env.NEXT_PUBLIC_FLASK_API_URL ?? "http://localhost:5000";
 const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
 const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const MIME_TO_EXT: Record<string, string> = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+};
 
 type AvatarSectionProps = {
   username: string;
@@ -53,7 +58,7 @@ export function AvatarSection({ username, avatarUrl, onUpdate }: AvatarSectionPr
         return;
       }
 
-      const ext = file.name.split(".").pop();
+      const ext = MIME_TO_EXT[file.type] ?? "jpg";
       const path = `${user.id}/${Date.now()}.${ext}`;
 
       const { error: uploadErr } = await supabase.storage

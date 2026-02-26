@@ -22,7 +22,6 @@ def get_mongo_client() -> MongoClient:
         
         _mongo_client = MongoClient(
             mongo_uri,
-            tlsAllowInvalidCertificates=True,
             serverSelectionTimeoutMS=10000
         )
     return _mongo_client
@@ -69,6 +68,8 @@ def init_db(app):
             # Test connection
             client.admin.command('ping')
             app.logger.info("✓ Connected to MongoDB Atlas")
+            # Ensure index on user_id for fast profile lookups
+            get_profiles_collection().create_index("user_id", unique=True, background=True)
         except Exception as e:
             app.logger.error(f"MongoDB connection failed: {e}")
             raise

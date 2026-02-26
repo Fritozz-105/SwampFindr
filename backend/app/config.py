@@ -1,13 +1,15 @@
 """Application configuration."""
 import os
-from datetime import timedelta
+
+
+_DEFAULT_SECRET = 'dev-secret-key-change-in-production'
 
 
 class Config:
     """Base configuration."""
     
     # Flask Config
-    SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
+    SECRET_KEY = os.getenv('SECRET_KEY', _DEFAULT_SECRET)
     DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
     
     # API Config
