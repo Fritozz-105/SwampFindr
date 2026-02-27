@@ -19,10 +19,9 @@ def get_mongo_client() -> MongoClient:
         mongo_uri = os.getenv('URI')
         if not mongo_uri:
             raise ValueError("URI environment variable not set")
-        
+
         _mongo_client = MongoClient(
             mongo_uri,
-            tlsAllowInvalidCertificates=True,
             serverSelectionTimeoutMS=10000
         )
     return _mongo_client
@@ -69,6 +68,9 @@ def init_db(app):
             # Test connection
             client.admin.command('ping')
             app.logger.info("✓ Connected to MongoDB Atlas")
+            # Ensure unique index on Profiles.user_id
+            get_profiles_collection().create_index("user_id", unique=True, background=True)
+            app.logger.info("✓ Ensured unique index on Profiles.user_id")
         except Exception as e:
             app.logger.error(f"MongoDB connection failed: {e}")
             raise

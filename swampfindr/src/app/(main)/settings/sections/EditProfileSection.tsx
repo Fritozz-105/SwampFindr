@@ -55,6 +55,12 @@ export function EditProfileSection({ username, phone, onUpdate }: EditProfileSec
         data: { session },
       } = await supabase.auth.getSession();
 
+      if (!session?.access_token) {
+        setError("Session expired. Please log in again.");
+        setSaving(false);
+        return;
+      }
+
       const res = await fetch(`${API_URL}/api/v1/profiles/me`, {
         method: "PATCH",
         headers: {

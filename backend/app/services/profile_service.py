@@ -1,5 +1,6 @@
 """Profile service — CRUD and preference embedding generation."""
 import logging
+import threading
 from datetime import datetime, timezone
 from typing import Optional
 
@@ -93,7 +94,11 @@ def update_preferences(user_id: str, data: PreferencesUpdateRequest) -> Optional
 
     profile = get_profile_by_user_id(user_id)
     if profile:
-        generate_preference_embedding(user_id, profile)
+        threading.Thread(
+            target=generate_preference_embedding,
+            args=(user_id, profile),
+            daemon=True,
+        ).start()
 
     return profile
 
@@ -130,8 +135,13 @@ def generate_preference_embedding(user_id: str, profile: dict) -> Optional[str]:
             parts.append(f"Additional notes: {excerpt}")
 
         chunk_text = " ".join(parts)
-        record_id = upsert_record(chunk_text, category="user_preference", ns="user-preferences")
+        record_id = upsert_record(chunk_text, category="user_preference", ns="user-preferences", user_id=user_id)
         logger.info("Created preference embedding %s for user %s", record_id, user_id)
+
+        get_profiles_collection().update_one(
+            {"user_id": user_id},
+            {"$set": {"pinecone_record_id": record_id}},
+        )
 
         return record_id
     except Exception:
