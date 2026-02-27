@@ -22,6 +22,7 @@ export default function UpdatePasswordPage() {
             fontSize: 28,
             fontWeight: 700,
             color: "var(--color-text)",
+            letterSpacing: "-0.02em",
             marginBottom: 8,
           }}
         >
@@ -58,9 +59,7 @@ export default function UpdatePasswordPage() {
             </Alert>
           )}
 
-          <SubmitButton isPending={isPending}>
-            {auth.updatePassword.submitLabel}
-          </SubmitButton>
+          <SubmitButton isPending={isPending}>{auth.updatePassword.submitLabel}</SubmitButton>
         </div>
       </form>
 
@@ -76,7 +75,7 @@ export default function UpdatePasswordPage() {
           href="/auth/login"
           style={{
             color: "var(--color-primary)",
-            fontWeight: 600,
+            fontWeight: 500,
             textDecoration: "none",
           }}
         >

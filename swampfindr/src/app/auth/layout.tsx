@@ -3,11 +3,7 @@ import Link from "next/link";
 import { branding } from "@/data/branding";
 import { auth } from "@/data/auth";
 
-export default function AuthLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div style={{ display: "flex", minHeight: "100vh" }}>
       {/* Left — branding panel (hidden on mobile) */}
@@ -22,15 +18,13 @@ export default function AuthLayout({
           priority
           style={{
             objectFit: "cover",
-            filter: "blur(6px)",
-            transform: "scale(1.08)",
           }}
         />
         <div
           style={{
             position: "absolute",
             inset: 0,
-            background: "rgba(10, 8, 28, 0.6)",
+            background: "rgba(0, 0, 0, 0.55)",
           }}
         />
 
@@ -49,8 +43,8 @@ export default function AuthLayout({
             <span
               style={{
                 fontFamily: "var(--font-display)",
-                fontWeight: 800,
-                fontSize: 20,
+                fontWeight: 700,
+                fontSize: 18,
                 color: "white",
                 letterSpacing: "-0.02em",
               }}
@@ -63,10 +57,10 @@ export default function AuthLayout({
             <p
               style={{
                 fontSize: 11,
-                fontWeight: 600,
-                letterSpacing: "0.12em",
+                fontWeight: 500,
+                letterSpacing: "0.1em",
                 textTransform: "uppercase",
-                color: "rgba(255,255,255,0.45)",
+                color: "rgba(255,255,255,0.5)",
                 marginBottom: 18,
               }}
             >
@@ -76,18 +70,17 @@ export default function AuthLayout({
               style={{
                 fontFamily: "var(--font-display)",
                 fontSize: "clamp(28px, 3vw, 40px)",
-                fontWeight: 800,
+                fontWeight: 700,
                 color: "white",
                 lineHeight: 1.12,
+                letterSpacing: "-0.02em",
                 marginBottom: 16,
               }}
             >
               {branding.heading}{" "}
               <span
                 style={{
-                  background: "var(--gradient-primary)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
+                  color: "var(--color-accent)",
                 }}
               >
                 {branding.highlightWord}
@@ -96,8 +89,8 @@ export default function AuthLayout({
             <p
               style={{
                 fontSize: 15,
-                color: "rgba(255,255,255,0.58)",
-                lineHeight: 1.65,
+                color: "rgba(255,255,255,0.6)",
+                lineHeight: 1.6,
                 maxWidth: 300,
               }}
             >
@@ -105,7 +98,7 @@ export default function AuthLayout({
             </p>
           </div>
 
-          <p style={{ fontSize: 13, color: "rgba(255,255,255,0.28)" }}>
+          <p style={{ fontSize: 12, color: "rgba(255,255,255,0.3)" }}>
             {branding.copyright(new Date().getFullYear())}
           </p>
         </div>
@@ -118,14 +111,12 @@ export default function AuthLayout({
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "#ffffff",
+          background: "var(--color-surface)",
           padding: "40px 24px",
           overflowY: "auto",
         }}
       >
-        <div style={{ width: "100%", maxWidth: 400 }}>
-          {children}
-        </div>
+        <div style={{ width: "100%", maxWidth: 400 }}>{children}</div>
       </div>
     </div>
   );
