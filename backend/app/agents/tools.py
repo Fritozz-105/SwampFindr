@@ -6,45 +6,60 @@ import pandas as pd
 import numpy as np
 
 
+_bus_stops_df = pd.read_csv('gnv-bus-stops.csv')  # load once
+
+
 def get_tools():
     """Return a list of all the tools available"""
     return [semantic_search, closest_bus_stops]
 
 
 @tool
-def closest_bus_stops(lat: float, lng: float, radius_m: float = 1000):
+def closest_bus_stops(lat: float, lng: float, radius_m: float = 1000) -> dict:
     """
     Find all bus stops within a given radius of a location.
-    Arguments:
-        lat (float): Latitude of the target location
-        lng (longitude): Longitude of the target location
-        radius_m (float): Search radius in meters (default 1000m)
-
+    Args:
+        lat: Latitude of the target location
+        lng: Longitude of the target location
+        radius_m: Search radius in meters (default 1000m)
     Returns:
-        Tuple of:
-        JSON: Nearby bus stops
-        int: amount of nearest bus stops
+        Dict with 'stops' (list of nearby bus stops) and 'count' (number of stops found)
     """
-    df = pd.read_csv('gnv-bus-stops.csv')
-    R = 6_371_000  # Earth's radius in meters
+    df = _bus_stops_df.copy()
+    R = 6_371_000
 
-    lat1 = np.radians(lat)
-    lat2 = np.radians(df['stop_lat'])
-    dlat = np.radians(df['stop_lat'] - lat)
+    lat1_rad = np.radians(lat)
+    lat2_rad = np.radians(df['stop_lat'])
+    dlat = lat2_rad - lat1_rad
     dlng = np.radians(df['stop_lon'] - lng)
 
-    a = np.sin(dlat / 2) ** 2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlng / 2) ** 2
+    a = np.sin(dlat / 2) ** 2 + np.cos(lat1_rad) * np.cos(lat2_rad) * np.sin(dlng / 2) ** 2
     df['distance_m'] = R * 2 * np.arcsin(np.sqrt(a))
 
     results_df = df[df['distance_m'] <= radius_m].sort_values('distance_m').reset_index(drop=True)
-    results_json = results_df.to_json(orient='records')
 
-    return results_json, len(results_df)
+    if results_df.empty:
+        return {"stops": [], "count": 0, "message": "No bus stops found within the given radius"}
+
+    return {
+        "stops": json.loads(results_df.to_json(orient='records')),
+        "count": len(results_df)
+    }
 
 
 @tool
 def semantic_search(query: str):
-    """Semantic search for relevant apartments in the vector database"""
+    """
+    Find k=3 matching vectors from the database that align with the query vector.
+    Arguments:
+        query (str): The query vector
+    Returns:
+        List of:
+        {"id" : id of vector hit
+        "text" : text of vector hit
+        "category" : category of vector hit
+        "score" : score of vector hit}
+    """
     results = query_records(
         query_text = query,
         ns="main",
