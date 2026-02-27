@@ -14,19 +14,20 @@ pc = Pinecone(api_key=PINECONE_API_KEY)
 idx = pc.Index(INDEX_NAME)
 
 
-def upsert_record(chunk_text, category, ns='main'):
-    random_id = str(uuid.uuid4())
+def upsert_record(chunk_text, category, ns='main', user_id=None):
+    record_id = f"user-{user_id}" if user_id else str(uuid.uuid4())
     idx.upsert_records(
         ns,
         [
             {
-                "_id": random_id,
+                "_id": record_id,
                 "chunk_text": chunk_text,
                 "category": category,
+                **({"user_id": user_id} if user_id else {}),
             }
         ]
     )
-    return random_id
+    return record_id
 
 
 def query_records(query_text, ns, top_k=3):

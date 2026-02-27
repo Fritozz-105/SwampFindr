@@ -1,9 +1,10 @@
 """All tools for the agent"""
 import json
-from langchain_core.tools import tool
-from backend.app.services.pinecone_service import query_records
 import pandas as pd
 import numpy as np
+
+from langchain_core.tools import tool
+from app.services.pinecone_service import query_records
 
 
 _bus_stops_df = pd.read_csv('gnv-bus-stops.csv')  # load once

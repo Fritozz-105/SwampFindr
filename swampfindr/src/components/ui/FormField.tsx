@@ -6,6 +6,9 @@ type FormFieldProps = {
   placeholder?: string;
   required?: boolean;
   "aria-describedby"?: string;
+  value?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  error?: string;
 };
 
 export function FormField({
@@ -16,6 +19,9 @@ export function FormField({
   placeholder,
   required,
   "aria-describedby": ariaDescribedby,
+  value,
+  onChange,
+  error,
 }: FormFieldProps) {
   return (
     <div>
@@ -23,10 +29,10 @@ export function FormField({
         htmlFor={id}
         style={{
           display: "block",
-          fontSize: 14,
+          fontSize: 13,
           fontWeight: 500,
-          color: "var(--color-text)",
-          marginBottom: 6,
+          color: "var(--color-text-secondary)",
+          marginBottom: 4,
         }}
       >
         {label}
@@ -39,7 +45,9 @@ export function FormField({
         placeholder={placeholder}
         required={required}
         aria-describedby={ariaDescribedby}
+        {...(value !== undefined ? { value, onChange } : {})}
       />
+      {error && <p style={{ color: "var(--color-error)", fontSize: 13, marginTop: 4 }}>{error}</p>}
     </div>
   );
 }

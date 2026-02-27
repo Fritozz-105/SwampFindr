@@ -12,9 +12,9 @@ export function FormDivider({ text = "or continue with email" }: FormDividerProp
         margin: "24px 0",
       }}
     >
-      <div style={{ flex: 1, height: 1, background: "#e8e8e8" }} />
-      <span style={{ fontSize: 13, color: "#aaa" }}>{text}</span>
-      <div style={{ flex: 1, height: 1, background: "#e8e8e8" }} />
+      <div style={{ flex: 1, height: 1, background: "var(--color-border)" }} />
+      <span style={{ fontSize: 13, color: "var(--color-text-muted)" }}>{text}</span>
+      <div style={{ flex: 1, height: 1, background: "var(--color-border)" }} />
     </div>
   );
 }
