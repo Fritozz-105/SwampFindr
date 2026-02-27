@@ -4,6 +4,7 @@ import os
 from dotenv import load_dotenv
 from backend.app.agents.prompts import SYSTEM_PROMPT
 from backend.app.agents.tools import get_tools as tools
+from langgraph.checkpoint.memory import InMemorySaver
 
 
 load_dotenv()
@@ -22,12 +23,17 @@ agent = create_agent(
     model,
     tools=tools(),
     system_prompt=SYSTEM_PROMPT,
+    checkpointer = InMemorySaver(), # replace with prod db
 )
 
 
-def run_agent(user_query: str) -> dict:
+def run_agent(user_query: str, thread_id: str = "default") -> dict:
+    config = {"configurable": {"thread_id": thread_id}}
+
     response = agent.invoke(
-        {"messages": [{"role": "user", "content": user_query}]}
+        {"messages": [{"role": "user", "content": user_query}]},
+        config=config
     )
+
     return {"response": response["messages"][-1].content}
 
