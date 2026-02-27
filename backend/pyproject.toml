@@ -14,8 +14,11 @@ dependencies = [
     "pymongo>=4.16.0",
     "pydantic>=2.12.5",
     "langchain>=1.2.10",
+    "langchain-openai>=0.3.0",
     "langchain-ollama>=1.0.1",
+    "pinecone>=5.0.0",
     "certifi>=2026.1.4",
+    "PyJWT[crypto]>=2.8.0",
 ]
 
 [project.optional-dependencies]

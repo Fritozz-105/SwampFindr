@@ -43,6 +43,7 @@ export default function SignupPage() {
             fontSize: 26,
             fontWeight: 700,
             color: "var(--color-text)",
+            letterSpacing: "-0.02em",
             marginBottom: 6,
           }}
         >
@@ -54,7 +55,7 @@ export default function SignupPage() {
             href="/auth/login"
             style={{
               color: "var(--color-primary)",
-              fontWeight: 600,
+              fontWeight: 500,
               textDecoration: "none",
             }}
           >
@@ -112,7 +113,7 @@ export default function SignupPage() {
                   marginTop: 6,
                   paddingLeft: 16,
                   fontSize: 13,
-                  color: "var(--color-accent)",
+                  color: "var(--color-error)",
                   listStyle: "disc",
                 }}
               >
@@ -123,22 +124,17 @@ export default function SignupPage() {
             )}
           </div>
 
-          <FormField
+          <PasswordInput
             id="confirmPassword"
             name="confirmPassword"
-            type="password"
             label={auth.labels.confirmPassword}
             placeholder={auth.placeholders.confirmPassword}
             required
           />
 
-          {state.error && (
-            <Alert variant="error">{state.error}</Alert>
-          )}
+          {state.error && <Alert variant="error">{state.error}</Alert>}
 
-          <SubmitButton isPending={isPending}>
-            {auth.signup.submitLabel}
-          </SubmitButton>
+          <SubmitButton isPending={isPending}>{auth.signup.submitLabel}</SubmitButton>
         </div>
       </form>
     </div>

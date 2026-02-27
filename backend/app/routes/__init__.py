@@ -1,9 +1,10 @@
 """API routes initialization."""
 from flask import Blueprint
 from flask_restx import Api
-from backend.app.routes.api import api as api_namespace
-from backend.app.routes.agent import agent
-from backend.app.routes.vectordb import vectordb
+from app.routes.api import api as api_namespace
+from app.routes.agent import agent
+from app.routes.vectordb import vectordb
+from app.routes.profiles import profiles
 
 
 # Create main blueprint
@@ -15,13 +16,22 @@ api = Api(
     title='SwampFindr API',
     version='1.0',
     description='REST API for SwampFindr - Agent-based apartment search application',
-    doc='/docs'
+    doc='/docs',
+    authorizations={
+        'Bearer': {
+            'type': 'apiKey',
+            'in': 'header',
+            'name': 'Authorization',
+            'description': 'Enter: Bearer <your_supabase_token>',
+        }
+    },
 )
 
 # Add namespaces
 api.add_namespace(api_namespace, path='/listings')
 api.add_namespace(agent, path="/chat")
 api.add_namespace(vectordb, path="/pinecone")
+api.add_namespace(profiles, path="/profiles")
 
 
 def register_blueprints(app):

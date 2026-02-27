@@ -2,14 +2,16 @@
 import os
 from datetime import timedelta
 
+_DEFAULT_SECRET = 'dev-secret-key-change-in-production'
+
 
 class Config:
     """Base configuration."""
-    
+
     # Flask Config
-    SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
+    SECRET_KEY = os.getenv('SECRET_KEY', _DEFAULT_SECRET)
     DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
-    
+
     # API Config
     API_TITLE = 'SwampFindr API'
     API_VERSION = 'v1'
@@ -17,13 +19,12 @@ class Config:
     OPENAPI_URL_PREFIX = '/api'
     OPENAPI_SWAGGER_UI_PATH = '/docs'
     OPENAPI_SWAGGER_UI_URL = 'https://cdn.jsdelivr.net/npm/swagger-ui-dist/'
-    
+
     # CORS Config
     CORS_HEADERS = 'Content-Type'
-    
-    # Database Config (if needed later)
-    
-    # JWT Config (if needed later)
+
+    # Supabase JWT Config
+    SUPABASE_JWT_SECRET = os.getenv('SUPABASE_JWT_SECRET', '')
 
 
 class DevelopmentConfig(Config):

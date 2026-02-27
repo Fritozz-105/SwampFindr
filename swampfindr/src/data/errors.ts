@@ -19,4 +19,20 @@ export const errors = {
   callback: {
     authFailed: "Could not authenticate. Please try again.",
   },
+  onboarding: {
+    submitFailed: "Could not save your profile. Please try again.",
+    networkError: "Could not connect to the server. Please try again later.",
+  },
+  settings: {
+    profileUpdateFailed: "Could not update profile. Please try again.",
+    preferencesUpdateFailed: "Could not update preferences. Please try again.",
+    passwordUpdateFailed: "Failed to update password. Please try again.",
+    wrongCurrentPassword: "Current password is incorrect. Please try again.",
+    emailUpdateFailed: "Failed to update email. Please try again.",
+    avatarUploadFailed: "Could not upload photo. Please try again.",
+    mfaEnrollFailed: "Could not set up 2FA. Please try again.",
+    mfaVerifyFailed: "Invalid code. Please try again.",
+    mfaUnenrollFailed: "Could not disable 2FA. Please try again.",
+    networkError: "Could not connect to the server. Please try again later.",
+  },
 } as const;
