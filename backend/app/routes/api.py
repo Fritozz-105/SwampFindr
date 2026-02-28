@@ -1,9 +1,9 @@
 """API endpoints for listings."""
 from flask import request, jsonify
 from flask_restx import Namespace, Resource, fields
-from app.models import ListingModel, UnitModel
-from app.utils.pydantic_to_restx import pydantic_to_restx_model
-from app.database import get_listings_collection, get_units_collection
+from backend.app.models import ListingModel, UnitModel
+from backend.app.utils.pydantic_to_restx import pydantic_to_restx_model
+from backend.app.database import get_listings_collection, get_units_collection
 
 api = Namespace('listings', description='Apartment listings operations')
 

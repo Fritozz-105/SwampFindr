@@ -5,9 +5,10 @@ import numpy as np
 
 from langchain_core.tools import tool
 from backend.app.services.pinecone_service import query_records
+from pathlib import Path
 
 
-_bus_stops_df = pd.read_csv('gnv-bus-stops.csv')  # load once
+_bus_stops_df = pd.read_csv(Path(__file__).parent / 'gnv-bus-stops.csv')
 
 
 def get_tools():
@@ -30,9 +31,9 @@ def closest_bus_stops(lat: float, lng: float, radius_m: float = 1000) -> dict:
     R = 6_371_000
 
     lat1_rad = np.radians(lat)
-    lat2_rad = np.radians(df['stop_lat'])
+    lat2_rad = np.radians(df['Latitude'])
     dlat = lat2_rad - lat1_rad
-    dlng = np.radians(df['stop_lon'] - lng)
+    dlng = np.radians(df['Longitude'] - lng)
 
     a = np.sin(dlat / 2) ** 2 + np.cos(lat1_rad) * np.cos(lat2_rad) * np.sin(dlng / 2) ** 2
     df['distance_m'] = R * 2 * np.arcsin(np.sqrt(a))

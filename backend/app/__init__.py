@@ -1,9 +1,9 @@
 """Flask application factory."""
 from flask import Flask
 from flask_cors import CORS
-from app.config import Config, _DEFAULT_SECRET
-from app.routes import register_blueprints
-from app.database import init_db, close_db
+from backend.app.config import Config, _DEFAULT_SECRET
+from backend.app.routes import register_blueprints
+from backend.app.database import init_db, close_db
 import atexit
 
 
