@@ -1,6 +1,6 @@
 from flask import request, jsonify
 from flask_restx import Namespace, Resource, fields
-from app.agents.agent import run_agent
+from backend.app.agents.agent import run_agent
 
 agent = Namespace('agent', description='Agent-based apartment search operations')
 

@@ -1,10 +1,10 @@
 """API routes initialization."""
 from flask import Blueprint
 from flask_restx import Api
-from app.routes.api import api as api_namespace
-from app.routes.agent import agent
-from app.routes.vectordb import vectordb
-from app.routes.profiles import profiles
+from backend.app.routes.api import api as api_namespace
+from backend.app.routes.agent import agent
+from backend.app.routes.vectordb import vectordb
+from backend.app.routes.profiles import profiles
 
 
 # Create main blueprint

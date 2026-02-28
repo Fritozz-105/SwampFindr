@@ -4,15 +4,15 @@ import threading
 from datetime import datetime, timezone
 from typing import Optional
 
-from app.database import get_profiles_collection
-from app.models.profile import (
+from backend.app.database import get_profiles_collection
+from backend.app.models.profile import (
     ProfileModel,
     UserPreferences,
     OnboardingRequest,
     ProfileUpdateRequest,
     PreferencesUpdateRequest,
 )
-from app.services.pinecone_service import upsert_record
+from backend.app.services.pinecone_service import upsert_record
 
 logger = logging.getLogger(__name__)
 
