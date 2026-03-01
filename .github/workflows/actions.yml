@@ -1,0 +1,36 @@
+name: run listings.py
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Runs every day at midnight
+
+  jobs:
+    build:
+      runs-on: ubuntu-latest
+
+      steps:
+        - name: checkout repo content
+          uses: actions/checkout@v2
+        
+        - name: set up Python 3.11
+          uses: actions/setup-python@v6
+          with:
+            python-version: 3.11
+        - name: install dependencies
+          run: |
+            python -m pip install --upgrade pip
+            pip install -r backend/requirements.txt
+        - name: run listings.py
+          env:
+            RAPIDAPI_KEY: ${{ secrets.RAPIDAPI_KEY }}
+          run: |
+            git config --local user.email "kausthubhkonuru@gmail.com"
+            git config --local user.name "KKonuru"
+            git add -A 
+            git diff-index --quiet HEAD || (git commit -a -m "updated listings" --allow-empty)
+       
+        - name: push changes
+          uses: ad-m/github-push-action@v0.6.0
+          with:
+            github_token: ${{ secrets.GITHUB_TOKEN }}
+            branch: main
