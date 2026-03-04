@@ -5,7 +5,9 @@ import numpy as np
 
 from langchain_core.tools import tool
 from backend.app.services.pinecone_service import query_records
-from backend.app.services.profile_service import PreferencesUpdateRequest, update_preferences
+from backend.app.services.profile_service import PreferencesUpdateRequest, update_preferences, get_profile_by_user_id
+from backend.app.database import get_listings_collection, get_units_collection
+
 from pathlib import Path
 
 
@@ -14,7 +16,7 @@ _bus_stops_df = pd.read_csv(Path(__file__).parent / 'gnv-bus-stops.csv')
 
 def get_tools():
     """Return a list of all the tools available"""
-    return [semantic_search, closest_bus_stops, update_preference_embedding]
+    return [semantic_search, closest_bus_stops, update_preference_embedding, swipe_on_listing]
 
 @tool 
 def update_preference_embedding(
@@ -65,7 +67,57 @@ def update_preference_embedding(
             "data": profile
         }
     except Exception as e:
-        return {"success": False, "error": f"Error with updating preferences | str(e)"}
+        return {"success": False, "error": f"Error with updating preferences | {str(e)}"}
+
+
+@tool
+def swipe_on_listing(user_id: str, listing_id: str, action: str) -> dict:
+    """
+    Track the user's interest via a swipe on a listing (like/dislike/pass)
+    This tool should be called when the user reacts to an apartment and it updates the excerpt in the embedding
+    Args:
+        user_id: The user's identification key
+        listing_id: Listing that the user is reacting to
+        action: 'like' 'dislike' 'pass'
+    Returns:
+        Dictionary with the user's recorded action
+    """
+    if action.lower() not in ('like', 'dislike', 'pass'):
+        return {"success": False, "error": f"Error with parsing user action"}
+
+    try:
+        listings = get_listings_collection()
+        listing = listings.find_one({'listing_id': listing_id})
+        if not listing:
+            return {"success": False, "error" : "Listing not found"}
+
+        profile = get_profile_by_user_id(user_id)
+        if not profile:
+            return {"success": False, "error": "Profile not found"}
+
+        existing_prefs = profile.get('preferences', {})
+        existing_excerpt = existing_prefs.get("excerpt", "")
+
+        extension = "ed" if action == "pass" else "d"
+
+        city = listing.get("City") or listing.get("city", "")
+        beds = listing.get("beds_min", "?")
+        price = listing.get("list_price_min", "?")
+        snippet = f"User {action}{extension} a {beds}bd ~${price}/mo in {city}."
+
+        new_excerpt = f"{existing_excerpt} {snippet}"
+        new_excerpt = new_excerpt[-250:]
+
+        data = PreferencesUpdateRequest(
+            **{k: existing_prefs[k] for k in existing_prefs if k != "excerpt"},
+            excerpt=new_excerpt
+        )
+
+        update_preferences(user_id, data)
+        return {"success" : True, "excerpt": new_excerpt}
+
+    except Exception as e:
+        return {"success": False, "error": str(e)}
 
 
 @tool
