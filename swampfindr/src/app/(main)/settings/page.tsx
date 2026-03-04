@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { settings } from "@/data/settings";
 import { SettingsForm } from "./SettingsForm";
 
-const FLASK_API_URL = process.env.FLASK_API_URL ?? "http://localhost:5000";
+const FLASK_API_URL = process.env.FLASK_API_URL ?? "http://localhost:8080";
 
 export default async function SettingsPage() {
   const supabase = await createClient();

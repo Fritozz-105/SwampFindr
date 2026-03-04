@@ -1,6 +1,6 @@
 from flask import request
 from flask_restx import Namespace, Resource, fields
-from backend.app.services.pinecone_service import upsert_record, query_records
+from app.services.pinecone_service import upsert_record, query_records
 
 
 vectordb = Namespace("vectordb", description="Pinecone API")

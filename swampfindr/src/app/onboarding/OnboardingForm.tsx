@@ -135,7 +135,7 @@ export function OnboardingForm() {
         return;
       }
 
-      const apiUrl = process.env.NEXT_PUBLIC_FLASK_API_URL ?? "http://localhost:5000";
+      const apiUrl = process.env.NEXT_PUBLIC_FLASK_API_URL ?? "http://localhost:8080";
       const res = await fetch(`${apiUrl}/api/v1/profiles/onboarding`, {
         method: "POST",
         headers: {

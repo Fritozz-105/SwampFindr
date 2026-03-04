@@ -4,9 +4,9 @@ import pandas as pd
 import numpy as np
 
 from langchain_core.tools import tool
-from backend.app.services.pinecone_service import query_records
-from backend.app.services.profile_service import PreferencesUpdateRequest, update_preferences, get_profile_by_user_id
-from backend.app.database import get_listings_collection, get_units_collection
+from app.services.pinecone_service import query_records
+from app.services.profile_service import PreferencesUpdateRequest, update_preferences, get_profile_by_user_id
+from app.database import get_listings_collection, get_units_collection
 
 from pathlib import Path
 
