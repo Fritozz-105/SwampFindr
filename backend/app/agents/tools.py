@@ -5,6 +5,7 @@ import numpy as np
 
 from langchain_core.tools import tool
 from backend.app.services.pinecone_service import query_records
+from backend.app.services.profile_service import PreferencesUpdateRequest, update_preferences
 from pathlib import Path
 
 
@@ -13,7 +14,58 @@ _bus_stops_df = pd.read_csv(Path(__file__).parent / 'gnv-bus-stops.csv')
 
 def get_tools():
     """Return a list of all the tools available"""
-    return [semantic_search, closest_bus_stops]
+    return [semantic_search, closest_bus_stops, update_preference_embedding]
+
+@tool 
+def update_preference_embedding(
+        user_id: str,
+        bedrooms: int = 1,
+        bathrooms: int = 1,
+        price_min: int = 500,
+        price_max: int = 1800,
+        distance_from_campus: str = "any",
+        roommates: int = 0,
+        amenities: list[str] = [],
+        excerpt: str = ""
+)-> dict:
+    """Update the user's housing preferences and recompile their preferences embedding.
+    This should be called when the user implicitly or directly expresses a change in interest
+    Args:
+        user_id: User ID
+        bedrooms: Number of bedrooms in each apartment
+        bathrooms: Number of bathrooms in each apartment
+        price_min: Minimum price in each apartment
+        price_max: Maximum price in each apartment
+        distance_from_campus: Preferred distance from UF campus
+        roommates: Number of roommates in each apartment
+        amenities: Amenities in each apartment
+        excerpt: Any additional notes to be embedded
+    Returns:
+        Dict with 'success' and updated profile data or either an 'error'
+    """
+    try:
+        data = PreferencesUpdateRequest(
+            bedrooms=bedrooms,
+            bathrooms=bathrooms,
+            price_min=price_min,
+            price_max=price_max,
+            distance_from_campus=distance_from_campus,
+            roommates=roommates,
+            amenities=amenities,
+            excerpt=excerpt,
+        )
+        profile = update_preferences(user_id, data)
+        if not profile:
+            return {
+                "success": False,
+                "error": "Profile was not found"
+            }
+        return {
+            "success": True,
+            "data": profile
+        }
+    except Exception as e:
+        return {"success": False, "error": f"Error with updating preferences | str(e)"}
 
 
 @tool
