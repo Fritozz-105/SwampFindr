@@ -1,5 +1,5 @@
 """Database package initialization."""
-from backend.app.database.mongo import (
+from app.database.mongo import (
     get_db,
     get_listings_collection,
     get_units_collection,

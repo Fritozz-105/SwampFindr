@@ -7,7 +7,7 @@ import { settings } from "@/data/settings";
 import { errors } from "@/data/errors";
 import { FormField, Alert } from "@/components/ui";
 
-const API_URL = process.env.NEXT_PUBLIC_FLASK_API_URL ?? "http://localhost:5000";
+const API_URL = process.env.NEXT_PUBLIC_FLASK_API_URL ?? "http://localhost:8080";
 
 type EditProfileSectionProps = {
   username: string;

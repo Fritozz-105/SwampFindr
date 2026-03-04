@@ -16,7 +16,7 @@ import {
 } from "@/components/ui";
 import type { UserPreferences } from "@/types/profile";
 
-const API_URL = process.env.NEXT_PUBLIC_FLASK_API_URL ?? "http://localhost:5000";
+const API_URL = process.env.NEXT_PUBLIC_FLASK_API_URL ?? "http://localhost:8080";
 
 type EditPreferencesSectionProps = {
   preferences: UserPreferences | null;

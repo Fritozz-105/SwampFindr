@@ -7,7 +7,7 @@ import { settings } from "@/data/settings";
 import { errors } from "@/data/errors";
 import { Alert } from "@/components/ui";
 
-const API_URL = process.env.NEXT_PUBLIC_FLASK_API_URL ?? "http://localhost:5000";
+const API_URL = process.env.NEXT_PUBLIC_FLASK_API_URL ?? "http://localhost:8080";
 const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
 const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 

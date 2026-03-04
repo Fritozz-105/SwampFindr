@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { errors } from "@/data/errors";
 
-const FLASK_API_URL = process.env.FLASK_API_URL ?? "http://localhost:5000";
+const FLASK_API_URL = process.env.FLASK_API_URL ?? "http://localhost:8080";
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
