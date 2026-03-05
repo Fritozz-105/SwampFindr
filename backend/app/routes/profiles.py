@@ -6,13 +6,13 @@ from flask import request, g
 from flask_restx import Namespace, Resource, fields
 from pydantic import ValidationError
 
-from backend.app.auth import require_auth
-from backend.app.models.profile import (
+from app.auth import require_auth
+from app.models.profile import (
     OnboardingRequest,
     ProfileUpdateRequest,
     PreferencesUpdateRequest,
 )
-from backend.app.services.profile_service import (
+from app.services.profile_service import (
     create_or_update_profile,
     get_profile_by_user_id,
     generate_preference_embedding,

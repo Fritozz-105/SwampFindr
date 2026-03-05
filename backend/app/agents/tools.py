@@ -4,9 +4,9 @@ import pandas as pd
 import numpy as np
 
 from langchain_core.tools import tool
-from backend.app.services.pinecone_service import query_records
-from backend.app.services.profile_service import PreferencesUpdateRequest, update_preferences, get_profile_by_user_id
-from backend.app.database import get_listings_collection, get_units_collection
+from app.services.pinecone_service import query_records
+from app.services.profile_service import PreferencesUpdateRequest, update_preferences, get_profile_by_user_id
+from app.database import get_listings_collection, get_units_collection
 
 from pathlib import Path
 
@@ -17,6 +17,7 @@ _bus_stops_df = pd.read_csv(Path(__file__).parent / 'gnv-bus-stops.csv')
 def get_tools():
     """Return a list of all the tools available"""
     return [semantic_search, closest_bus_stops, update_preference_embedding, swipe_on_listing]
+
 
 @tool 
 def update_preference_embedding(
@@ -121,6 +122,18 @@ def swipe_on_listing(user_id: str, listing_id: str, action: str) -> dict:
 
 
 @tool
+def suggest_listing() -> dict:
+    """
+    Suggest another listing to the user, this action is ideally completed when the user swipes on a listing.
+    Args:
+        NONE
+    Returns:
+        Dictionary with the listing details to propose to the user.
+    """
+    try:
+        listings = get_listings_collection()
+
+@tool
 def closest_bus_stops(lat: float, lng: float, radius_m: float = 1000) -> dict:
     """
     Find all bus stops within a given radius of a location.
@@ -183,4 +196,3 @@ def semantic_search(query: str):
         }
         for hit in hits
     ]
-

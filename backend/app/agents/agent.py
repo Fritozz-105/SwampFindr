@@ -1,17 +1,20 @@
 from langchain.agents import create_agent
 from langchain_core.messages import HumanMessage
 from langchain_openai import ChatOpenAI
+
+from langgraph.checkpoint.memory import InMemorySaver
 import os
 from dotenv import load_dotenv
-from backend.app.agents.prompts import SYSTEM_PROMPT
-from backend.app.agents.tools import get_tools as tools
-from backend.app.agents.prompts import SYSTEM_PROMPT
-from backend.app.agents.tools import get_tools as tools
-from langgraph.checkpoint.memory import InMemorySaver
+
+from app.agents.prompts import SYSTEM_PROMPT
+from app.agents.tools import get_tools as tools
+from app.agents.prompts import SYSTEM_PROMPT
+from app.agents.tools import get_tools as tools
+
+import time
 
 
 load_dotenv()
-
 
 model = ChatOpenAI(
     model = "gpt-4o-mini",
@@ -75,16 +78,17 @@ def run_agent(user_query: str, thread_id: str = "default") -> dict:
 def run_agent_stream(user_query: str, thread_id: str = "default"):
     config = {"configurable": {"thread_id": thread_id}}
     try:
-        for chunk in agent.stream(
+        for chunk, metadata in agent.stream(
             {"messages": [HumanMessage(content=user_query)]},
             config=config,
-            stream_mode="values"
+            stream_mode="messages"
         ):
-            yield chunk["messages"][-1].content
+            if chunk.type == "AIMessageChunk" and chunk.content:
+                yield chunk.content
     except TimeoutError:
-        return {"error": "Request timed out, please try again"}
+        yield "[error: timed out]"
     except Exception as e:
-        return {"error": f"Agent error: {e}"}
+        yield f"[error: {e}]"
 
 
 if __name__ == "__main__":
@@ -96,5 +100,8 @@ if __name__ == "__main__":
             break
         if not query:
             continue
-        response = run_agent(query, thread_id=thread_id)
-        print(f"Agent: {response.get('response') or response.get('error')}\n")
+        print("Agent: ", end="", flush=True)
+        for chunk in run_agent_stream(query, thread_id=thread_id):
+            print(chunk, end="", flush=True)
+            time.sleep(0.01)
+        print("\n")
