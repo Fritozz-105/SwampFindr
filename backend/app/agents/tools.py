@@ -16,10 +16,75 @@ _bus_stops_df = pd.read_csv(Path(__file__).parent / 'gnv-bus-stops.csv')
 
 def get_tools():
     """Return a list of all the tools available"""
-    return [semantic_search, closest_bus_stops, update_preference_embedding, swipe_on_listing]
+    return [
+        semantic_search,
+        closest_bus_stops,
+        update_preference_embedding,
+        swipe_on_listing,
+        suggest_listing
+    ]
 
 
-@tool 
+@tool
+def suggest_listing(user_id: str, top_k: int = 1) -> dict:
+    """
+       Suggest apartment listings based on the user's  preferences embedding.
+       Call this when the user asks for recommendations, suggestions, or wants to find apartments.
+       Args:
+           user_id: The user's identification key
+           top_k: Number of listings to return (default 3)
+       Returns:
+           Dict with 'listings' (list of matched listings with units) or 'error'
+    """
+
+    try:
+        profile = get_profile_by_user_id(user_id)
+        if not profile:
+            return {"success": False, "error": "Profile not found"}
+
+        prefs = profile.get("preferences", {})
+
+        query = (
+            f"{prefs.get('bedrooms', 1)} bedroom apartment, "
+            f"${prefs.get('price_min', 500)}-${prefs.get('price_max', 1800)}/mo, "
+            f"distance from campus: {prefs.get('distance_from_campus', 'any')}, "
+            f"amenities: {', '.join(prefs.get('amenities', []) or [])}. "
+            f"{prefs.get('excerpt', '')}"
+        )
+
+        results = query_records(query, ns = "main", top_k=top_k)
+        hits = results.get("result", {}).get("hits", [])
+
+        if not hits:
+            return {"success": False, "error": "No results"}
+
+        listings_col = get_listings_collection()
+        units_col = get_units_collection()
+
+        listings = []
+        for hit in hits:
+            listing_id = hit["fields"].get("listing_id")
+            if not listing_id:
+                continue
+            listing = listings_col.find_one({"listing_id": listing_id})
+            if not listing:
+                continue
+
+            listing["_id"] = str(listing["_id"])
+            units = list(units_col.find({"listing_id": listing_id}))
+            for u in units:
+                u["_id"] = str(u["_id"])
+            listing["units"] = units
+            listing["match_score"] = hit["_score"]
+            listings.append(listing)
+
+            return {"success": True, "listings": listings, "count": len(listings)}
+
+    except Exception as e:
+        return {"success" :False, "error": str(e)}
+
+
+@tool
 def update_preference_embedding(
         user_id: str,
         bedrooms: int = 1,
@@ -28,7 +93,7 @@ def update_preference_embedding(
         price_max: int = 1800,
         distance_from_campus: str = "any",
         roommates: int = 0,
-        amenities: list[str] = [],
+        amenities: list[str] | None = None,
         excerpt: str = ""
 )-> dict:
     """Update the user's housing preferences and recompile their preferences embedding.
@@ -47,6 +112,7 @@ def update_preference_embedding(
         Dict with 'success' and updated profile data or either an 'error'
     """
     try:
+        amenities = amenities or []
         data = PreferencesUpdateRequest(
             bedrooms=bedrooms,
             bathrooms=bathrooms,
@@ -120,18 +186,6 @@ def swipe_on_listing(user_id: str, listing_id: str, action: str) -> dict:
     except Exception as e:
         return {"success": False, "error": str(e)}
 
-
-@tool
-def suggest_listing() -> dict:
-    """
-    Suggest another listing to the user, this action is ideally completed when the user swipes on a listing.
-    Args:
-        NONE
-    Returns:
-        Dictionary with the listing details to propose to the user.
-    """
-    try:
-        listings = get_listings_collection()
 
 @tool
 def closest_bus_stops(lat: float, lng: float, radius_m: float = 1000) -> dict:
