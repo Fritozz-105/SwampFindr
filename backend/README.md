@@ -77,8 +77,8 @@ python run.py
 ```
 
 The API will be available at:
-- **API Base URL:** `http://localhost:5000/api/v1`
-- **Swagger UI Docs:** `http://localhost:5000/api/v1/docs`
+- **API Base URL:** `http://localhost:8080/api/v1`
+- **Swagger UI Docs:** `http://localhost:8080/api/v1/docs`
 
 #### Production Mode
 
@@ -88,7 +88,7 @@ FLASK_ENV=production python run.py
 
 ## 📚 API Documentation
 
-Once the server is running, visit `http://localhost:5000/api/v1/docs` for interactive Swagger documentation.
+Once the server is running, visit `http://localhost:8080/api/v1/docs` for interactive Swagger documentation.
 
 ### Available Endpoints
 
@@ -112,7 +112,7 @@ Once the server is running, visit `http://localhost:5000/api/v1/docs` for intera
 ### Example Request
 
 ```bash
-curl http://localhost:5000/api/v1/listings/?city=Gainesville&minPrice=1000&maxPrice=2000
+curl http://localhost:8080/api/v1/listings/?city=Gainesville&minPrice=1000&maxPrice=2000
 ```
 
 ## 🧪 Testing
@@ -198,7 +198,7 @@ Copy `.env.example` to `.env` and configure:
 FLASK_ENV=development
 DEBUG=True
 SECRET_KEY=your-secret-key-here
-PORT=5000
+PORT=8080
 
 # Add database URL when ready
 # DATABASE_URL=postgresql://user:password@localhost:5432/swampfindr
