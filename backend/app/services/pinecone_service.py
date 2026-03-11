@@ -24,7 +24,7 @@ def upsert_record(chunk_text, category, ns='main', user_id=None, listing_id=None
                 "chunk_text": chunk_text,
                 "category": category,
                 **({"user_id": user_id} if user_id else {}),
-                **{{"listing_id": listing_id} if listing_id else {}},
+                **({"listing_id": listing_id} if listing_id else {}),
             }
         ]
     )
@@ -38,6 +38,6 @@ def query_records(query_text, ns, top_k=3):
             "inputs": {"text": query_text},
             "top_k": top_k
         },
-        fields=["chunk_text", "category"]
+        fields=["chunk_text", "category", "listing_id"]
     )
     return results

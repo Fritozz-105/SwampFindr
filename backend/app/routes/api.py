@@ -141,10 +141,12 @@ class Listing(Resource):
             # Get associated units
             units = list(units_collection.find({'listing_id': listing_id}))
             
-            # Convert ObjectId to string
+            # Convert ObjectId and datetime to JSON-safe types
             listing['_id'] = str(listing['_id'])
             for unit in units:
                 unit['_id'] = str(unit['_id'])
+                if hasattr(unit.get('availability'), 'isoformat'):
+                    unit['availability'] = unit['availability'].isoformat()
             
             listing['units'] = units
             
