@@ -8,7 +8,7 @@ REST API backend for SwampFindr, built with Flask and included Swagger documenta
 backend/
 ├── app/
 │   ├── __init__.py          # Flask app factory
-│   ├── config.py            # Configuration management 
+│   ├── config.py            # Configuration management
 │   ├── agents/              # Agent system code
 │   │   ├── __init__.py
 │   │   ├── prompts.py       # System prompts & templates
@@ -23,18 +23,19 @@ backend/
 │   │   └── __init__.py
 │   ├── schemas/             # Data validation schemas
 │   │   └── __init__.py
-│   └── utils/               # Helper functions. Also the mongodb setup 
+│   └── utils/               # Helper functions. Also the mongodb setup
 │       └── __init__.py
 ├── tests/                   # Test suite
 │   ├── __init__.py
 │   └── test_api.py
 ├── scripts/                 # Data Pipeline Scripts
 │   └── listings.py
-|   └── helpers.py           
+|   └── helpers.py
 ├── run.py                   # Application entry point
 ├── pyproject.toml           # UV/Python dependencies
 └── README.md                # This file
 ```
+
 ## Setup
 
 ### Prerequisites
@@ -47,11 +48,13 @@ backend/
 1. **Clone the repository** (if not already done)
 
 2. **Navigate to the backend directory:**
+
    ```bash
    cd backend
    ```
 
 3. **Install dependencies using UV:**
+
    ```bash
    uv sync
    ```
@@ -77,6 +80,7 @@ python run.py
 ```
 
 The API will be available at:
+
 - **API Base URL:** `http://localhost:8080/api/v1`
 - **Swagger UI Docs:** `http://localhost:8080/api/v1/docs`
 
@@ -85,6 +89,11 @@ The API will be available at:
 ```bash
 FLASK_ENV=production python run.py
 ```
+
+## Development
+
+When pushing your changes, also update the Heroku remote
+`git subtree push --prefix backend heroku main`
 
 ## 📚 API Documentation
 
@@ -175,6 +184,7 @@ Configuration is managed in `app/config.py` with support for multiple environmen
 - `TestingConfig` - Running tests
 
 Set the environment using the `FLASK_ENV` variable:
+
 ```bash
 export FLASK_ENV=production  # or development, testing
 ```
@@ -203,5 +213,3 @@ PORT=8080
 # Add database URL when ready
 # DATABASE_URL=postgresql://user:password@localhost:5432/swampfindr
 ```
-
-
