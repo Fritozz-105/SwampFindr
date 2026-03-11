@@ -51,10 +51,7 @@ export function SettingsForm({ user, initialProfile }: SettingsFormProps) {
       </SettingsCard>
 
       <SettingsCard title={s.preferences.title} description={s.preferences.description}>
-        <EditPreferencesSection
-          preferences={profile?.preferences ?? null}
-          onUpdate={refetch}
-        />
+        <EditPreferencesSection preferences={profile?.preferences ?? null} onUpdate={refetch} />
       </SettingsCard>
 
       <SettingsCard title={s.password.title} description={s.password.description}>
