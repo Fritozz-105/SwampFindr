@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { ProfileData } from "@/types/profile";
 
-const API_URL = process.env.NEXT_PUBLIC_FLASK_API_URL ?? "http://localhost:8080";
+const API_URL = process.env.FLASK_API_URL ?? "http://localhost:8080";
 
 export function useProfile() {
   const [profile, setProfile] = useState<ProfileData | null>(null);
