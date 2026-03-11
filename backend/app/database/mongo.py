@@ -1,5 +1,6 @@
 """MongoDB database connection and management."""
 import os
+import certifi
 from pymongo import MongoClient
 from pymongo.database import Database
 from pymongo.collection import Collection
@@ -22,7 +23,8 @@ def get_mongo_client() -> MongoClient:
 
         _mongo_client = MongoClient(
             mongo_uri,
-            serverSelectionTimeoutMS=10000
+            serverSelectionTimeoutMS=10000,
+            tlsCAFile=certifi.where()
         )
     return _mongo_client
 
