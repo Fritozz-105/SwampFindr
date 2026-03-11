@@ -1,4 +1,5 @@
 """API endpoints for listings."""
+import re
 from flask import request, jsonify
 from flask_restx import Namespace, Resource, fields
 from app.models import ListingModel, UnitModel
@@ -46,7 +47,7 @@ class ListingList(Resource):
             # Filter by city
             city = request.args.get('city')
             if city:
-                query['city'] = {'$regex': city, '$options': 'i'}
+                query['city'] = {'$regex': re.escape(city), '$options': 'i'}
             
             # Filter by minimum square footage
             sqft_min = request.args.get('sqftMin', type=int)
