@@ -1,6 +1,7 @@
 from flask import request, jsonify
 from flask_restx import Namespace, Resource, fields
 from app.agents.agent import run_agent
+from app.auth import require_auth
 
 agent = Namespace('agent', description='Agent-based apartment search operations')
 
@@ -20,6 +21,8 @@ class AgentChat(Resource):
     """Agent chat endpoint."""
     @agent.expect(query_model)
     @agent.marshal_with(response_model)
+    @agent.doc(security="Bearer")
+    @require_auth
     def post(self):
         """Handle user query and generate agent response."""
         data = request.json
