@@ -1,34 +1,50 @@
 from langchain.agents import create_agent
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
-
-from langgraph.checkpoint.memory import InMemorySaver
+from langchain_community.chat_models.litellm import ChatLiteLLM
 import os
 import httpx
 from dotenv import load_dotenv
 from app.agents.prompts import SYSTEM_PROMPT
 from app.agents.tools import get_tools as tools
-from app.agents.user_context import set_current_user_id, reset_current_user_id
-
-import time
-
+from app.database.mongo import get_mongo_client
+from langgraph.checkpoint.memory import InMemorySaver
+from langgraph.checkpoint.mongodb import MongoDBSaver
 
 load_dotenv()
 
-model = ChatOpenAI(
-    model = "gpt-4o-mini",
-    temperature = 0.1,
-    max_tokens = 512,
-    timeout=30,
-    api_key = os.getenv("OPENAI_API_KEY")
-)
+try:
+    model = ChatOpenAI(
+        model = "gpt-4o-mini",
+        temperature = 0.1,
+        max_tokens = 256,
+        timeout=30,
+        api_key = os.getenv("OPENAI_API_KEY")
+    )
+except Exception as e:
+    print(f"OpenAI initialization failed: {e}. Using Navigator AI (Llama 3.3 70B) as fallback.")
+    model = ChatLiteLLM(
+        model = "llama-3.3-70b-instruct",
+        api_key = os.getenv("NAVIGATOR_AI"),
+        api_base = os.getenv("NAVIGATOR_AI_BASE_URL"),
+        temperature = 0.1,
+        max_tokens =2048,
+    ) 
 
+try:
+    checkpointer = MongoDBSaver(
+        client=get_mongo_client(),
+        db_name="UserData",
+    )
+except Exception as e:
+    print(f"MongoDB checkpointer initialization failed: {e}. Falling back to in-memory checkpointer.")
+    checkpointer = InMemorySaver()
 
 agent = create_agent(
     model,
     tools=tools(),
     system_prompt=SYSTEM_PROMPT,
-    checkpointer = InMemorySaver(), # replace with prod db
+    checkpointer =checkpointer, 
 )
 
 

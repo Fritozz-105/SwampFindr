@@ -7,3 +7,4 @@ venv/
 env/
 .ipynb_checkpoints/
 *.log
+TODO.md
