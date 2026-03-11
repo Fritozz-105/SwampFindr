@@ -25,6 +25,7 @@ class ProfileModel(BaseModel):
     phone: str = Field(default="")
     avatar_url: Optional[str] = None
     preferences: UserPreferences = Field(default_factory=UserPreferences)
+    favorites: List[str] = Field(default_factory=list)
     onboarding_completed: bool = False
     pinecone_record_id: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))

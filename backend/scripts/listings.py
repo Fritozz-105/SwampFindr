@@ -1,6 +1,6 @@
 """Script to fetch rental listings from the RapidAPI endpoint, process the data, and store it in MongoDB."""
 from dotenv import load_dotenv
-load_dotenv() 
+load_dotenv()
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))) # Add parent directory to path
@@ -21,9 +21,9 @@ all_listings = []
 for page in range(1, 5):
     conn = http.client.HTTPSConnection("realtor16.p.rapidapi.com")
     conn.request("GET",
-                  f"/search/forrent/coordinates?latitude=29.6502711&longitude=-82.3416219&radius=15&page={page}&type=apartment", 
+                  f"/search/forrent/coordinates?latitude=29.6502711&longitude=-82.3416219&radius=15&page={page}&type=apartment,condos,townhomes",
                   headers=headers)
-    
+
     res = conn.getresponse()
     data = res.read()
     page_data = json.loads(data.decode("utf-8"))
@@ -49,7 +49,7 @@ for prop in all_listings:
 print(f"Total listings fetched: {len(all_listings)}")
 print(f"Listings with complete data: {len(mongo_listings)}")
 print(f"Units extracted: {len(mongo_units)}")
-print(f"Listings skipped due to incomplete data: {skip}") 
+print(f"Listings skipped due to incomplete data: {skip}")
 
 print("Connecting to MongoDB and inserting data...")
 try:
@@ -82,8 +82,3 @@ except Exception as e:
     listings_collection.insert_many([listing.model_dump() for listing in mongo_listings])
     units_collection.insert_many([unit.model_dump() for unit in mongo_units])
     print("Data insertion successful on retry.")
-
-
-
-
-

@@ -140,11 +140,12 @@ export function AvatarSection({ username, avatarUrl, onUpdate }: AvatarSectionPr
   }
 
   const initial = username?.charAt(0)?.toUpperCase() || "?";
+  const validAvatar = avatarUrl && (avatarUrl.startsWith("http://") || avatarUrl.startsWith("https://"));
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-        {avatarUrl ? (
+        {validAvatar ? (
           <Image src={avatarUrl} alt="Avatar" width={80} height={80} className="avatar-circle" />
         ) : (
           <div className="avatar-placeholder">{initial}</div>

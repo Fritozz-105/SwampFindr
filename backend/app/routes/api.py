@@ -1,4 +1,5 @@
 """API endpoints for listings."""
+import re
 from flask import request, jsonify
 from flask_restx import Namespace, Resource, fields
 from app.models import ListingModel, UnitModel
@@ -46,7 +47,7 @@ class ListingList(Resource):
             # Filter by city
             city = request.args.get('city')
             if city:
-                query['city'] = {'$regex': city, '$options': 'i'}
+                query['city'] = {'$regex': re.escape(city), '$options': 'i'}
             
             # Filter by minimum square footage
             sqft_min = request.args.get('sqftMin', type=int)
@@ -141,10 +142,12 @@ class Listing(Resource):
             # Get associated units
             units = list(units_collection.find({'listing_id': listing_id}))
             
-            # Convert ObjectId to string
+            # Convert ObjectId and datetime to JSON-safe types
             listing['_id'] = str(listing['_id'])
             for unit in units:
                 unit['_id'] = str(unit['_id'])
+                if hasattr(unit.get('availability'), 'isoformat'):
+                    unit['availability'] = unit['availability'].isoformat()
             
             listing['units'] = units
             

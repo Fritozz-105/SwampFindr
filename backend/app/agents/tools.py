@@ -78,7 +78,7 @@ def suggest_listing(user_id: str, top_k: int = 1) -> dict:
             listing["match_score"] = hit["_score"]
             listings.append(listing)
 
-            return {"success": True, "listings": listings, "count": len(listings)}
+        return {"success": True, "listings": listings, "count": len(listings)}
 
     except Exception as e:
         return {"success" :False, "error": str(e)}
@@ -173,7 +173,7 @@ def swipe_on_listing(user_id: str, listing_id: str, action: str) -> dict:
         snippet = f"User {action}{extension} a {beds}bd ~${price}/mo in {city}."
 
         new_excerpt = f"{existing_excerpt} {snippet}"
-        new_excerpt = new_excerpt[-250:]
+        new_excerpt = new_excerpt[-200:]
 
         data = PreferencesUpdateRequest(
             **{k: existing_prefs[k] for k in existing_prefs if k != "excerpt"},
