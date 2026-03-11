@@ -12,12 +12,15 @@ from app.models.profile import (
     ProfileUpdateRequest,
     PreferencesUpdateRequest,
 )
+from app.database import get_listings_collection
 from app.services.profile_service import (
     create_or_update_profile,
     get_profile_by_user_id,
     generate_preference_embedding,
     update_profile,
     update_preferences,
+    toggle_favorite,
+    get_favorites,
 )
 
 logger = logging.getLogger(__name__)
@@ -163,6 +166,58 @@ class ProfilePreferences(Resource):
             return {"success": False, "error": "Profile not found"}, 404
 
         return {"success": True, "data": profile}
+
+
+favorite_request_model = profiles.model("FavoriteRequest", {
+    "listing_id": fields.String(required=True, description="Listing ID to toggle"),
+})
+
+favorite_response_model = profiles.model("FavoriteResponse", {
+    "success": fields.Boolean,
+    "action": fields.String(description="'added' or 'removed'"),
+    "favorites": fields.List(fields.String),
+})
+
+favorites_list_model = profiles.model("FavoritesListResponse", {
+    "success": fields.Boolean,
+    "data": fields.List(fields.String),
+    "count": fields.Integer,
+})
+
+
+@profiles.route("/me/favorites")
+class ProfileFavorites(Resource):
+    @profiles.expect(favorite_request_model)
+    @profiles.doc(security="Bearer")
+    @require_auth
+    def post(self):
+        """Toggle a listing in the user's favorites."""
+        if not request.json or "listing_id" not in request.json:
+            return {"success": False, "error": "listing_id is required"}, 400
+
+        listing_id = request.json["listing_id"]
+
+        # Validate listing exists
+        listing = get_listings_collection().find_one({"listing_id": listing_id})
+        if not listing:
+            return {"success": False, "error": "Listing not found"}, 404
+
+        result = toggle_favorite(g.user_id, listing_id)
+        if result is None:
+            return {"success": False, "error": "Profile not found"}, 404
+
+        return {
+            "success": True,
+            "action": result["action"],
+            "favorites": result["favorites"],
+        }
+
+    @profiles.doc(security="Bearer")
+    @require_auth
+    def get(self):
+        """Get the current user's favorites list."""
+        favorites = get_favorites(g.user_id)
+        return {"success": True, "data": favorites, "count": len(favorites)}
 
 
 @profiles.route("/status")

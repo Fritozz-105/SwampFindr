@@ -58,5 +58,3 @@ htmlcov/
 # UV
 uv.lock
 
-# Test file
-test_mongo.py

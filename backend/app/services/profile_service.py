@@ -103,6 +103,40 @@ def update_preferences(user_id: str, data: PreferencesUpdateRequest) -> Optional
     return profile
 
 
+def toggle_favorite(user_id: str, listing_id: str) -> Optional[dict]:
+    """Add or remove a listing_id from the user's favorites list."""
+    collection = get_profiles_collection()
+    profile = collection.find_one({"user_id": user_id}, {"favorites": 1})
+    if not profile:
+        return None
+
+    favorites = profile.get("favorites", [])
+    if listing_id in favorites:
+        collection.update_one(
+            {"user_id": user_id},
+            {"$pull": {"favorites": listing_id}},
+        )
+        action = "removed"
+    else:
+        collection.update_one(
+            {"user_id": user_id},
+            {"$addToSet": {"favorites": listing_id}},
+        )
+        action = "added"
+
+    updated = collection.find_one({"user_id": user_id}, {"favorites": 1, "_id": 0})
+    return {"action": action, "favorites": updated.get("favorites", [])}
+
+
+def get_favorites(user_id: str) -> list:
+    """Return the favorites array from the user's profile."""
+    collection = get_profiles_collection()
+    profile = collection.find_one({"user_id": user_id}, {"favorites": 1, "_id": 0})
+    if not profile:
+        return []
+    return profile.get("favorites", [])
+
+
 def generate_preference_embedding(user_id: str, profile: dict) -> Optional[str]:
     """Build natural-language text from preferences and upsert to Pinecone.
 
