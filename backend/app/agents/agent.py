@@ -8,8 +8,6 @@ from dotenv import load_dotenv
 
 from app.agents.prompts import SYSTEM_PROMPT
 from app.agents.tools import get_tools as tools
-from app.agents.prompts import SYSTEM_PROMPT
-from app.agents.tools import get_tools as tools
 
 import time
 

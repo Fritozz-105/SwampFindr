@@ -1,6 +1,7 @@
 from flask import request
 from flask_restx import Namespace, Resource, fields
 from app.services.pinecone_service import upsert_record, query_records
+from app.auth import require_auth
 
 
 vectordb = Namespace("vectordb", description="Pinecone API")
@@ -29,6 +30,8 @@ upsert_response =  vectordb.model('UpsertResponse', {
 class Upsert(Resource):
     @vectordb.expect(upsert_model)
     @vectordb.marshal_with(upsert_response)
+    @vectordb.doc(security="Bearer")
+    @require_auth
     def post(self):
         """Upsert an embedding to the main namespace"""
         return {"id": upsert_record(request.json["chunk_text"], request.json["category"]), "status": "Upserted successfully!"}
@@ -38,6 +41,8 @@ class Upsert(Resource):
 class UpsertTest(Resource):
     @vectordb.expect(upsert_model)
     @vectordb.marshal_with(upsert_response)
+    @vectordb.doc(security="Bearer")
+    @require_auth
     def post(self):
         """Upsert a record into the test namespace."""
         return {"id": upsert_record(request.json["chunk_text"], request.json["category"], ns="test"), "status": "Upserted successfully!"}
