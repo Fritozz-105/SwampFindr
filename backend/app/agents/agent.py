@@ -1,5 +1,5 @@
 from langchain.agents import create_agent
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
 
 from langgraph.checkpoint.memory import InMemorySaver
@@ -17,7 +17,7 @@ load_dotenv()
 model = ChatOpenAI(
     model = "gpt-4o-mini",
     temperature = 0.1,
-    max_tokens = 256,
+    max_tokens = 512,
     timeout=30,
     api_key = os.getenv("OPENAI_API_KEY")
 )

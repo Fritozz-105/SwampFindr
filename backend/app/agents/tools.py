@@ -2,6 +2,7 @@
 import json
 import pandas as pd
 import numpy as np
+import httpx
 
 from langchain_core.tools import tool
 from app.services.pinecone_service import query_records
@@ -19,6 +20,7 @@ def get_tools():
     return [
         semantic_search,
         closest_bus_stops,
+        decode_coordinates,
         update_preference_embedding,
         swipe_on_listing,
         suggest_listing
@@ -188,7 +190,7 @@ def swipe_on_listing(user_id: str, listing_id: str, action: str) -> dict:
 
 
 @tool
-def closest_bus_stops(lat: float, lng: float, radius_m: float = 1000) -> dict:
+def closest_bus_stops(lat: float, lng: float, radius_m: float = 350) -> dict:
     """
     Find all bus stops within a given radius of a location.
     Args:
@@ -218,6 +220,38 @@ def closest_bus_stops(lat: float, lng: float, radius_m: float = 1000) -> dict:
         "stops": json.loads(results_df.to_json(orient='records')),
         "count": len(results_df)
     }
+
+
+@tool
+def decode_coordinates(location: str) :
+    """
+    Geocode a location to get its longitude and latitude coordinates
+    Args:
+        location: A place/address query to geocode
+    Returns:
+        Data with the latitude and longitude of a given coordinate
+    """
+    if not location or not location.strip():
+        return "Need location!"
+
+    user_agent = "SwampFindr/1.0 University of Florida (ufl.edu)"
+
+    try:
+        with httpx.Client(timeout=15.0, headers={"User-Agent": user_agent}) as client:
+            geocode_resp = client.get(
+                "https://nominatim.openstreetmap.org/search",
+                params={"q": location.strip(), "format": "jsonv2", "limit": 1},
+            )
+            geocode_resp.raise_for_status()
+            geocode_data = geocode_resp.json()
+
+            center_lat = float(geocode_data[0]["lat"])
+            center_lon = float(geocode_data[0]["lon"])
+
+    except Exception as e:
+        return f"Error: {e}"
+
+    return center_lat, center_lon
 
 
 @tool
