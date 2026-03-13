@@ -8,11 +8,19 @@ from langchain_core.tools import tool
 from app.services.pinecone_service import query_records
 from app.services.profile_service import PreferencesUpdateRequest, update_preferences, get_profile_by_user_id
 from app.database import get_listings_collection, get_units_collection
+from app.agents.user_context import get_current_user_id
 
 from pathlib import Path
 
 
 _bus_stops_df = pd.read_csv(Path(__file__).parent / 'gnv-bus-stops.csv')
+
+
+def _require_user_id() -> str:
+    user_id = get_current_user_id()
+    if not user_id:
+        raise ValueError("Authenticated user context is missing")
+    return user_id
 
 
 def get_tools():
@@ -28,17 +36,16 @@ def get_tools():
 
 
 @tool
-def suggest_listing(user_id: str, top_k: int = 1) -> dict:
+def suggest_listing(top_k: int = 1) -> dict:
     """
        Suggest apartment listings based on the user's  preferences embedding.
        Call this when the user asks for recommendations, suggestions, or wants to find apartments.
        Args:
-           user_id: The user's identification key
            top_k: Number of listings to return (default 3)
        Returns:
            Dict with 'listings' (list of matched listings with units) or 'error'
     """
-
+    user_id = _require_user_id()
     try:
         profile = get_profile_by_user_id(user_id)
         if not profile:
@@ -88,7 +95,6 @@ def suggest_listing(user_id: str, top_k: int = 1) -> dict:
 
 @tool
 def update_preference_embedding(
-        user_id: str,
         bedrooms: int = 1,
         bathrooms: int = 1,
         price_min: int = 500,
@@ -101,7 +107,6 @@ def update_preference_embedding(
     """Update the user's housing preferences and recompile their preferences embedding.
     This should be called when the user implicitly or directly expresses a change in interest
     Args:
-        user_id: User ID
         bedrooms: Number of bedrooms in each apartment
         bathrooms: Number of bathrooms in each apartment
         price_min: Minimum price in each apartment
@@ -113,6 +118,7 @@ def update_preference_embedding(
     Returns:
         Dict with 'success' and updated profile data or either an 'error'
     """
+    user_id = _require_user_id()
     try:
         amenities = amenities or []
         data = PreferencesUpdateRequest(
@@ -140,12 +146,11 @@ def update_preference_embedding(
 
 
 @tool
-def swipe_on_listing(user_id: str, listing_id: str, action: str) -> dict:
+def swipe_on_listing(listing_id: str, action: str) -> dict:
     """
     Track the user's interest via a swipe on a listing (like/dislike/pass)
     This tool should be called when the user reacts to an apartment and it updates the excerpt in the embedding
     Args:
-        user_id: The user's identification key
         listing_id: Listing that the user is reacting to
         action: 'like' 'dislike' 'pass'
     Returns:
@@ -154,6 +159,7 @@ def swipe_on_listing(user_id: str, listing_id: str, action: str) -> dict:
     if action.lower() not in ('like', 'dislike', 'pass'):
         return {"success": False, "error": f"Error with parsing user action"}
 
+    user_id = _require_user_id()
     try:
         listings = get_listings_collection()
         listing = listings.find_one({'listing_id': listing_id})
