@@ -15,7 +15,7 @@ idx = pc.Index(INDEX_NAME)
 
 
 def upsert_record(chunk_text, category, ns='main', user_id=None, listing_id=None):
-    record_id = f"user-{user_id}" if user_id else str(uuid.uuid4())
+    record_id = f"ID-{user_id}" if user_id else f"ID-{listing_id}"
     idx.upsert_records(
         ns,
         [

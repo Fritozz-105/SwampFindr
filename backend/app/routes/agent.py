@@ -1,4 +1,4 @@
-from flask import request, jsonify
+from flask import request, g
 from flask_restx import Namespace, Resource, fields
 from app.agents.agent import run_agent
 from app.auth import require_auth
@@ -28,6 +28,6 @@ class AgentChat(Resource):
         data = request.json
         if not data or not data.get('query'):
             agent.abort(400, 'Query is required')
-        result = run_agent(data.get('query'))
+        result = run_agent(data.get('query'), user_id=g.user_id)
         return result, 200
 

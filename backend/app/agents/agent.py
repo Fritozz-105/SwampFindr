@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 
 from app.agents.prompts import SYSTEM_PROMPT
 from app.agents.tools import get_tools as tools
+from app.agents.user_context import set_current_user_id, reset_current_user_id
 
 import time
 
@@ -57,8 +58,10 @@ def get_history(thread_id: str) -> list:
 
 
 # Simple invocation of the agent
-def run_agent(user_query: str, thread_id: str = "default") -> dict:
-    config = {"configurable": {"thread_id": thread_id}}
+def run_agent(user_query: str, user_id: str | None = None, thread_id: str | None = None) -> dict:
+    res_thread_id = thread_id or (f"user:{user_id}" if user_id else "default")
+    config = {"configurable": {"thread_id": res_thread_id}}
+    tkn = set_current_user_id(user_id)
     try:
         response = agent.invoke(
             {"messages": [{"role": "user", "content": user_query}]},
@@ -68,13 +71,17 @@ def run_agent(user_query: str, thread_id: str = "default") -> dict:
         return {"error": "Request timed out, please try again"}
     except Exception as e:
         return {"error": f"Agent error: {e}"}
+    finally:
+        reset_current_user_id(tkn)
 
     return {"response": response["messages"][-1].content}
 
 
 # Stream the agent responses
-def run_agent_stream(user_query: str, thread_id: str = "default"):
-    config = {"configurable": {"thread_id": thread_id}}
+def run_agent_stream(user_query: str, user_id: str | None = None, thread_id: str | None = None):
+    res_thread_id = thread_id or (f"user:{user_id}" if user_id else "default")
+    config = {"configurable": {"thread_id": res_thread_id}}
+    tkn = set_current_user_id(user_id)
     try:
         for chunk, metadata in agent.stream(
             {"messages": [HumanMessage(content=user_query)]},
@@ -87,6 +94,8 @@ def run_agent_stream(user_query: str, thread_id: str = "default"):
         yield "[error: timed out]"
     except Exception as e:
         yield f"[error: {e}]"
+    finally:
+        reset_current_user_id(tkn)
 
 
 if __name__ == "__main__":
