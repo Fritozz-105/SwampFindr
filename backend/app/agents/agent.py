@@ -4,6 +4,7 @@ from langchain_openai import ChatOpenAI
 
 from langgraph.checkpoint.memory import InMemorySaver
 import os
+import httpx
 from dotenv import load_dotenv
 
 from app.agents.prompts import SYSTEM_PROMPT
@@ -30,6 +31,17 @@ agent = create_agent(
     system_prompt=SYSTEM_PROMPT,
     checkpointer = InMemorySaver(), # replace with prod db
 )
+
+
+def _is_timeout_error(error: Exception) -> bool:
+    if isinstance(error, (TimeoutError, httpx.TimeoutException)):
+        return True
+    current = error
+    while current:
+        if "timeout" in current.__class__.__name__.lower():
+            return True
+        current = current.__cause__
+    return False
 
 
 # Return thread history
@@ -67,9 +79,9 @@ def run_agent(user_query: str, user_id: str | None = None, thread_id: str | None
             {"messages": [{"role": "user", "content": user_query}]},
             config=config
         )
-    except TimeoutError:
-        return {"error": "Request timed out, please try again"}
     except Exception as e:
+        if _is_timeout_error(e):
+            return {"error": "Request timed out, please try again"}
         return {"error": f"Agent error: {e}"}
     finally:
         reset_current_user_id(tkn)
@@ -90,9 +102,10 @@ def run_agent_stream(user_query: str, user_id: str | None = None, thread_id: str
         ):
             if chunk.type == "AIMessageChunk" and chunk.content:
                 yield chunk.content
-    except TimeoutError:
-        yield "[error: timed out]"
     except Exception as e:
+        if _is_timeout_error(e):
+            yield "[error: timed out]"
+            return
         yield f"[error: {e}]"
     finally:
         reset_current_user_id(tkn)

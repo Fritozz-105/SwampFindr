@@ -14,6 +14,8 @@ from pathlib import Path
 
 
 _bus_stops_df = pd.read_csv(Path(__file__).parent / 'gnv-bus-stops.csv')
+MAX_SUGGEST_TOP_K = 20
+MAX_BUS_RADIUS_M = 10_000
 
 
 def _require_user_id() -> str:
@@ -45,6 +47,12 @@ def suggest_listing(top_k: int = 1) -> dict:
        Returns:
            Dict with 'listings' (list of matched listings with units) or 'error'
     """
+    if top_k < 1 or top_k > MAX_SUGGEST_TOP_K:
+        return {
+            "success": False,
+            "error": f"top_k must be between 1 and {MAX_SUGGEST_TOP_K}",
+        }
+
     user_id = _require_user_id()
     try:
         profile = get_profile_by_user_id(user_id)
@@ -206,6 +214,17 @@ def closest_bus_stops(lat: float, lng: float, radius_m: float = 350) -> dict:
     Returns:
         Dict with 'stops' (list of nearby bus stops) and 'count' (number of stops found)
     """
+    if not (-90 <= lat <= 90):
+        return {"stops": [], "count": 0, "error": "lat must be between -90 and 90"}
+    if not (-180 <= lng <= 180):
+        return {"stops": [], "count": 0, "error": "lng must be between -180 and 180"}
+    if radius_m <= 0 or radius_m > MAX_BUS_RADIUS_M:
+        return {
+            "stops": [],
+            "count": 0,
+            "error": f"radius_m must be > 0 and <= {MAX_BUS_RADIUS_M}",
+        }
+
     df = _bus_stops_df.copy()
     R = 6_371_000
 
@@ -238,7 +257,7 @@ def decode_coordinates(location: str) :
         Data with the latitude and longitude of a given coordinate
     """
     if not location or not location.strip():
-        return "Need location!"
+        return {"success": False, "error": "Need location!"}
 
     user_agent = "SwampFindr/1.0 University of Florida (ufl.edu)"
 
@@ -250,14 +269,19 @@ def decode_coordinates(location: str) :
             )
             geocode_resp.raise_for_status()
             geocode_data = geocode_resp.json()
+            if not geocode_data:
+                return {
+                    "success": False,
+                    "error": "No coordinates found for the given location",
+                }
 
             center_lat = float(geocode_data[0]["lat"])
             center_lon = float(geocode_data[0]["lon"])
 
     except Exception as e:
-        return f"Error: {e}"
+        return {"success": False, "error": f"Error: {e}"}
 
-    return center_lat, center_lon
+    return {"success": True, "lat": center_lat, "lng": center_lon}
 
 
 @tool
@@ -287,6 +311,7 @@ def semantic_search(query: str):
             "text": hit["fields"].get("chunk_text", ""),
             "category": hit["fields"].get("category", ""),
             "score": hit["_score"],
+            "listing_id" : hit["fields"].get("listing_id", "")
         }
         for hit in hits
     ]
