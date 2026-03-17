@@ -12,7 +12,9 @@ query_model = agent.model('Query', {
 
 
 response_model = agent.model('Response', {
+    'success': fields.Boolean(description='If agent run succeeded'),
     'response': fields.String(description='Agent response'),
+    'error': fields.String(description='Error message when request fails'),
 })
 
 
@@ -29,5 +31,11 @@ class AgentChat(Resource):
         if not data or not data.get('query'):
             agent.abort(400, 'Query is required')
         result = run_agent(data.get('query'), user_id=g.user_id)
-        return result, 200
+        if result.get("success"):
+            return result, 200
+
+        error = result.get("error", "")
+        if "timed out" in error.lower():
+            return result, 504
+        return result, 502
 

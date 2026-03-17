@@ -121,7 +121,7 @@ if __name__ == "__main__":
         if not query:
             continue
         print("Agent: ", end="", flush=True)
-        for chunk in run_agent_stream(query, thread_id=thread_id):
+        for chunk in run_agent_stream(query, user_id="pytest-user-1", thread_id=thread_id):
             print(chunk, end="", flush=True)
             time.sleep(0.01)
         print("\n")
