@@ -44,6 +44,21 @@ def _is_timeout_error(error: Exception) -> bool:
     return False
 
 
+def _as_text(content) -> str:
+    """Normalize the agent response into str format"""
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        parts = []
+        for item in content:
+            if isinstance(item, str):
+                parts.append(item)
+            elif isinstance(item, dict) and item.get("type") == "text":
+                parts.append(str(item.get("text", "")))
+        return "".join(parts).strip()
+    return str(content or "")
+
+
 # Return thread history
 def get_history(thread_id: str) -> list:
     config = {"configurable": {"thread_id": thread_id}}
@@ -81,12 +96,39 @@ def run_agent(user_query: str, user_id: str | None = None, thread_id: str | None
         )
     except Exception as e:
         if _is_timeout_error(e):
-            return {"error": "Request timed out, please try again"}
-        return {"error": f"Agent error: {e}"}
+            return {
+                "success" : False,
+                "response" : "",
+                "error" : "Request timed out",
+                "error_type" : 'timeout',
+                "thread_id" : res_thread_id,
+            }
+        return {
+            "success" : False,
+            "response" : "",
+            "error" : f"Agent error | {e}",
+            "error_type" : type(e).__name__,
+            "thread_id" : res_thread_id,
+        }
     finally:
         reset_current_user_id(tkn)
 
-    return {"response": response["messages"][-1].content}
+    msgs = response.get('messages', [])
+    if not msgs:
+        return {
+            "success" : False,
+            "response" : "",
+            "error" : "No messages received",
+            "error_type" : "Empty payload",
+            "thread_id" : res_thread_id,
+        }
+    return {
+        "success" : True,
+        "response" : _as_text(msgs[-1].content),
+        "error" : None,
+        "error_type" : None,
+        "thread_id" : res_thread_id,
+    }
 
 
 # Stream the agent responses

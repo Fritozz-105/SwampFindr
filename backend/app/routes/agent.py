@@ -8,6 +8,7 @@ agent = Namespace('agent', description='Agent-based apartment search operations'
 
 query_model = agent.model('Query', {
     'query': fields.String(required=True, description='User query for apartment search'),
+    'thread_id': fields.String(require=False, description='Thread ID'),
 })
 
 
@@ -15,6 +16,8 @@ response_model = agent.model('Response', {
     'success': fields.Boolean(description='If agent run succeeded'),
     'response': fields.String(description='Agent response'),
     'error': fields.String(description='Error message when request fails'),
+    'error_type': fields.String(description='Error category'),
+    'thread_id': fields.String(description='Chat thread ID'),
 })
 
 
@@ -29,13 +32,18 @@ class AgentChat(Resource):
         """Handle user query and generate agent response."""
         data = request.json
         if not data or not data.get('query'):
-            agent.abort(400, 'Query is required')
-        result = run_agent(data.get('query'), user_id=g.user_id)
+            return {
+                'success': False,
+                'response': "",
+                "error" : "Query parameter is missing" ,
+                "error_type" : "Missing field",
+                "thread_id" : None
+            }, 400
+        result = run_agent(data.get('query'), g.user_id, data.get('thread_id'))
         if result.get("success"):
             return result, 200
 
-        error = result.get("error", "")
-        if "timed out" in error.lower():
+        if result.get('error_type') == 'timeout':
             return result, 504
         return result, 502
 
