@@ -100,14 +100,14 @@ def run_agent(user_query: str, user_id: str | None = None, thread_id: str | None
                 "success" : False,
                 "response" : "",
                 "error" : "Request timed out",
-                "error type" : 'timeout',
+                "error_type" : 'timeout',
                 "thread_id" : res_thread_id,
             }
         return {
             "success" : False,
             "response" : "",
             "error" : f"Agent error | {e}",
-            "error type" : type(e).__name__,
+            "error_type" : type(e).__name__,
             "thread_id" : res_thread_id,
         }
     finally:
@@ -119,7 +119,7 @@ def run_agent(user_query: str, user_id: str | None = None, thread_id: str | None
             "success" : False,
             "response" : "",
             "error" : "No messages received",
-            "error type" : "Empty payload",
+            "error_type" : "Empty payload",
             "thread_id" : res_thread_id,
         }
     return {
