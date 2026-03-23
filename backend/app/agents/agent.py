@@ -1,7 +1,7 @@
 from langchain.agents import create_agent
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
-from langchain_community.chat_models.litellm import ChatLiteLLM
+from langchain_ollama import ChatOllama
 import os
 import httpx
 import time
@@ -12,7 +12,7 @@ from app.agents.user_context import set_current_user_id, reset_current_user_id
 from app.database.mongo import get_mongo_client
 from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.checkpoint.mongodb import MongoDBSaver
-
+from langchain_ollama.llms import OllamaLLM
 load_dotenv()
 
 try:
@@ -24,14 +24,8 @@ try:
         api_key = os.getenv("OPENAI_API_KEY")
     )
 except Exception as e:
-    print(f"OpenAI initialization failed: {e}. Using Navigator AI (Llama 3.3 70B) as fallback.")
-    model = ChatLiteLLM(
-        model = "llama-3.3-70b-instruct",
-        api_key = os.getenv("NAVIGATOR_AI"),
-        api_base = os.getenv("NAVIGATOR_AI_BASE_URL"),
-        temperature = 0.1,
-        max_tokens =2048,
-    ) 
+    print(f"OpenAI initialization failed: {e}. Using Ollama (llama3-groq-tool-use:latest) as fallback.")
+    model = OllamaLLM(model="llama3-groq-tool-use:latest",temperature=0.1,max_tokens=256,timeout=30)
 
 try:
     checkpointer = MongoDBSaver(
