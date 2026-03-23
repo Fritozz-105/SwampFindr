@@ -118,14 +118,14 @@ def run_agent(user_query: str, thread_id: str) -> dict:
                 "response" : "",
                 "error" : "Request timed out",
                 "error_type" : 'timeout',
-                "thread_id" : res_thread_id,
+                "thread_id" : thread_id,
             }
         return {
             "success" : False,
             "response" : "",
             "error" : f"Agent error | {e}",
             "error_type" : type(e).__name__,
-            "thread_id" : res_thread_id,
+            "thread_id" : thread_id,
         }
     finally:
         reset_current_user_id(tkn)
@@ -137,14 +137,14 @@ def run_agent(user_query: str, thread_id: str) -> dict:
             "response" : "",
             "error" : "No messages received",
             "error_type" : "Empty payload",
-            "thread_id" : res_thread_id,
+            "thread_id" : thread_id,
         }
     return {
         "success" : True,
         "response" : _as_text(msgs[-1].content),
         "error" : None,
         "error_type" : None,
-        "thread_id" : res_thread_id,
+        "thread_id" : thread_id,
     }
 
 
@@ -179,7 +179,7 @@ if __name__ == "__main__":
         if not query:
             continue
         print("Agent: ", end="", flush=True)
-        for chunk in run_agent_stream(query, user_id="pytest-user-1", thread_id=thread_id):
+        for chunk in run_agent_stream(query, thread_id=thread_id):
             print(chunk, end="", flush=True)
             time.sleep(0.01)
         print("\n")
