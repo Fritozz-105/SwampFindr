@@ -1,5 +1,5 @@
 from langchain.agents import create_agent
-from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_core.messages import HumanMessage
 from langchain_openai import ChatOpenAI
 from langchain_ollama import ChatOllama
 import os
@@ -10,22 +10,29 @@ from app.agents.prompts import SYSTEM_PROMPT
 from app.agents.tools import get_tools as tools
 from app.agents.user_context import set_current_user_id, reset_current_user_id
 from app.database.mongo import get_mongo_client
+from app.services.conversation_service import get_user_id_for_thread
 from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.checkpoint.mongodb import MongoDBSaver
-from langchain_ollama.llms import OllamaLLM
+
 load_dotenv()
 
-try:
+openai_api_key = (os.getenv("OPENAI_API_KEY") or "").strip()
+if openai_api_key:
     model = ChatOpenAI(
-        model = "gpt-4o-mini",
-        temperature = 0.1,
-        max_tokens = 256,
+        model="gpt-4o-mini",
+        temperature=0.1,
+        max_tokens=256,
         timeout=30,
-        api_key = os.getenv("OPENAI_API_KEY")
+        api_key=openai_api_key,
     )
-except Exception as e:
-    print(f"OpenAI initialization failed: {e}. Using Ollama (llama3-groq-tool-use:latest) as fallback.")
-    model = OllamaLLM(model="llama3-groq-tool-use:latest",temperature=0.1,max_tokens=256,timeout=30)
+else:
+    print("OPENAI_API_KEY not set. Using Ollama (llama3-groq-tool-use:latest).")
+    model = ChatOllama(
+        model="llama3-groq-tool-use:latest",
+        base_url=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434"),
+        temperature=0.1,
+        num_predict=256,
+    )
 
 try:
     checkpointer = MongoDBSaver(
@@ -96,10 +103,9 @@ def get_history(thread_id: str) -> list:
 
 
 # Simple invocation of the agent
-def run_agent(user_query: str, user_id: str | None = None, thread_id: str | None = None) -> dict:
-    res_thread_id = thread_id or (f"user:{user_id}" if user_id else "default")
-    config = {"configurable": {"thread_id": res_thread_id}}
-    tkn = set_current_user_id(user_id)
+def run_agent(user_query: str, thread_id: str) -> dict:
+    config = {"configurable": {"thread_id": thread_id}}
+    tkn = set_current_user_id(get_user_id_for_thread(thread_id))
     try:
         response = agent.invoke(
             {"messages": [{"role": "user", "content": user_query}]},
@@ -143,10 +149,9 @@ def run_agent(user_query: str, user_id: str | None = None, thread_id: str | None
 
 
 # Stream the agent responses
-def run_agent_stream(user_query: str, user_id: str | None = None, thread_id: str | None = None):
-    res_thread_id = thread_id or (f"user:{user_id}" if user_id else "default")
-    config = {"configurable": {"thread_id": res_thread_id}}
-    tkn = set_current_user_id(user_id)
+def run_agent_stream(user_query: str, thread_id: str):
+    config = {"configurable": {"thread_id": thread_id}}
+    tkn = set_current_user_id(get_user_id_for_thread(thread_id))
     try:
         for chunk, metadata in agent.stream(
             {"messages": [HumanMessage(content=user_query)]},

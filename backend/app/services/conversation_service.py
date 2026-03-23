@@ -28,6 +28,15 @@ def user_owns_thread(user_id: str, thread_id: str) -> bool:
     return collection.find_one({"user_id": user_id, "thread_id": thread_id}) is not None
 
 
+def get_user_id_for_thread(thread_id: str) -> str | None:
+    """Return the owner user_id for a thread_id, or None when not found."""
+    collection = get_chat_threads_collection()
+    doc = collection.find_one({"thread_id": thread_id}, {"_id": 0, "user_id": 1})
+    if not doc:
+        return None
+    return doc.get("user_id")
+
+
 def touch_thread(user_id: str, thread_id: str) -> None:
     """Update thread activity timestamp after successful chat activity."""
     collection = get_chat_threads_collection()
