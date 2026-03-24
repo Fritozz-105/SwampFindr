@@ -62,6 +62,12 @@ def get_profiles_collection() -> Collection:
     return db['Profiles']
 
 
+def get_chat_threads_collection() -> Collection:
+    """Get the ChatThreads collection from the UserData database."""
+    db = get_userdata_db()
+    return db['ChatThreads']
+
+
 def init_db(app):
     """Initialize database connection with Flask app."""
     with app.app_context():
@@ -73,6 +79,12 @@ def init_db(app):
             # Ensure unique index on Profiles.user_id
             get_profiles_collection().create_index("user_id", unique=True, background=True)
             app.logger.info("✓ Ensured unique index on Profiles.user_id")
+            get_chat_threads_collection().create_index("thread_id", unique=True, background=True)
+            get_chat_threads_collection().create_index(
+                [("user_id", 1), ("updated_at", -1)],
+                background=True,
+            )
+            app.logger.info("✓ Ensured ChatThreads indexes")
         except Exception as e:
             app.logger.error(f"MongoDB connection failed: {e}")
             raise

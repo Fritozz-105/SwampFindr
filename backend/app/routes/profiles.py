@@ -22,6 +22,8 @@ from app.services.profile_service import (
     toggle_favorite,
     get_favorites,
 )
+from app.services.conversation_service import get_user_threads, user_owns_thread
+from app.agents.agent import get_history
 
 logger = logging.getLogger(__name__)
 
@@ -78,6 +80,28 @@ preferences_update_model = profiles.model("PreferencesUpdateRequest", {
     "roommates": fields.Integer(default=0),
     "amenities": fields.List(fields.String, default=[]),
     "excerpt": fields.String(default="", description="Max 200 characters"),
+})
+
+thread_item_model = profiles.model("ThreadItem", {
+    "thread_id": fields.String,
+    "created_at": fields.String,
+    "updated_at": fields.String,
+})
+
+thread_list_response_model = profiles.model("ThreadListResponse", {
+    "success": fields.Boolean,
+    "data": fields.List(fields.Nested(thread_item_model)),
+})
+
+chat_history_message_model = profiles.model("ChatHistoryMessage", {
+    "role": fields.String,
+    "content": fields.Raw,
+})
+
+chat_history_response_model = profiles.model("ChatHistoryResponse", {
+    "success": fields.Boolean,
+    "thread_id": fields.String,
+    "data": fields.List(fields.Nested(chat_history_message_model)),
 })
 
 
@@ -230,3 +254,33 @@ class ProfileStatus(Resource):
         completed = bool(profile and profile.get("onboarding_completed"))
 
         return {"success": True, "onboarding_completed": completed}
+
+
+@profiles.route("/threads")
+class UserThreads(Resource):
+    @profiles.doc(security="Bearer")
+    @profiles.marshal_with(thread_list_response_model)
+    @require_auth
+    def get(self):
+        return {"success": True, "data": get_user_threads(g.user_id)}, 200
+    
+
+@profiles.route("/chathistory")
+class ChatHistory(Resource):
+    @profiles.doc(security="Bearer")
+    @profiles.doc(params={"thread_id": "Conversation thread id"})
+    @profiles.marshal_with(chat_history_response_model)
+    @require_auth
+    def get(self):
+        thread_id = request.args.get("thread_id", "").strip()
+        if not thread_id:
+            return {"success": False, "error": "thread_id query param is required"}, 400
+
+        if not user_owns_thread(g.user_id, thread_id):
+            return {"success": False, "error": "thread_id not found for user"}, 404
+
+        return {
+            "success": True,
+            "thread_id": thread_id,
+            "data": get_history(thread_id),
+        }, 200

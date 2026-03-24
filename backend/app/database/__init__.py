@@ -4,6 +4,7 @@ from app.database.mongo import (
     get_listings_collection,
     get_units_collection,
     get_profiles_collection,
+    get_chat_threads_collection,
     init_db,
     close_db
 )
@@ -13,6 +14,7 @@ __all__ = [
     'get_listings_collection',
     'get_units_collection',
     'get_profiles_collection',
+    'get_chat_threads_collection',
     'init_db',
     'close_db'
 ]
