@@ -9,9 +9,10 @@ import type { Listing } from "@/types/listing";
 interface ListingCardProps {
   listing: Listing;
   onFavoriteToggle: (listingId: string) => void;
+  basePath?: string;
 }
 
-export function ListingCard({ listing, onFavoriteToggle }: ListingCardProps) {
+export function ListingCard({ listing, onFavoriteToggle, basePath = "/home" }: ListingCardProps) {
   const [hovered, setHovered] = useState(false);
   const hasPhoto = listing.photos.length > 0;
   const matchPercent = listing.match_score !== null ? Math.round(listing.match_score * 100) : null;
@@ -144,7 +145,7 @@ export function ListingCard({ listing, onFavoriteToggle }: ListingCardProps) {
 
       {/* Content overlay */}
       <Link
-        href={`/home/${listing.listing_id}`}
+        href={`${basePath}/${listing.listing_id}`}
         style={{
           position: "relative",
           display: "flex",

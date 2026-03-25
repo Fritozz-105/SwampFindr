@@ -38,12 +38,6 @@ def _attach_units(listings: list) -> list:
 def search_listings(user_id: str, query: str, top_k: int = 50) -> dict:
     """
     Search listings via Pinecone vector similarity.
-
-    1. Pass query text to Pinecone (handles embedding internally)
-    2. Hydrate full listing data from MongoDB
-    3. Attach match_score, is_favorited, units
-    4. Save search history (only if results > 0)
-    5. Return all results (frontend handles pagination/filtering)
     """
     # Clamp top_k
     top_k = max(1, min(top_k, 100))
