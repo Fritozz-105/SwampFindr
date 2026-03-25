@@ -94,7 +94,7 @@ export function SearchFilters({
 
   const getPriceLabel = () => {
     if (filters.priceMin !== null && filters.priceMax !== null)
-      return `$${filters.priceMin}–$${filters.priceMax}`;
+      return `$${filters.priceMin}\u2013$${filters.priceMax}`;
     if (filters.priceMin !== null) return `$${filters.priceMin}+`;
     if (filters.priceMax !== null) return `Up to $${filters.priceMax}`;
     return "Price";
@@ -112,7 +112,7 @@ export function SearchFilters({
 
   const getSqftLabel = () => {
     if (filters.sqftMin !== null && filters.sqftMax !== null)
-      return `${filters.sqftMin}–${filters.sqftMax} sqft`;
+      return `${filters.sqftMin}\u2013${filters.sqftMax} sqft`;
     if (filters.sqftMin !== null) return `${filters.sqftMin}+ sqft`;
     if (filters.sqftMax !== null) return `Up to ${filters.sqftMax} sqft`;
     return "Sqft";
@@ -154,28 +154,31 @@ export function SearchFilters({
                 min={0}
                 value={filters.priceMin ?? ""}
                 onChange={(e) => {
-                  const val = e.target.value ? Math.max(0, Number(e.target.value)) : null;
-                  onFiltersChange({
-                    ...filters,
-                    priceMin: val,
-                    priceMax: val !== null && filters.priceMax !== null && filters.priceMax < val ? val : filters.priceMax,
-                  });
+                  const val = e.target.value ? Number(e.target.value) : null;
+                  onFiltersChange({ ...filters, priceMin: val });
+                }}
+                onBlur={() => {
+                  const min = filters.priceMin !== null ? Math.max(0, filters.priceMin) : null;
+                  const max = min !== null && filters.priceMax !== null && filters.priceMax < min ? min : filters.priceMax;
+                  onFiltersChange({ ...filters, priceMin: min, priceMax: max });
                 }}
                 style={inputStyle}
               />
-              <span style={{ fontSize: 13, color: "#8c8c9a" }}>–</span>
+              <span style={{ fontSize: 13, color: "#8c8c9a" }}>{"\u2013"}</span>
               <span style={{ fontSize: 13, color: "#8c8c9a" }}>$</span>
               <input
                 type="number"
                 placeholder="Max"
-                min={filters.priceMin ?? 0}
+                min={0}
                 value={filters.priceMax ?? ""}
                 onChange={(e) => {
-                  const val = e.target.value ? Math.max(filters.priceMin ?? 0, Number(e.target.value)) : null;
-                  onFiltersChange({
-                    ...filters,
-                    priceMax: val,
-                  });
+                  const val = e.target.value ? Number(e.target.value) : null;
+                  onFiltersChange({ ...filters, priceMax: val });
+                }}
+                onBlur={() => {
+                  let max = filters.priceMax !== null ? Math.max(0, filters.priceMax) : null;
+                  if (max !== null && filters.priceMin !== null && max < filters.priceMin) max = filters.priceMin;
+                  onFiltersChange({ ...filters, priceMax: max });
                 }}
                 style={inputStyle}
               />
@@ -278,27 +281,30 @@ export function SearchFilters({
                 min={0}
                 value={filters.sqftMin ?? ""}
                 onChange={(e) => {
-                  const val = e.target.value ? Math.max(0, Number(e.target.value)) : null;
-                  onFiltersChange({
-                    ...filters,
-                    sqftMin: val,
-                    sqftMax: val !== null && filters.sqftMax !== null && filters.sqftMax < val ? val : filters.sqftMax,
-                  });
+                  const val = e.target.value ? Number(e.target.value) : null;
+                  onFiltersChange({ ...filters, sqftMin: val });
+                }}
+                onBlur={() => {
+                  const min = filters.sqftMin !== null ? Math.max(0, filters.sqftMin) : null;
+                  const max = min !== null && filters.sqftMax !== null && filters.sqftMax < min ? min : filters.sqftMax;
+                  onFiltersChange({ ...filters, sqftMin: min, sqftMax: max });
                 }}
                 style={inputStyle}
               />
-              <span style={{ fontSize: 13, color: "#8c8c9a" }}>–</span>
+              <span style={{ fontSize: 13, color: "#8c8c9a" }}>{"\u2013"}</span>
               <input
                 type="number"
                 placeholder="Max"
-                min={filters.sqftMin ?? 0}
+                min={0}
                 value={filters.sqftMax ?? ""}
                 onChange={(e) => {
-                  const val = e.target.value ? Math.max(filters.sqftMin ?? 0, Number(e.target.value)) : null;
-                  onFiltersChange({
-                    ...filters,
-                    sqftMax: val,
-                  });
+                  const val = e.target.value ? Number(e.target.value) : null;
+                  onFiltersChange({ ...filters, sqftMax: val });
+                }}
+                onBlur={() => {
+                  let max = filters.sqftMax !== null ? Math.max(0, filters.sqftMax) : null;
+                  if (max !== null && filters.sqftMin !== null && max < filters.sqftMin) max = filters.sqftMin;
+                  onFiltersChange({ ...filters, sqftMax: max });
                 }}
                 style={inputStyle}
               />
