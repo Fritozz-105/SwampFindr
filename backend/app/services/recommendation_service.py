@@ -1,9 +1,9 @@
 """Recommendation service."""
 import logging
-from datetime import datetime
 from typing import Optional
 
-from app.database import get_listings_collection, get_units_collection
+from app.database import get_listings_collection
+from app.services.listing_utils import attach_units
 from app.services.profile_service import get_profile_by_user_id, get_favorites
 from app.services.pinecone_service import query_records
 
@@ -35,32 +35,6 @@ def _build_preference_query(prefs: dict) -> str:
     parts.append(f"Additional notes: {excerpt}")
 
   return " ".join(parts)
-
-
-def _attach_units(listings: list) -> list:
-  """Attach units from the Units collection to each listing."""
-  if not listings:
-    return listings
-
-  listing_ids = [l["listing_id"] for l in listings]
-  units_collection = get_units_collection()
-  all_units = list(units_collection.find(
-    {"listing_id": {"$in": listing_ids}},
-    {"_id": 0},
-  ))
-
-  units_by_listing = {}
-  for unit in all_units:
-    # Convert datetime fields to ISO strings for JSON serialization
-    if isinstance(unit.get("availability"), datetime):
-      unit["availability"] = unit["availability"].isoformat()
-    lid = unit["listing_id"]
-    units_by_listing.setdefault(lid, []).append(unit)
-
-  for listing in listings:
-    listing["units"] = units_by_listing.get(listing["listing_id"], [])
-
-  return listings
 
 
 def get_recommendations(user_id: str, page: int, per_page: int) -> dict:
@@ -124,7 +98,7 @@ def get_recommendations(user_id: str, page: int, per_page: int) -> dict:
     source = "fallback"
     listings, total = _fallback_recommendations(prefs, favorites_set, page, per_page)
 
-  _attach_units(listings)
+  attach_units(listings)
 
   return {
     "listings": listings,

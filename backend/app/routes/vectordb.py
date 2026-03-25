@@ -51,6 +51,8 @@ class UpsertTest(Resource):
 @vectordb.route('/query')
 class Query(Resource):
     @vectordb.expect(query_model)
+    @vectordb.doc(security="Bearer")
+    @require_auth
     def post(self):
         """Query database for similar records"""
         return {"results": query_records(request.json["query_text"], request.json["namespace"], request.json.get("top_k", 3))}
