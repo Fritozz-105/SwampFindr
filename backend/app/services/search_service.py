@@ -3,36 +3,12 @@ import logging
 from datetime import datetime, timezone
 from typing import Optional
 
-from app.database import get_listings_collection, get_units_collection, get_search_history_collection
+from app.database import get_listings_collection, get_search_history_collection
+from app.services.listing_utils import attach_units
 from app.services.profile_service import get_profile_by_user_id
 from app.services.pinecone_service import query_records
 
 logger = logging.getLogger(__name__)
-
-
-def _attach_units(listings: list) -> list:
-    """Attach units from the Units collection to each listing."""
-    if not listings:
-        return listings
-
-    listing_ids = [l["listing_id"] for l in listings]
-    units_collection = get_units_collection()
-    all_units = list(units_collection.find(
-        {"listing_id": {"$in": listing_ids}},
-        {"_id": 0},
-    ))
-
-    units_by_listing = {}
-    for unit in all_units:
-        if isinstance(unit.get("availability"), datetime):
-            unit["availability"] = unit["availability"].isoformat()
-        lid = unit["listing_id"]
-        units_by_listing.setdefault(lid, []).append(unit)
-
-    for listing in listings:
-        listing["units"] = units_by_listing.get(listing["listing_id"], [])
-
-    return listings
 
 
 def search_listings(user_id: str, query: str, top_k: int = 50) -> dict:
@@ -77,7 +53,7 @@ def search_listings(user_id: str, query: str, top_k: int = 50) -> dict:
     mongo_listings.sort(key=lambda x: x.get("match_score", 0), reverse=True)
 
     # Attach units
-    _attach_units(mongo_listings)
+    attach_units(mongo_listings)
 
     total = len(mongo_listings)
 

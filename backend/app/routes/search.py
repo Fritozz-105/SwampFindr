@@ -1,14 +1,19 @@
 """Search API endpoints."""
+import logging
 from flask import request, g
 from flask_restx import Namespace, Resource, fields
 
 from app.auth import require_auth
 from app.services.search_service import search_listings, get_recent_searches
 
+logger = logging.getLogger(__name__)
+
 search = Namespace(
     "search",
     description="Semantic listing search",
 )
+
+_MAX_QUERY_LENGTH = 500
 
 search_response_model = search.model("SearchResponse", {
     "success": fields.Boolean,
@@ -40,6 +45,9 @@ class SearchList(Resource):
         if not q:
             return {"success": False, "error": "Query parameter 'q' is required"}, 400
 
+        if len(q) > _MAX_QUERY_LENGTH:
+            return {"success": False, "error": f"Query exceeds maximum length of {_MAX_QUERY_LENGTH} characters"}, 400
+
         top_k = request.args.get("top_k", 50, type=int)
 
         try:
@@ -51,7 +59,8 @@ class SearchList(Resource):
                 "total": result["total"],
             }
         except Exception as e:
-            return {"success": False, "error": f"Search failed: {str(e)}"}, 502
+            logger.exception("Search failed for user %s: %s", g.user_id, e)
+            return {"success": False, "error": "Search failed. Please try again later."}, 502
 
 
 @search.route("/history")
