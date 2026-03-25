@@ -20,6 +20,7 @@ search_response_model = search.model("SearchResponse", {
     "data": fields.List(fields.Raw, description="List of listings with match_score"),
     "query": fields.String,
     "total": fields.Integer,
+    "error": fields.String(description="Error message on failure"),
 })
 
 history_entry_model = search.model("SearchHistoryEntry", {
