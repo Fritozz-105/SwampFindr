@@ -129,13 +129,7 @@ export function SearchView() {
 
       {/* Loading state */}
       {loading && (
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
-            gap: 20,
-          }}
-        >
+        <div className="search-grid">
           {Array.from({ length: 6 }).map((_, i) => (
             <SkeletonCard key={i} />
           ))}
@@ -193,13 +187,7 @@ export function SearchView() {
       {/* List view */}
       {!loading && !error && view === "list" && filteredResults.length > 0 && (
         <>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(3, 1fr)",
-              gap: 20,
-            }}
-          >
+          <div className="search-grid">
             {paginatedResults.map((listing) => (
               <ListingCard
                 key={listing.listing_id}

@@ -41,32 +41,13 @@ export function SearchLanding({
       }}
     >
       <div style={{ width: "100%", maxWidth: 640 }}>
-        <h1
-          style={{
-            fontFamily: "var(--font-display)",
-            fontSize: 32,
-            fontWeight: 700,
-            color: "#1a1a2e",
-            letterSpacing: "-0.02em",
-            textAlign: "center",
-            marginBottom: 24,
-          }}
-        >
+        <h1 className="search-landing-heading">
           Find Your Place
         </h1>
 
         <SearchBar value={query} onChange={onQueryChange} onSubmit={onSearch} loading={loading} />
 
-        <div
-          style={{
-            display: "flex",
-            gap: 8,
-            marginTop: 16,
-            overflowX: "auto",
-            paddingBottom: 4,
-            scrollbarWidth: "none",
-          }}
-        >
+        <div className="search-chips">
           {EXAMPLE_QUERIES.map((eq) => (
             <button
               key={eq}

@@ -45,7 +45,6 @@ export function ListingCard({ listing, onFavoriteToggle, basePath = "/home" }: L
         position: "relative",
         borderRadius: 16,
         overflow: "hidden",
-        minHeight: 400,
         transform: hovered ? "scale(1.02)" : "scale(1)",
         boxShadow: hovered
           ? "0 0 50px -15px rgba(79, 60, 201, 0.4)"
@@ -146,13 +145,13 @@ export function ListingCard({ listing, onFavoriteToggle, basePath = "/home" }: L
       {/* Content overlay */}
       <Link
         href={`${basePath}/${listing.listing_id}`}
+        className="listing-card-link"
         style={{
           position: "relative",
           display: "flex",
           flexDirection: "column",
           justifyContent: "flex-end",
           height: "100%",
-          minHeight: 400,
           padding: 20,
           color: "white",
           textDecoration: "none",
