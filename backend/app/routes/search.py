@@ -1,0 +1,68 @@
+"""Search API endpoints."""
+from flask import request, g
+from flask_restx import Namespace, Resource, fields
+
+from app.auth import require_auth
+from app.services.search_service import search_listings, get_recent_searches
+
+search = Namespace(
+    "search",
+    description="Semantic listing search",
+)
+
+search_response_model = search.model("SearchResponse", {
+    "success": fields.Boolean,
+    "data": fields.List(fields.Raw, description="List of listings with match_score"),
+    "query": fields.String,
+    "total": fields.Integer,
+})
+
+history_entry_model = search.model("SearchHistoryEntry", {
+    "query": fields.String,
+    "result_count": fields.Integer,
+    "created_at": fields.String,
+})
+
+history_response_model = search.model("SearchHistoryResponse", {
+    "success": fields.Boolean,
+    "data": fields.List(fields.Nested(history_entry_model)),
+})
+
+
+@search.route("/")
+class SearchList(Resource):
+    @search.doc(security="Bearer")
+    @search.marshal_with(search_response_model)
+    @require_auth
+    def get(self):
+        """Search listings using natural language query."""
+        q = request.args.get("q", "").strip()
+        if not q:
+            return {"success": False, "error": "Query parameter 'q' is required"}, 400
+
+        top_k = request.args.get("top_k", 50, type=int)
+
+        try:
+            result = search_listings(g.user_id, q, top_k)
+            return {
+                "success": True,
+                "data": result["listings"],
+                "query": q,
+                "total": result["total"],
+            }
+        except Exception as e:
+            return {"success": False, "error": f"Search failed: {str(e)}"}, 502
+
+
+@search.route("/history")
+class SearchHistory(Resource):
+    @search.doc(security="Bearer")
+    @search.marshal_with(history_response_model)
+    @require_auth
+    def get(self):
+        """Get recent search history for the current user."""
+        history = get_recent_searches(g.user_id)
+        return {
+            "success": True,
+            "data": history,
+        }

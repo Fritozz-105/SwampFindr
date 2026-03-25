@@ -68,6 +68,12 @@ def get_chat_threads_collection() -> Collection:
     return db['ChatThreads']
 
 
+def get_search_history_collection() -> Collection:
+    """Get the SearchHistory collection from the UserData database."""
+    db = get_userdata_db()
+    return db['SearchHistory']
+
+
 def init_db(app):
     """Initialize database connection with Flask app."""
     with app.app_context():
@@ -85,6 +91,11 @@ def init_db(app):
                 background=True,
             )
             app.logger.info("✓ Ensured ChatThreads indexes")
+            get_search_history_collection().create_index(
+                [("user_id", 1), ("created_at", -1)],
+                background=True,
+            )
+            app.logger.info("Ensured SearchHistory indexes")
         except Exception as e:
             app.logger.error(f"MongoDB connection failed: {e}")
             raise
