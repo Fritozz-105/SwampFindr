@@ -79,6 +79,6 @@ def query_records(query_text, ns, top_k=3):
             "inputs": {"text": query_text},
             "top_k": top_k
         },
-        fields=["chunk_text", "category", "listing_id"]
+        fields=["chunk_text", "category", "listing_id", "latitude", "longitude"]
     )
     return results

@@ -32,9 +32,7 @@ class AgentChat(Resource):
     """Agent chat endpoint."""
     @agent.expect(query_model)
     @agent.doc(security="Bearer")
-    @require_auth
     @agent.marshal_with(response_model)
-    @agent.doc(security="Bearer")
     @require_auth
     def post(self):
         """Handle user query and generate agent response."""
