@@ -49,7 +49,9 @@ export function useSearch() {
     const fetchHistory = async () => {
       try {
         const supabase = createClient();
-        const { data: { session } } = await supabase.auth.getSession();
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
         if (!session?.access_token) return;
         const res = await getSearchHistory(session.access_token);
         setSearchHistory(res.data);
@@ -98,22 +100,26 @@ export function useSearch() {
 
       try {
         const supabase = createClient();
-        const { data: { session } } = await supabase.auth.getSession();
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
         if (!session?.access_token) {
           setError("Not authenticated");
           return;
         }
 
-        const res = await searchListings(session.access_token, q);
+        const res = await searchListings(session.access_token, q, 50, isRestore);
         setResults(res.data);
         setFilters(defaultFilters);
         setPage(1);
 
-        try {
-          const historyRes = await getSearchHistory(session.access_token);
-          setSearchHistory(historyRes.data);
-        } catch {
-          // Non-critical
+        if (!isRestore) {
+          try {
+            const historyRes = await getSearchHistory(session.access_token);
+            setSearchHistory(historyRes.data);
+          } catch {
+            // Non-critical
+          }
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : "Search failed");
@@ -135,7 +141,9 @@ export function useSearch() {
     );
     try {
       const supabase = createClient();
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session?.access_token) return;
       await toggleFavorite(session.access_token, listingId);
     } catch {

@@ -11,7 +11,7 @@ from app.services.pinecone_service import query_records
 logger = logging.getLogger(__name__)
 
 
-def search_listings(user_id: str, query: str, top_k: int = 50) -> dict:
+def search_listings(user_id: str, query: str, top_k: int = 50, *, skip_history: bool = False) -> dict:
     """
     Search listings via Pinecone vector similarity.
     """
@@ -57,8 +57,8 @@ def search_listings(user_id: str, query: str, top_k: int = 50) -> dict:
 
     total = len(mongo_listings)
 
-    # Save search history (only if results > 0)
-    if total > 0:
+    # Save search history (only for new user-initiated searches with results)
+    if total > 0 and not skip_history:
         _save_search_history(user_id, query, mongo_listings)
 
     return {"listings": mongo_listings, "total": total}
