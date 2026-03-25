@@ -66,15 +66,13 @@ export async function searchListings(
   token: string,
   query: string,
   topK: number = 50,
+  skipHistory: boolean = false,
 ): Promise<SearchResponse> {
-  return flaskFetch<SearchResponse>(
-    `/search/?q=${encodeURIComponent(query)}&top_k=${topK}`,
-    { token },
-  );
+  const params = new URLSearchParams({ q: query, top_k: String(topK) });
+  if (skipHistory) params.set("skip_history", "1");
+  return flaskFetch<SearchResponse>(`/search/?${params.toString()}`, { token });
 }
 
-export async function getSearchHistory(
-  token: string,
-): Promise<SearchHistoryResponse> {
+export async function getSearchHistory(token: string): Promise<SearchHistoryResponse> {
   return flaskFetch<SearchHistoryResponse>("/search/history", { token });
 }

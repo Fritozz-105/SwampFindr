@@ -50,9 +50,10 @@ class SearchList(Resource):
             return {"success": False, "error": f"Query exceeds maximum length of {_MAX_QUERY_LENGTH} characters"}, 400
 
         top_k = request.args.get("top_k", 50, type=int)
+        skip_history = request.args.get("skip_history", "0") == "1"
 
         try:
-            result = search_listings(g.user_id, q, top_k)
+            result = search_listings(g.user_id, q, top_k, skip_history=skip_history)
             return {
                 "success": True,
                 "data": result["listings"],

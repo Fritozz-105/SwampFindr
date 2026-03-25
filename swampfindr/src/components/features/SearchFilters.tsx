@@ -55,12 +55,7 @@ export function SearchFilters({
   return (
     <div
       ref={containerRef}
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 8,
-        flexWrap: "wrap",
-      }}
+      className="search-filters-bar"
     >
       {/* Price pill */}
       <div style={{ position: "relative" }}>
@@ -73,7 +68,7 @@ export function SearchFilters({
           {getPriceLabel(filters)}
         </button>
         {openDropdown === "price" && (
-          <div style={dropdownStyle}>
+          <div className="search-filter-dropdown" style={dropdownStyle}>
             <div
               style={{
                 display: "flex",
@@ -132,7 +127,7 @@ export function SearchFilters({
           {getBedsLabel(filters)}
         </button>
         {openDropdown === "beds" && (
-          <div style={dropdownStyle}>
+          <div className="search-filter-dropdown" style={dropdownStyle}>
             <div style={{ display: "flex", gap: 6 }}>
               {[
                 { label: "Any", value: null },
@@ -167,7 +162,7 @@ export function SearchFilters({
           {getBathsLabel(filters)}
         </button>
         {openDropdown === "baths" && (
-          <div style={dropdownStyle}>
+          <div className="search-filter-dropdown" style={dropdownStyle}>
             <div style={{ display: "flex", gap: 6 }}>
               {[
                 { label: "Any", value: null },
@@ -201,7 +196,7 @@ export function SearchFilters({
           {getSqftLabel(filters)}
         </button>
         {openDropdown === "sqft" && (
-          <div style={dropdownStyle}>
+          <div className="search-filter-dropdown" style={dropdownStyle}>
             <div
               style={{
                 display: "flex",
@@ -250,6 +245,7 @@ export function SearchFilters({
 
       {/* Result count */}
       <div
+        className="search-result-count"
         style={{
           marginLeft: "auto",
           fontSize: 13,

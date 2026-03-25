@@ -521,6 +521,105 @@ body {
   padding: 4px 0 24px;
 }
 
+/* Search — responsive grid */
+.search-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+@media (max-width: 1024px) {
+  .search-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .search-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Search — example query chips wrap on mobile */
+.search-chips {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+}
+
+@media (max-width: 640px) {
+  .search-chips {
+    flex-wrap: wrap;
+    overflow-x: visible;
+  }
+}
+
+/* Search — filter dropdowns stay in viewport on mobile */
+@media (max-width: 640px) {
+  .search-filter-dropdown {
+    position: fixed !important;
+    left: 16px !important;
+    right: 16px !important;
+    top: auto !important;
+    bottom: 72px !important;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+  }
+}
+
+/* Search — listing card responsive height */
+.listing-card-link {
+  min-height: 400px;
+}
+
+@media (max-width: 640px) {
+  .listing-card-link {
+    min-height: 320px;
+  }
+}
+
+/* Search — landing heading responsive */
+.search-landing-heading {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: #1a1a2e;
+  letter-spacing: -0.02em;
+  text-align: center;
+  margin-bottom: 24px;
+  font-size: 32px;
+}
+
+@media (max-width: 640px) {
+  .search-landing-heading {
+    font-size: 24px;
+    margin-bottom: 16px;
+  }
+}
+
+/* Search — result count moves below filters on mobile */
+.search-filters-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 640px) {
+  .search-filters-bar {
+    gap: 6px;
+  }
+
+  .search-result-count {
+    width: 100%;
+    margin-left: 0 !important;
+    margin-top: 4px;
+  }
+}
+
 /* Password visibility toggle */
 .password-toggle {
   position: absolute;
