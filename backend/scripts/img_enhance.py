@@ -4,6 +4,13 @@ import requests
 from PIL import Image
 from io import BytesIO
 from pathlib import Path
+import base64
+from datetime import datetime, timezone
+import argparse
+import sys
+import os
+
+
 
 import matplotlib.pyplot as plt
 from scipy.ndimage import gaussian_filter
@@ -77,3 +84,107 @@ def optimize_img(img, res_increase: int = 4):
             high_res[i * mult:(i + 1) * mult, j * mult:(j + 1) * mult] = img[i, j]
 
     blurred_img = gaussian_filter(high_res, sigma=1.2)
+    return np.clip(blurred_img, 0, 255).astype(np.uint8)
+
+
+def array_to_jpeg_bytes(img: np.ndarray, quality: int = 90) -> bytes:
+    pil_img = Image.fromarray(img.astype(np.uint8))
+    buff = BytesIO()
+    pil_img.save(buff, format="JPEG", quality=quality)
+    return buff.getvalue()
+
+
+def upload_cleaned_image_default(img: np.ndarray) -> str:
+    """
+    Default "upload back" implementation:
+    store as base64 data URI string directly in Mongo listing doc.
+
+    Replace this function if you want real CDN/S3 upload and return hosted URL.
+    """
+    encoded = base64.b64encode(array_to_jpeg_bytes(img)).decode("ascii")
+    return f"data:image/jpeg;base64,{encoded}"
+
+
+def get_listings_collection():
+    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+    from app.database.mongo import get_listings_collection as _get_listings_collection
+
+    return _get_listings_collection()
+
+
+def process_listings_images(
+    listing_id: str | None = None,
+    limit: int = 0,
+    upload_fn=upload_cleaned_image_default,
+):
+    """
+    Pipeline:
+    1) Pull listings from Mongo
+    2) Download each image
+    3) Clean via optimize_img (numpy)
+    4) Upload cleaned image (upload_fn)
+    5) Write cleaned_photos back to listing
+       Fallback: if any image fails, keep original URL for that image
+    """
+    listings_collection = get_listings_collection()
+
+    query = {"listing_id": listing_id} if listing_id else {}
+    cursor = listings_collection.find(query, {"listing_id": 1, "photos": 1})
+    if limit and limit > 0:
+        cursor = cursor.limit(limit)
+
+    processed_listings = 0
+    processed_images = 0
+    failed_images = 0
+
+    for listing in cursor:
+        lid = listing.get("listing_id")
+        photos = listing.get("photos", []) or []
+        cleaned_photos = []
+
+        for idx, url in enumerate(photos):
+            try:
+                arr = download_image_as_array(url, save_path=f"tmp/original_{lid}_{idx}.jpg")
+                cleaned = optimize_img(arr)
+                uploaded = upload_fn(cleaned)
+                cleaned_photos.append(uploaded)
+                processed_images += 1
+            except Exception as exc:
+                print(f"[WARN] {lid} photo#{idx} failed: {exc}")
+                cleaned_photos.append(url)  # Fallback to original URL
+                failed_images += 1
+
+        listings_collection.update_one(
+            {"_id": listing["_id"]},
+            {"$set": {
+                "cleaned_photos": cleaned_photos,
+                "image_cleanup_meta": {
+                    "updated_at": datetime.now(timezone.utc),
+                    "total_images": len(photos),
+                    "failed_images": sum(1 for i, p in enumerate(cleaned_photos) if i < len(photos) and p == photos[i]),
+                },
+            }},
+        )
+        processed_listings += 1
+        print(f"[OK] Updated listing {lid} ({len(photos)} images)")
+
+    summary = {
+        "processed_listings": processed_listings,
+        "processed_images": processed_images,
+        "failed_images": failed_images,
+    }
+    print(summary)
+    return summary
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Clean listing images and upload cleaned URLs back to Mongo.")
+    parser.add_argument("--listing-id", type=str, default=None, help="Only process one listing_id")
+    parser.add_argument("--limit", type=int, default=0, help="Process first N listings (0 = no limit)")
+    args = parser.parse_args()
+
+    process_listings_images(listing_id=args.listing_id, limit=args.limit)
+
+
+if __name__ == "__main__":
+    main()
