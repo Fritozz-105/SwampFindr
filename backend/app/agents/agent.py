@@ -17,6 +17,7 @@ from langgraph.checkpoint.mongodb import MongoDBSaver
 load_dotenv()
 
 openai_api_key = (os.getenv("OPENAI_API_KEY") or "").strip()
+openai_base_url = (os.getenv("OPENAI_BASE_URL") or "").strip() or None # make base_url empty in .env then it will use OPENAI url
 if openai_api_key:
     model = ChatOpenAI(
         model="gpt-4o-mini",
@@ -24,6 +25,7 @@ if openai_api_key:
         max_tokens=256,
         timeout=30,
         api_key=openai_api_key,
+        base_url=openai_base_url,
     )
 else:
     print("OPENAI_API_KEY not set. Using Ollama (llama3-groq-tool-use:latest).")
@@ -47,7 +49,7 @@ agent = create_agent(
     model,
     tools=tools(),
     system_prompt=SYSTEM_PROMPT,
-    checkpointer =checkpointer, 
+    checkpointer =checkpointer,
 )
 
 

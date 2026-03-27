@@ -1,4 +1,5 @@
 import type { RecommendationResponse, Listing } from "@/types/listing";
+import type { SearchResponse, SearchHistoryResponse } from "@/types/search";
 
 const FLASK_API_URL = process.env.NEXT_PUBLIC_FLASK_API_URL ?? "http://localhost:8080";
 
@@ -59,4 +60,19 @@ export async function getListingDetail(
   listingId: string,
 ): Promise<{ success: boolean; data: Listing }> {
   return flaskFetch(`/listings/${listingId}`);
+}
+
+export async function searchListings(
+  token: string,
+  query: string,
+  topK: number = 50,
+  skipHistory: boolean = false,
+): Promise<SearchResponse> {
+  const params = new URLSearchParams({ q: query, top_k: String(topK) });
+  if (skipHistory) params.set("skip_history", "1");
+  return flaskFetch<SearchResponse>(`/search/?${params.toString()}`, { token });
+}
+
+export async function getSearchHistory(token: string): Promise<SearchHistoryResponse> {
+  return flaskFetch<SearchHistoryResponse>("/search/history", { token });
 }

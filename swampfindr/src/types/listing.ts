@@ -30,6 +30,8 @@ export interface Listing {
   units: Unit[];
   match_score: number | null;
   is_favorited: boolean;
+  latitude: number | null;
+  longitude: number | null;
 }
 
 export interface PaginationMeta {

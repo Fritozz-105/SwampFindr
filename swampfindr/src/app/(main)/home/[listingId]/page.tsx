@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { useParams } from "next/navigation";
-import Link from "next/link";
+import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import {
   ChevronLeft,
@@ -176,6 +175,7 @@ function ImageGallery({ photos, address }: { photos: string[]; address: string }
 
 export default function ListingDetailPage() {
   const params = useParams<{ listingId: string }>();
+  const router = useRouter();
   const [listing, setListing] = useState<Listing | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -254,21 +254,24 @@ export default function ListingDetailPage() {
         <p style={{ color: "var(--color-text-secondary)", fontSize: 15, marginBottom: 16 }}>
           {error || "Listing not found."}
         </p>
-        <Link
-          href="/home"
+        <button
+          onClick={() => router.back()}
           style={{
             color: "var(--color-primary)",
             fontSize: 14,
             fontWeight: 600,
-            textDecoration: "none",
+            background: "none",
+            border: "none",
+            cursor: "pointer",
             display: "inline-flex",
             alignItems: "center",
             gap: 6,
+            padding: 0,
           }}
         >
           <ArrowLeft size={16} />
-          Back to feed
-        </Link>
+          Go back
+        </button>
       </div>
     );
   }
@@ -281,22 +284,25 @@ export default function ListingDetailPage() {
   return (
     <div style={{ maxWidth: 900, margin: "0 auto", padding: "32px 24px" }}>
       {/* Back link */}
-      <Link
-        href="/home"
+      <button
+        onClick={() => router.back()}
         style={{
           display: "inline-flex",
           alignItems: "center",
           gap: 6,
           color: "var(--color-text-secondary)",
           fontSize: 14,
-          textDecoration: "none",
+          background: "none",
+          border: "none",
+          cursor: "pointer",
+          padding: 0,
           marginBottom: 20,
           transition: "opacity 0.15s",
         }}
       >
         <ArrowLeft size={16} />
-        Back to feed
-      </Link>
+        Go back
+      </button>
 
       {/* Photo gallery */}
       <ImageGallery photos={listing.photos} address={listing.address} />

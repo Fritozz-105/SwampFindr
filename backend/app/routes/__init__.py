@@ -6,6 +6,7 @@ from app.routes.agent import agent
 from app.routes.vectordb import vectordb
 from app.routes.profiles import profiles
 from app.routes.recommendations import recommendations
+from app.routes.search import search
 
 
 # Create main blueprint
@@ -34,6 +35,7 @@ api.add_namespace(agent, path="/chat")
 api.add_namespace(vectordb, path="/pinecone")
 api.add_namespace(profiles, path="/profiles")
 api.add_namespace(recommendations, path="/recommendations")
+api.add_namespace(search, path="/search")
 
 
 def register_blueprints(app):
