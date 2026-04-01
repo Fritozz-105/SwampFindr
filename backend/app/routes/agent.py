@@ -10,6 +10,8 @@ from app.services.conversation_service import (
 
 agent = Namespace('agent', description='Agent-based apartment search operations')
 
+MAX_QUERY_LENGTH = 2000
+
 
 query_model = agent.model('Query', {
     'query': fields.String(required=True, description='User query for apartment search'),
@@ -44,6 +46,17 @@ class AgentChat(Resource):
                 'response': "",
                 "error": "Query parameter is missing",
                 "error_type": "Missing field",
+                "thread_id": None,
+                "is_new_thread": False,
+                "listings": [],
+            }, 400
+
+        if len(data['query']) > MAX_QUERY_LENGTH:
+            return {
+                'success': False,
+                'response': "",
+                "error": f"Query exceeds maximum length of {MAX_QUERY_LENGTH} characters",
+                "error_type": "Invalid input",
                 "thread_id": None,
                 "is_new_thread": False,
                 "listings": [],

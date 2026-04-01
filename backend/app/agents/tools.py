@@ -263,7 +263,7 @@ def get_crimes_nearby(lat: float, lng: float, radius_m: float = 800, limit: int 
     """
     if not (-90 <= lat <= 90):
         return {"success": False, "error": "Latitude must be between -90 and 90"}
-    if not {-180 <= lng <= 180}:
+    if not (-180 <= lng <= 180):
         return {"success": False, "error": "Longitude must be between -180 and 180"}
     if radius_m <= 0 or radius_m > 5000:
         return {"success": False, "error": "radius_m must be between 0 and 5000"}
