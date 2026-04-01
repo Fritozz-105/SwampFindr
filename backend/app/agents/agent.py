@@ -81,7 +81,7 @@ def _as_text(content) -> str:
         return "".join(parts).strip()
     return str(content or "")
 
-
+# next 3 functions are tools to return listings in agent chat
 def _python_repr_to_json(s: str) -> str:
     """Best-effort conversion of a Python repr string to valid JSON."""
     s = re.sub(r'datetime\.datetime\([^)]*\)', 'null', s)
