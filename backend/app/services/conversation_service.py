@@ -13,7 +13,7 @@ def _get_collection():
         return None
     try:
         return get_chat_threads_collection()
-    except Exception as e:
+    except Exception:
         return None
 
 def create_thread_for_user(user_id: str) -> dict:
@@ -32,12 +32,13 @@ def create_thread_for_user(user_id: str) -> dict:
 
 
 def user_owns_thread(user_id: str, thread_id: str) -> bool:
-    """Return True when thread_id belongs to user_id."""
+    """Return True when thread_id belongs to user_id and is not soft-deleted."""
     collection = _get_collection()
     if collection is None:
         return True
-    collection = get_chat_threads_collection()
-    return collection.find_one({"user_id": user_id, "thread_id": thread_id}) is not None
+    return collection.find_one(
+        {"user_id": user_id, "thread_id": thread_id, "deleted_at": {"$exists": False}}
+    ) is not None
 
 
 def get_user_id_for_thread(thread_id: str) -> str | None:
@@ -63,15 +64,30 @@ def touch_thread(user_id: str, thread_id: str) -> None:
 
 
 def get_user_threads(user_id: str) -> list[dict]:
-    """List all thread ids for a user, newest activity first."""
+    """List all thread ids for a user, newest activity first. Excludes soft-deleted threads."""
     collection = _get_collection()
     if collection is None:
         return []
     docs = list(
-        collection.find({"user_id": user_id}, {"_id": 0, "user_id": 0}).sort("updated_at", -1)
+        collection.find(
+            {"user_id": user_id, "deleted_at": {"$exists": False}},
+            {"_id": 0, "user_id": 0},
+        ).sort("updated_at", -1)
     )
     for doc in docs:
         for key in ("created_at", "updated_at"):
             if isinstance(doc.get(key), datetime):
                 doc[key] = doc[key].isoformat()
     return docs
+
+
+def soft_delete_thread(user_id: str, thread_id: str) -> bool:
+    """Soft-delete a thread by setting deleted_at. Returns True if the thread was found and deleted."""
+    collection = _get_collection()
+    if collection is None:
+        return False
+    result = collection.update_one(
+        {"user_id": user_id, "thread_id": thread_id, "deleted_at": {"$exists": False}},
+        {"$set": {"deleted_at": datetime.now(timezone.utc)}},
+    )
+    return result.modified_count > 0

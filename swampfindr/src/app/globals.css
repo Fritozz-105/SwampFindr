@@ -197,6 +197,11 @@ body {
   to { transform: rotate(360deg); }
 }
 
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
 .spinner {
   width: 20px;
   height: 20px;
@@ -638,4 +643,36 @@ body {
 
 .password-toggle:hover {
   color: var(--color-text);
+}
+
+/* Chat responsive styles */
+@media (max-width: 768px) {
+  .thread-sidebar-desktop {
+    display: none !important;
+  }
+  .thread-sidebar-mobile {
+    display: block !important;
+  }
+  .thread-sidebar-mobile .mobile-only-close {
+    display: flex !important;
+  }
+  .chat-mobile-topbar {
+    display: flex !important;
+  }
+  .chat-container {
+    height: calc(100vh - 56px - 64px) !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .thread-sidebar-desktop {
+    display: flex !important;
+    flex-direction: column;
+  }
+  .thread-sidebar-mobile {
+    display: none !important;
+  }
+  .chat-mobile-topbar {
+    display: none !important;
+  }
 }

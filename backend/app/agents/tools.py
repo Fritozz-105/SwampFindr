@@ -96,10 +96,10 @@ def suggest_listing(top_k: int = 1) -> dict:
             listing["match_score"] = hit["_score"]
             listings.append(listing)
 
-        return {"success": True, "listings": listings, "count": len(listings)}
+        return json.dumps({"success": True, "listings": listings, "count": len(listings)}, default=str)
 
     except Exception as e:
-        return {"success" :False, "error": str(e)}
+        return json.dumps({"success": False, "error": str(e)})
 
 
 @tool

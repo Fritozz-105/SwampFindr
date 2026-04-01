@@ -22,7 +22,7 @@ from app.services.profile_service import (
     toggle_favorite,
     get_favorites,
 )
-from app.services.conversation_service import get_user_threads, user_owns_thread
+from app.services.conversation_service import get_user_threads, user_owns_thread, soft_delete_thread
 from app.agents.agent import get_history
 
 logger = logging.getLogger(__name__)
@@ -263,7 +263,19 @@ class UserThreads(Resource):
     @require_auth
     def get(self):
         return {"success": True, "data": get_user_threads(g.user_id)}, 200
-    
+
+
+@profiles.route("/threads/<string:thread_id>")
+class UserThread(Resource):
+    @profiles.doc(security="Bearer")
+    @require_auth
+    def delete(self, thread_id):
+        """Soft-delete a conversation thread (data preserved in DB)."""
+        deleted = soft_delete_thread(g.user_id, thread_id)
+        if not deleted:
+            return {"success": False, "error": "Thread not found"}, 404
+        return {"success": True}, 200
+
 
 @profiles.route("/chathistory")
 class ChatHistory(Resource):
