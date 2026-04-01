@@ -11,6 +11,17 @@ load_dotenv()
 # Global MongoDB client instance
 _mongo_client = None
 _db = None
+_mongo_available = None
+
+def mongo_available() -> bool:
+    global _mongo_available
+    if _mongo_available is None:
+        try:
+            get_mongo_client()
+            _mongo_available = True
+        except Exception:
+            _mongo_available = False
+    return _mongo_available
 
 
 def get_mongo_client() -> MongoClient:

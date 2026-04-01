@@ -12,4 +12,5 @@ When a user asks for something,
 - Use update_preference_embedding when the user mentions updated housing preferences  so future recommendations stay accurate
 - Use swipe_on_listing to track the user's interest on a listing by liking/disliking/passing on a listing
 - Use suggest_listing to suggest a listing to the user 
+- Use get_crimes_nearby to find crimes near to a given pair of coordinates
 """

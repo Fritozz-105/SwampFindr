@@ -4,16 +4,25 @@ from datetime import datetime, timezone
 from uuid import uuid4
 
 from app.database import get_chat_threads_collection
+from app.database.mongo import mongo_available
 from app.models.conversation import ChatThreadModel
 
 
+def _get_collection():
+    if not mongo_available():
+        return None
+    try:
+        return get_chat_threads_collection()
+    except Exception as e:
+        return None
+
 def create_thread_for_user(user_id: str) -> dict:
     """Create and persist a new thread mapping for the authenticated user."""
-    collection = get_chat_threads_collection()
     thread_id = str(uuid4())
     thread = ChatThreadModel(user_id=user_id, thread_id=thread_id)
-
-    collection.insert_one(thread.model_dump())
+    collection = _get_collection()
+    if collection is not None:
+        collection.insert_one(thread.model_dump())
     return {
         "user_id": user_id,
         "thread_id": thread_id,
@@ -24,13 +33,18 @@ def create_thread_for_user(user_id: str) -> dict:
 
 def user_owns_thread(user_id: str, thread_id: str) -> bool:
     """Return True when thread_id belongs to user_id."""
+    collection = _get_collection()
+    if collection is None:
+        return True
     collection = get_chat_threads_collection()
     return collection.find_one({"user_id": user_id, "thread_id": thread_id}) is not None
 
 
 def get_user_id_for_thread(thread_id: str) -> str | None:
     """Return the owner user_id for a thread_id, or None when not found."""
-    collection = get_chat_threads_collection()
+    collection = _get_collection()
+    if collection is None:
+        return None
     doc = collection.find_one({"thread_id": thread_id}, {"_id": 0, "user_id": 1})
     if not doc:
         return None
@@ -39,7 +53,9 @@ def get_user_id_for_thread(thread_id: str) -> str | None:
 
 def touch_thread(user_id: str, thread_id: str) -> None:
     """Update thread activity timestamp after successful chat activity."""
-    collection = get_chat_threads_collection()
+    collection = _get_collection()
+    if collection is None:
+        return
     collection.update_one(
         {"user_id": user_id, "thread_id": thread_id},
         {"$set": {"updated_at": datetime.now(timezone.utc)}},
@@ -48,7 +64,9 @@ def touch_thread(user_id: str, thread_id: str) -> None:
 
 def get_user_threads(user_id: str) -> list[dict]:
     """List all thread ids for a user, newest activity first."""
-    collection = get_chat_threads_collection()
+    collection = _get_collection()
+    if collection is None:
+        return []
     docs = list(
         collection.find({"user_id": user_id}, {"_id": 0, "user_id": 0}).sort("updated_at", -1)
     )
