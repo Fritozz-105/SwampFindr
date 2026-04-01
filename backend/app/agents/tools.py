@@ -33,7 +33,8 @@ def get_tools():
         decode_coordinates,
         update_preference_embedding,
         swipe_on_listing,
-        suggest_listing
+        suggest_listing,
+        get_crimes_nearby
     ]
 
 
@@ -244,6 +245,76 @@ def closest_bus_stops(lat: float, lng: float, radius_m: float = 350) -> dict:
     return {
         "stops": json.loads(results_df.to_json(orient='records')),
         "count": len(results_df)
+    }
+
+
+@tool
+def get_crimes_nearby(lat: float, lng: float, radius_m: float = 800, limit: int = 50) -> dict:
+    """
+    Fetch recent crime incidents near a given pair of coordinates via the GNV open data portal.
+    Args:
+        lat: Latitude of the target location
+        lng: Longitude of the target location
+        radius_m: Search radius in meters (default 800m)
+        limit: Maximum # of incidents to return (default 50)
+
+    Returns:
+        Dictionary with the 'incidents', 'count', and 'summary'
+    """
+    if not (-90 <= lat <= 90):
+        return {"success": False, "error": "Latitude must be between -90 and 90"}
+    if not {-180 <= lng <= 180}:
+        return {"success": False, "error": "Longitude must be between -180 and 180"}
+    if radius_m <= 0 or radius_m > 5000:
+        return {"success": False, "error": "radius_m must be between 0 and 5000"}
+
+    limit = max(1, min(limit, 200))
+    BASE_URL = "https://data.cityofgainesville.org/resource/gvua-xt9q.json"
+    HEADERS = {"User-Agent": "SwampFindr/1.0 University of Florida (ufl.edu)"}
+
+    params = {
+        "$where": f"within_circle(location, {lat}, {lng}, {radius_m})",
+        "$limit": limit,
+        "$order": "report_date DESC",
+        "$select": "report_date,offense_date,narrative,address,latitude,longitude",
+    }
+
+    try:
+        with httpx.Client(timeout=30.0, headers=HEADERS) as client:
+            resp = client.get(BASE_URL, params=params)
+            resp.raise_for_status()
+            data = resp.json()
+    except httpx.ConnectTimeout:
+        return {"success": False, "error": "Connection timed out reaching crime data API"}
+    except httpx.HTTPStatusError as e:
+        return {"success": False, "error": f"API error {e.response.status_code}: {e.response.text}"}
+    except Exception as e:
+        return {"success": False, "error": f"Request failed: {e}"}
+
+    if not data:
+        return {"success": True, "incidents": [], "count": 0, "summary": {}}
+
+    summary: dict[str, int] = {}
+
+    incidents = []
+    for row in data:
+        offense = row.get("narrative") or "Unknown"
+        summary[offense] = summary.get(offense, 0) + 1
+        incidents.append({
+            "date": row.get("report_date", ""),
+            "offense": offense,
+            "address": row.get("address", ""),
+            "lat": row.get("latitude"),
+            "lng": row.get("longitude"),
+        })
+
+    return {
+        "success": True,
+        "incidents": incidents,
+        "count": len(incidents),
+        "summary": dict(sorted(summary.items(), key=lambda x: x[1], reverse=True)),
+        "radius_m": radius_m,
+        "source": "Gainesville Police Department via dataGNV (data.cityofgainesville.org)",
     }
 
 

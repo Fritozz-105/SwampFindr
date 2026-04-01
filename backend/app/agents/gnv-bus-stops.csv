@@ -33,14 +33,10 @@ stop_id,stop_name,stop_desc,Latitude,Longitude
 38,University Commons Apartments @ Archer Road,Eastbound Archer RD @ Nearside SW 23rd TER,29.63196028,-82.36199718
 39,The Bartram Apartments,Eastbound Archer RD @ Farside SW 23rd DR,29.63369636,-82.3581948
 40,Shands Care Helicopter Pad,Eastbound Archer RD @ Nearside Gale Lemerand DR,29.63640161,-82.35091151
-41,Shands Hospital @ Dental Science Building,Northbound Center DR @ Farside Archer RD,29.63905427,-82.34614118
 42,Shands Hospital @ HPNP Building,Northbound Center DR @ Farside Mowry RD,29.64084372,-82.34606499
 43,Greenhouse - Agronomy Building,Northbound Center DR @ Nearside Museum RD,29.64436011,-82.34685268
 45,University Police Department,Eastbound Museum RD @ Farside Newell DR,29.6447586,-82.34306806
-46,Beaty Towers,Eastbound Museum RD @ Nearside SW 13th ST,29.64470561,-82.34079068
 47,Sorority Row @ SW 8th Avenue,Eastbound SW 8th AVE @ Farside SW 12th ST,29.64485444,-82.33780768
-48,Norman Hall,Northbound SW 12th ST @ Farside SW 7th AVE,29.64602661,-82.33702318
-50,Campus USA Bank,Northbound SW 12th ST @ Nearside SW 4th AVE,29.6481866,-82.33707502
 51,Camden Court Apartments,Northbound SW 12th ST @ Nearside SW 2th AVE,29.64970077,-82.33704802
 52,Eastbound SW 2nd Avenue @ SW 10th Street,Eastbound SW 2nd AVE @ Nearside SW 10th ST,29.65015377,-82.33540985
 53,Eastbound SW 2nd Ave @ SW 7th Terrace,Eastbound SW 2nd AVE @ Farside SW 7th TER,29.65018094,-82.33208414
@@ -61,10 +57,6 @@ stop_id,stop_name,stop_desc,Latitude,Longitude
 82,McPherson Recreational Center,Northbound SE 15th ST @ Farside SE 22nd AVE,29.63375196,-82.30579405
 84,Northbound SE 15th Street @ SE 13th Place,Northbound SE 15th ST @ Farside SE 13th PL,29.63904543,-82.30579603
 85,Lincoln Estate Neighborhood,Eastbound SE 12th AVE @ Farside SE 15th ST,29.64024461,-82.30544869
-87,Lincoln Estate Neighborhood,Eastbound SE 12th AVE @ Farside SE 17th TER,29.64022461,-82.30274386
-89,Lincoln Estate Neighborhood,Eastbound SE 12th AVE @ Nearside SE 19th TER,29.64019944,-82.2995482
-90,Lincoln Estate Neighborhood,Northbound SE 19th TER @ Nearside SE 10th PL,29.64174863,-82.29932598
-92,Lincoln Estate Neighborhood,Northbound SE 19th TER @ Nearside SE 8th AVE,29.64444194,-82.29935353
 96,Northbound SE 15th Street @ SE 3rd Avenue,Northbound SE 15th ST @ Nearside SE 3rd Ave,29.64878958,-82.30578802
 97,Veteran's Honor Center,Eastbound SE 3rd AVE @ Nearside SE 17th ST,29.64909794,-82.30334586
 98,Little One Day Care,Eastbound Hawthorne RD @ Farside SE 21st ST,29.64892454,-82.30151937
@@ -76,23 +68,16 @@ stop_id,stop_name,stop_desc,Latitude,Longitude
 107,Inside Alachua County Health Department,Southbound Alachua County Health Department @ Far*,29.6490856,-82.2949412
 108,SE 24th Street at Hawthorne Road,Southbound SE 24th ST @ Nearside Hawthorne RD,29.6461483,-82.29394927
 109,Phase III Supply,Westbound Hawthorne RD @ Nearside SE 21st ST,29.64701144,-82.29722836
-110,Veteran's Honor Center,Westbound SE 3rd AVE @ Farside SE 17th ST,29.64924863,-82.30417485
 111,Southbound SE 15th Street @ SE 4th Avenue,Southbound SE 15th ST @ Nearside SE 4th AVE,29.64838294,-82.30594303
 113,Southbound SE 15th Street @ SE 7th Avenue,Southbound SE 15th ST @ Nearside SE 7th AVE,29.6459966,-82.30596103
 115,Williams Elementary School,Westbound SE 7th AVE @ Nearside SE 12th TER,29.64583979,-82.3094919
 116,Waldo Rd @ SE 7th Avenue,Westbound SE 7th AVE @ Farside SE 11th ST,29.64584161,-82.31100618
 122,Lincoln Estates Neighborhood,Southbound SE 19th TER @ Farside SE 8th AVE,29.64422756,-82.29941165
-124,Lincoln Estates Neighborhood,Southbound SE 19th TER @ Nearside SE 10th PL,29.64188191,-82.29941977
 125,Westbound SE 12th Avenue @ SE 18th Terrace,Westbound SE 12th AVE @ Nearside SE 18th TER,29.64030198,-82.30235536
-127,Lincoln Estates Neighborhood,Westbound SE 12th AVE @ Nearside SE 15th ST,29.64032782,-82.30574171
 128,Southbound SE 15th Street @ SE 14th Avenue,Southbound SE 15th ST @ Nearside SE 14th AVE,29.63845911,-82.30594603
-129,McPherson Recreational Center,Southbound SE 15th ST @ Nearside SE 22nd AVE,29.63373294,-82.30590919
 131,Westbound SE 22nd Avenue @ SE 13th Street,Westbound SE 22nd AVE @ Nearside SE 13th ST,29.63186409,-82.30857958
 132,Westbound SE 22nd Avenue @ SE 12th Street,Westbound SE 22nd AVE @ Farside SE 12th ST,29.63185461,-82.31098386
 133,Gainesville Housing Authority,Northbound SE 4th ST @ Farside SE 19th PL,29.63397127,-82.31596136
-134,Norwood Neighborhood,Northbound SE 4th ST @ Nearside SE 14th LN,29.63637452,-82.31723972
-135,Dignity Project,Northbound SE 4th ST @ Nearside SE 11th PL,29.63923444,-82.31862919
-136,RTS Entrance,Northbound SE 4th ST @ Nearside SE 10th AVE,29.64164844,-82.31984319
 139,City Hall,Westbound E University AVE @ Nearside NE 1st ST,29.65205359,-82.32359835
 140,Alachua County Office of the State Attorney,Westbound W University AVE @ Nearside NW 2nd ST,29.65205724,-82.32640771
 142,Seagle Building,Westbound W University AVE @ Farside W 3rd ST,29.65207597,-82.32842667
@@ -124,13 +109,11 @@ stop_id,stop_name,stop_desc,Latitude,Longitude
 "1,177",Fifield Hall,Westbound Hull RD @ Farside Mowry RD,29.63772561,-82.36002101
 172,Terwilliger Elementary School,Southbound NW 62nd ST @ Farside NW 1st PL,29.65438919,-82.40897317
 173,Oaks Mall,Southbound SW 1st PL @ Farside SW 62nd BLVD,29.65318294,-82.41099583
-174,Terwilliger Elementary School,Northbound NW 62nd ST @ Nearside NW 4th PL,29.65587844,-82.40876583
 175,HOBBY LOBBY @ NW 62nd St,Northbound NW 62nd ST @ Nearside Newberry RD,29.65804627,-82.4087855
 176,Panera Bread @ Newberry Road,Eastbound Newberry RD @ Farside NW 62nd ST,29.65946377,-82.40768083
 177,Durant Estate,Eastbound Newberry RD @ Farside NW 57th ST,29.6594336,-82.40317083
 179,Eastbound W Newberry Rd @ NW 53rd Terrace,Eastbound Newberry RD @ Nearside NW 53rd TER,29.6590056,-82.39996017
 181,Millpond Apartments,Eastbound Newberry RD @ Farside NW 50th BLVD,29.6577331,-82.39592367
-182,Gainesville Health & Fitness,Eastbound Newberry RD @ Nearside NW 48th BLVD,29.65727377,-82.39470833
 184,Alarion Bank,Eastbound Newberry RD @ Nearside NW 43rd ST,29.65581877,-82.390733
 185,Urgent Care Center,Eastbound Newberry RD @ Farside NW 43rd ST,29.65490026,-82.38818212
 186,Life South Blood Center,Eastbound Newberry RD @ Nearside NW 39th ST,29.65429694,-82.3865545
@@ -139,7 +122,6 @@ stop_id,stop_name,stop_desc,Latitude,Longitude
 188,Regal Royal Park Stadium 16,Eastbound Newberry RD @ Farside SW 38th ST,29.6520006,-82.38022567
 189,SW 2nd AVE and SW 36th TER - CIL,Eastbound SW 2nd AVE @ Nearside SW 36th ST,29.65106128,-82.37739573
 190,Hawaiian Village,Eastbound SW 2nd AVE @ Nearside SW 34th ST,29.65045294,-82.37450984
-191,West Gate Shopping Center,Eastbound SW 2nd AVE @ Farside SW 34th ST,29.65031217,-82.37078814
 192,UF Golf Course,Eastbound SW 2nd AVE @ Farside SW 30th ST,29.65034294,-82.36742051
 194,Eastbound SW 2nd Avenue @ SW 26th Street,Eastbound SW 2nd AVE @ Nearside SW 26th ST,29.65034694,-82.36127801
 195,University of Florida Law School,Eastbound SW 2nd AVE @ Farside SW 23rd ST,29.65033444,-82.35884718
@@ -150,15 +132,11 @@ stop_id,stop_name,stop_desc,Latitude,Longitude
 200,Anderson Hall,Eastbound W University AVE @ Nearside NW 15th ST,29.65200044,-82.34201018
 201,Leonardo's Pizza By The Slice,Eastbound W University AVE @ Farside SW 13th ST,29.65198277,-82.33823035
 203,University of Florida Human Resources,Eastbound W University AVE @ Nearside W 8th ST,29.65196159,-82.33375126
-204,Ayers Medical Plaza,Eastbound W University AVE @ Nearside SW 7th ST,29.6519681,-82.33195935
-205,The Continuum,Eastbound W University AVE @ Farside W 6th ST,29.65192512,-82.3294374
 206,AT&T Building,Eastbound W University AVE @ Nearside W 3rd ST,29.65193408,-82.32804658
-207,Alachua County Office of the State Attorney,Eastbound W University AVE @ Nearside SW 1st ST,29.65186166,-82.32601734
 208,Bo Diddley Community Plaza,Eastbound E University AVE @ Nearside E 3st ST,29.65187082,-82.32274356
 209,Alachua County Courthouse,Northbound S Main ST @ Nearside SW 2nd AVE,29.64953707,-82.32490139
 210,Wells Fargo Downtown,Westbound NW 1st AVE @ Farside NW 1st ST,29.65339891,-82.32694495
 211,The 400,Westbound NW 1st AVE @ Farside NW 3rd ST,29.65275018,-82.32903464
-214,Santa Fe College Charles L. Blount Center,Northbound NW 6th ST @ Nearside NW 4th AVE,29.6555636,-82.33018902
 215,Williams Fellowship Hall,Northbound NW 6th ST @ Nearside NW 7th AVE,29.65737302,-82.33077003
 216,Gainesville Police Department,Northbound NW 6th ST @ Nearside NW 8th AVE,29.65924377,-82.33076652
 217,Big Ron's Yoga,Northbound NW 6th ST @ Nearside NW 10th AVE,29.66099543,-82.33080268
@@ -177,7 +155,6 @@ stop_id,stop_name,stop_desc,Latitude,Longitude
 243,Verizon Shop,Southbound NW 13th ST @ Nearside NW 26th PL,29.67747443,-82.33925252
 245,Gainesville Mall,Southbound NW 13th ST @ Farside NW 23rd AVE,29.67271989,-82.33924919
 247,Gainesville High School,Southbound NW 13th ST @ Nearside NW 19th LN,29.67050243,-82.33925052
-248,Gainesville High School,Southbound NW 13th ST @ Farside NW 18th AVE,29.66795343,-82.33925302
 249,Georgetown Apartments,Westbound NW 16th AVE @ Farside NW 13th ST,29.6668006,-82.34052118
 250,Gainesville High School Tennis Courts,Westbound NW 16th AVE @ Nearside NW 16th TER,29.6668221,-82.34306302
 252,Plaza Verde - NW 23rd Avenue,Eastbound NW 23rd AVE @ Farside NW 16th TER,29.6738826,-82.34176735
@@ -190,9 +167,7 @@ stop_id,stop_name,stop_desc,Latitude,Longitude
 261,Sunshine Inn,Northbound NW 13th ST @ Nearside NW 42nd AVE,29.6914488,-82.33888361
 262,Westgate Mobile Manor Park,Northbound NW 13th ST @ Nearside NW 45th AVE,29.69542593,-82.33887051
 263,Oak Ridge Apartments,Eastbound NW 45th AVE @ Farside NW 13th ST,29.69578141,-82.33732779
-270,Santa Fe College Charles L. Blount Center,Northbound NW 6th ST @ Nearside NW 5th AVE,29.6555446,-82.33076652
 272,University of Florida Family Medicine,Westbound SW 4th AVE @ Farside SW 6th ST,29.64838057,-82.33186138
-273,University of Florida Family Medicine,Eastbound SW 4th AVE @ Nearside SW 7th TER,29.6482616,-82.33197835
 275,Furniture & Antique @ NW 6th Street,Southbound NW 6th ST @ Farside NW 21st AVE,29.67276999,-82.33088564
 276,NW 6th ST at NW 19th LN (Hand N' Hand Childcare),Southbound NW 6th ST @ Nearside NW 19th LN,29.67053228,-82.33090919
 277,Acupuncture Center,Southbound NW 6th ST @ Farside NW 19th AVE,29.66913227,-82.33092902
@@ -201,15 +176,11 @@ stop_id,stop_name,stop_desc,Latitude,Longitude
 280,American Auto Insurance,Southbound NW 6th ST @ Nearside NW 10th AVE,29.66124914,-82.33100232
 281,Jon Uman Attorney,Southbound NW 6th ST @ Nearside NW 8th PL,29.65988472,-82.33100268
 282,Greater Bethel African Methodist Episcopal Church,Southbound NW 6th ST @ Farside NW 6th AVE,29.65639446,-82.33087253
-284,Santa Fe College Charles L. Blount Center,Eastbound NW 6th ST @ Nearside NW 3rd AVE,29.65399431,-82.33031442
-286,The 400,Eastbound NW 1st AVE @ Farside NW 3rd ST,29.6526736,-82.32911335
 287,Wachovia @ NW 1st Avenue,Eastbound NW 1st AVE @ Nearside NW 1st ST,29.65264977,-82.32612185
-288,Alachua County Courthouse,Southbound S Main ST @ Farside SE 2nd PL,29.64943027,-82.32510752
 291,Eastbound SE 7th Avenue @ SE 8th Street,Eastbound SE 7th AVE @ Nearside SE 8th ST,29.64575737,-82.31662374
 292,The Cotton Club,Eastbound SE 7th AVE @ Nearside SE 9th ST,29.64575381,-82.31521511
 293,Mt Moriah Baptist Church,Eastbound SE 7th AVE @ Nearside SE 10th TER,29.64575777,-82.31241602
 294,Tools for Schools,Eastbound SE 11th ST @ Farside SE 7th AVE,29.64572844,-82.31086936
-295,Williams Elementary School,Eastbound SE 7th AVE @ Farside SE 12th TER,29.6457296,-82.30893653
 297,Eastbound SE 7th Avenue @ SE 15th Street,Eastbound SE 7th AVE @ Nearside SE 15th ST,29.64572377,-82.30601469
 300,Fast Eddie's Restaurant,Northbound SE 15th ST @ Nearside SE 1st AVE,29.65077477,-82.30576269
 301,Eastbound University Avenue @ SE 15th Street,Eastbound E University AVE @ Farside SE 15th ST,29.65180444,-82.30473586
@@ -234,30 +205,22 @@ stop_id,stop_name,stop_desc,Latitude,Longitude
 324,Eastside High School,Northbound SE 43rd ST @ Farside SE 13th AVE,29.63989564,-82.27242102
 325,The Glades,Northbound SE 43rd ST @ Nearside SE 10th PL,29.64189987,-82.27241966
 327,The Verdant Cove,Southbound SE 43rd ST @ Nearside SE 10th PL,29.64218627,-82.2725472
-329,Chevron Food Mart @ SE 43rd Street,Southbound SE 43rd ST @ Nearside Hawthorne RD,29.63622277,-82.27255904
 330,Westbound Hawthorne Road @ SE 39th Street,Westbound Hawthorne RD @ Nearside SE 39th TER,29.63691894,-82.2757022
 331,Kangaroo @ SE 35th St,Southbound SE 35th ST @ Farside Hawthorne RD,29.63862311,-82.2808462
 332,Southbound SE 35th Street @ SE 16th Avenue,Southbound SE 35th ST @ Nearside SE 16th AVE,29.63663644,-82.2808427
 333,Southbound Se 35th Street @ SE 18th Avenue,Southbound SE 35th ST @ Farside SE 18th AVE,29.63479211,-82.2808637
 334,Southbound SE 35th Street @ SE 20th Avenue,Southbound SE 35th ST @ Nearside SE 20th AVE,29.63275966,-82.28088015
 335,Westbound SE 21st Avenue @ SE 32nd Terrace,Westbound SE 21st AVE @ Farside SE 32nd ST,29.63266444,-82.2836557
-336,Faith Missionary Church,Westbound SE 21st AVE @ Farside SE 30th Dr,29.63265844,-82.28569037
-337,Lana's Place,Westbound SE 21st AVE @ Nearside SE 27th ST,29.63269744,-82.2890722
-338,Durelle Heights Neighborhood,Northbound SE 27th ST @ Nearside SE 18th AVE,29.63486144,-82.2891822
 339,Northbound SE 27th Street @ SE 15th Avenue,Northbound SE 27th ST @ Nearside SE 15th AVE,29.63705661,-82.28912986
 341,Alachua County Sheriffs Department,Northbound SE 27th ST @ Nearside Hawthorne Rd,29.64190627,-82.28916803
-342,Alachua County Sheriffs Department,Westbound Hawthorne RD @ Farside SE 25th TER,29.64403873,-82.29137521
 343,Dollar General,Westbound Hawthorne RD @ Nearside SE 24th ST,29.64523094,-82.2936928
 345,BP Gas Station@ E University Avenue,Westbound E University AVE @ Farside SE 24th ST,29.65200394,-82.29423186
 346,Westbound E University Avenue @ SE 21st Street,Westbound E University AVE @ Nearside SE 21st ST,29.65202244,-82.29747919
 347,SE 18th St @ E University Avenue,Westbound E University AVE @ Nearside SE 18th ST,29.65202484,-82.30152483
 349,Westbound E University Avenue @ NE 16th Street,Westbound E University AVE @ Nearside NE 16th ST,29.65202402,-82.30429258
-350,Fast Eddie's Restaurant,Southbound SE 15th ST @ Farside SE 2nd AVE,29.65050594,-82.30592753
 357,SE 7th Avenue @ SE 10th Terrace,Westbound SE 7th AVE @ Nearside SE 10th TER,29.64586042,-82.31219855
-358,The Cotton Club,Westbound SE 7th AVE @ Nearside SE 9th ST,29.64584972,-82.31504448
 359,Westbound SE 7th Avenue @ SE 8th Street,Westbound SE 7th AVE @ Farside SE 8th ST,29.64585227,-82.31671302
 360,Norman Field,Northbound SW 13th ST @ Farside SW 8th AVE,29.64542832,-82.33920502
-361,Norman Hall,Northbound SW 13th ST @ Nearside SW 5th AVE,29.6471576,-82.33920252
 362,Courtyards Apartments,Northbound SW 13th ST @ Nearside SW 3rd AVE,29.64916344,-82.33921535
 363,Kangaroo @ SW 13th Street,Northbound SW 13th ST @ Nearside W University AVE,29.6514826,-82.33919868
 364,McDonald's @ SW 13th Street,Northbound NW 13th ST @ Nearside W University AVE,29.65315377,-82.33909802
@@ -265,9 +228,7 @@ stop_id,stop_name,stop_desc,Latitude,Longitude
 366,University House Apartments,Northbound NW 13th ST @ Farside NW 7th AVE,29.658724,-82.33906869
 367,Xerographic Copy Center,Northbound NW 13th ST @ Nearside NW 10th AVE,29.6610406,-82.33906452
 368,LifeSouth Community Blood Center @ NW 13th Street,Northbound NW 13th ST @ Nearside NW 14th AVE,29.66472527,-82.33903468
-369,CVS @ NW 13th Street,Northbound NW 13th ST @ Nearside NW 16th AVE,29.66640027,-82.33904452
 370,PNC Bank @ NW 13th Street,Northbound NW 13th ST @ Farside NW 18th AVE,29.66848245,-82.33902418
-371,Gainesville High School,Northbound NW 13th ST @ Nearside NW 19th LN,29.67008493,-82.33904118
 372,Oak Park Executive Center,Northbound NW 13th ST @ Farside NW 21st AVE,29.6715981,-82.33903452
 373,Furniture Kingdom,Westbound NW 23rd AVE @ Farside NW 13th ST,29.67408627,-82.34077435
 374,Social Security Administration,Westbound NW 23rd AVE @ Nearside NW 16th TER,29.67407376,-82.34277369
@@ -296,30 +257,20 @@ stop_id,stop_name,stop_desc,Latitude,Longitude
 402,ABC Liquor Store @ NW 34th Street,Southbound NW 34th ST @ Nearside NW 58th AVE,29.70959171,-82.35426053
 403,Kangaroo Gas @ NW 34th Street,Southbound NW 34th ST @ Nearside NW 23rd TER,29.70660522,-82.35665211
 404,Pine Ridge Apartments,Northbound NW 23rd TER @ Nearside NW 57th PL,29.70773359,-82.35790484
-405,Pine Ridge Apartments,Northbound NW 23rd TER @ Nearside NW 25th TER,29.70967909,-82.35962968
 406,Northbound NW 23rd Terrace @ NW 62nd Avenue,Northbound NW 23rd TER @ Nearside NW 62nd AVE,29.71133576,-82.36017484
-407,Pine Ridge Apartments,Northbound NW 23rd TER @ Nearside NW 65th PL,29.71433592,-82.36013868
 408,Northbound NW 23rd Terrace @ US Hwy 441,Northbound NW 23rd TER @ Nearside NW 13th ST,29.71513042,-82.35867584
 409,Walmart Northbound,Southbound NW 23rd ST @ Farside NW 62nd ST,29.709163,-82.355985
 412,Northwood Pines Neighborhood,Southbound NW 34th ST @ Nearside NW 23rd TER,29.70519255,-82.35971591
 413,Northwood Oaks Neighborhood,Southbound NW 34th ST @ Nearside NW 54th AVE,29.70408409,-82.36223334
-414,Barnhill Clinic,Southbound NW 34th ST @ Nearside NW 29th ST,29.70259709,-82.36559292
 416,Pizza Hut @ NW 34th Street,Southbound NW 34th ST @ Nearside NW 49th AVE,29.70033526,-82.37025967
-417,Capri Neighborhood,Southbound NW 34th ST @ Farside NW 44th PL,29.69458176,-82.37236967
 418,Southbound NW 34th Street @ NW 41st Avenue,Southbound NW 34th ST @ Farside NW 41st AVE,29.6909001,-82.37238334
 419,Eastbound NW 39th Avenue @ NW 34th Street,Eastbound NW 39th AVE @ Farside NW 34th ST,29.68851443,-82.37127517
 420,First Assembly Church,Eastbound NW 39th AVE @ Nearside NW 29th TER,29.68849476,-82.36615117
-421,Walnut Creek Neighborhood,Eastbound NW 39th AVE @ Nearside NW 25th TER,29.68844093,-82.36021701
 422,Uptown Village Apartments,Eastbound NW 39th AVE @ Farside NW 24th BLVD,29.68841093,-82.35714034
 423,Palmetto Woods Neighborhood,Eastbound NW 39th AVE @ Farside NW 22nd DR,29.68838309,-82.35398801
-424,Girls Place of Alachua County,Eastbound NW 39th AVE @ Nearside NW 21st ST,29.68840775,-82.35159703
 425,Eastbound NW 39th Ave at NW 19th St Green Tree Pk,Eastbound NW 39th AVE @ Nearside NW 19th ST,29.68841702,-82.34786804
-426,Ridgeview Baptist Church,Southbound NW 19th ST @ Nearside NW 36th AVE,29.68588793,-82.34743935
-427,Altrusa House of Gainesville,Westbound NW 36th AVE @ Farside NW 20th ST,29.68577276,-82.34953668
 428,Southbound NW 21st Street @ NW 36th Avenue,Southbound NW 21st ST @ Farside NW 36th AVE,29.68524001,-82.35155702
 429,Glen Springs Apartments,Southbound NW 21st ST @ Farside NW 32nd PL,29.68289084,-82.35157285
-430,Misty Oaks Apartments,Southbound NW 21st ST @ Nearside NW 31st AVE,29.68138693,-82.35157151
-432,Cobblestone Apartments,Eastbound NW 23rd ST @ Farside NW 28th CIR,29.67811815,-82.34924646
 433,Brookwood Terrace,Eastbound NW 23rd BLVD @ Farside NW 16th TER,29.67648476,-82.34804918
 434,Direct Auto Insurance,Southbound NW 13th ST @ Farside NW 14th AVE,29.66453941,-82.33926537
 435,State Farm Insurance @ NW 13th Street,Southbound NW 13th ST @ Farside NW 12th AVE,29.66301368,-82.33926636
@@ -337,7 +288,6 @@ stop_id,stop_name,stop_desc,Latitude,Longitude
 448,Westbound SW 40th Place @ NW 26th Terrace,Westbound SW 40th PL @ Nearside SW 26th TER,29.61365117,-82.3601048
 449,Campus Lodge Apartments,Westbound SW 40th TER @ Nearside SW 38th PL,29.61349728,-82.36205434
 450,Lexington Crossing Apartments,Northbound SW 27th ST @ Nearside SW 38th PL,29.61512078,-82.36230984
-451,Lexington Crossing Apartments,Northbound SW 27th ST @ Farside SW 38th PL,29.61621425,-82.36244382
 452,Gainesville Place Apartments @ SW 35th Place,Westbound SW 35th PL @ Nearside SW 28th TER,29.61979926,-82.36474101
 453,Windsor Park Apartments,Northbound SW 27th ST @ Nearside SW 35th PL,29.61738266,-82.36256279
 454,Northbound SW 27th Street @ SW 35th Place,Northbound SW 27th ST @ Nearside SW 35th PL,29.61962611,-82.36275901
@@ -360,16 +310,8 @@ stop_id,stop_name,stop_desc,Latitude,Longitude
 472,Rawlings Hall,Northbound Newell DR @ Nearside McCarty DR,29.64630777,-82.34338935
 473,Reitz Student Union,Southbound McCarty DR @ Nearside Museum RD,29.64514027,-82.34698268
 474,Commuter Lot Parking Garage,Southbound Gale Lemerand DR @ Farside Museum RD,29.642997,-82.350577
-475,Commuter Lot Parking Garage,Southbound Gale Lemerand DR @ Nearside Mowry RD,29.6409595,-82.35055286
-476,Parking & Transportation Services,Southbound Gale Lemerand DR @ Nearside Mowry RD,29.63945059,-82.35057546
 477,Cancer & Genetics Research Center,Westbound Mowry RD @ Farside Gale Lemerand DR,29.63883997,-82.35164666
 478,IFAS Lab,Westbound Mowry RD @ Farside Hull RD,29.63827953,-82.35697034
-479,Campus Edge Condominiums,Southbound SW 23rd DR @ Farside Hull RD,29.63704951,-82.35891682
-480,Mt Vernon Apartments,Southbound SW 23rd DR @ Nearside Archer RD,29.63571371,-82.35890657
-481,University Commons Apartments,Southbound SW 23rd TER @ Farside Archer RD,29.63026778,-82.36158634
-482,University of Florida Energy Research,Southbound SW 23rd TER @ Farside Archer RD,29.62789494,-82.35930918
-483,University Club Apartments,Southbound SW 23rd TER @ Nearside SW 31 PL,29.62536578,-82.35634218
-484,Towne Parc Apartments,Southbound SW 23rd TER @ Nearside SW 31 PL,29.6236845,-82.35616094
 486,Gator Place Condominiums,Southbound SW 23rd TER @ Farside SW 35th PL,29.61905311,-82.35574301
 488,Countryside at the University Apartments,Southbound SW 23rd TER @ Nearside Williston RD,29.61598136,-82.35541365
 489,Southbound SW 23rd Street @ Williston Road,Southbound SW 23rd ST @ Nearside Williston RD,29.61380578,-82.35518301
@@ -397,27 +339,16 @@ stop_id,stop_name,stop_desc,Latitude,Longitude
 517,Shenandoah Neighborhood,Westbound NW 23rd AVE @ Nearside NW 77th TER,29.67421128,-82.42504857
 518,Santa Fe College @ NW 83rd Street,Northbound NW 83rd ST @ Farside NW 23rd AVE,29.67524293,-82.43010849
 520,Santa Fe College,Westbound Santa Fe College @ Farside Santa Fe Col*,29.67962796,-82.43187572
-521,Santa Fe College,Eastbound NW South RD @ Nearside NW 83rd ST,29.67777977,-82.43053349
 522,The Pentecostals of Gainesville,Eastbound NW 23rd AVE @ Farside NW 83rd ST,29.67422327,-82.42841316
-523,Shenandoah Neighborhood,Eastbound NW 23rd AVE @ Farside NW 77th TER,29.6740746,-82.42518282
-524,Quail Ridge Neighborhood,Eastbound NW 23rd AVE @ Nearside NW 71st ST,29.6741895,-82.41826059
-525,Hickory Woods Neighborhood,Eastbound NW 23rd AVE @ Farside NW 68th TER,29.67419893,-82.41518133
 526,Eastbound NW 23rd Avenue @ NW 63rd Terrace,Eastbound NW 23rd AVE @ Nearside NW 63rd TER,29.67412208,-82.41045292
-528,Northwest Baptist Church,Eastbound NW 23rd AVE @ Nearside NW 55th ST,29.6740061,-82.40184483
-529,First Church of the Nazarene,Eastbound NW 23rd AVE @ Nearside NW 51st ST,29.6739981,-82.39737817
 531,Eastbound NW 23rd Avenue @ NW 46th Street,Eastbound NW 23rd AVE @ Nearside NW 46th ST,29.67402827,-82.39244917
-532,Floral Expressions,Eastbound NW 23rd AVE @ Nearside NW 43rd ST,29.6739751,-82.390177
 533,Millhopper Shopping Center @ NW 16th Boulevard,Eastbound NW 16th BLVD @ Nearside NW 43rd ST,29.67294743,-82.38672967
 534,Eastbound NW 16th Boulevard @ NW 39th Drive,Eastbound NW 16th BLVD @ Nearside NW 39th DR,29.67169343,-82.38397034
-535,B'Nai Israel School & Day Care,Eastbound NW 16th BLVD @ Nearside NW 38th TER,29.6707266,-82.38172067
-537,Willowcroft Neighborhood,Eastbound NW 16th BLVD @ Farside NW 35th WAY,29.6676716,-82.37510667
 538,Covenant Church,Eastbound NW 16th AVE @ Nearside NW 31st TER,29.66666059,-82.36891011
 539,Brywood Neighborhood,Eastbound NW 16th AVE @ Farside NW 27th TER,29.66666427,-82.36335668
 541,Raintree Neighborhood,Eastbound NW 16th AVE @ Nearside NW 23rd TER,29.66665008,-82.3579352
-543,Forest Ridge Neighborhood,Eastbound NW 16th AVE @ Nearside NW 22nd ST,29.66663233,-82.35308359
 544,Eastbound NW 16th Avenue @ NW 20th Way,Eastbound NW 16th AVE @ Nearside NW 20th WAY,29.66660695,-82.34990068
 545,Colony Park Apartments,Eastbound NW 16th AVE @ Nearside NW 18th ST,29.66659613,-82.34682135
-546,Georgetown Apartments,Eastbound NW 16th AVE @ Nearside NW 13th ST,29.6665696,-82.34039535
 553,Downtown Library,Northbound SE 3rd ST @ Nearside E University AVE,29.65176577,-82.32231769
 554,Salvation Army Thrift Store,Eastbound E University AVE @ Nearside E 7th ST,29.6518481,-82.31825119
 555,Eastbound E University Avenue @ SE 8th Street,Eastbound E University AVE @ Nearside SE 8th ST,29.65184877,-82.31631819
@@ -447,23 +378,15 @@ stop_id,stop_name,stop_desc,Latitude,Longitude
 590,Southbound SE 43rd Street @ E University Avenue,Southbound SE 43rd ST @ Farside E University AVE,29.65091847,-82.27249329
 591,Compassionate Outreach,Southbound SE 43rd ST @ Nearside SE 4th AVE,29.64832669,-82.27249808
 592,Lake Forest Trails Neighborhood,Southbound SE 43rd ST @ Nearside SE 6th AVE,29.64606628,-82.27251019
-595,Lake Forest Trails Neighborhood,Northbound SE 43rd ST @ Farside SE 6th AVE,29.64617144,-82.27239087
 596,Lake Forest Elementary School,Northbound SE 43rd ST @ Nearside SE 4th AVE,29.6480806,-82.2724102
 597,Sunrise Store @ SE 43rd Street,Northbound SE 43rd ST @ Nearside E University AVE,29.65097027,-82.2723612
-598,Eastside Plaza,Westbound E University AVE @ Farside SE 39th ST,29.65197077,-82.27698441
-599,Morningside Nature Center,Westbound E University AVE @ Nearside SE 38th ST,29.65198292,-82.27995894
-601,Fred Cone Park,Westbound E University AVE @ Nearside SE 27th ST,29.65199193,-82.28707086
-602,Pine Meadows Apartments,Westbound E University AVE @ Nearside NE 26th TER,29.6519906,-82.28987786
 608,Northbound NE 25th Street @ NE 6th Avenue,Northbound NE 25th ST @ Farside NE 6th AVE,29.65713327,-82.29227303
 609,Mt Carmel Baptist Church,Northbound NE 25th ST @ Nearside NE 8th AVE,29.65914477,-82.2922917
 611,Northbound NE 25th Street @ NE 11th Place,Northbound NE 25th ST @ Nearside NE 11th PL,29.6630121,-82.29194453
 612,Westbound NE 12th Avenue @ NE 24th Terrace,Westbound NE 12th AVE @ Nearside NE 24th TER,29.66378579,-82.29255263
 614,Southbound NE 24th Street @ NE 8th Avenue,Southbound NE 24th ST @ Nearside NE 8th AVE,29.66245577,-82.29369686
 617,Westbound NE 8th Avenue @ NE 23nd Street,Westbound NE 8th AVE @ Farside NE 23nd ST,29.65928766,-82.29466556
-618,Duval Elementary School,Westbound NE 8th AVE @ Nearside NE 21st ST,29.6592966,-82.29714036
-619,United Methodist Church,Northbound NE 19th ST @ Farside NE 8th AVE,29.6596756,-82.29981153
 623,Westbound NE 13th Street @ NE 8th Avenue,Westbound NE 8th AVE @ Nearside NE 13th ST,29.6593761,-82.30803611
-624,Sunny Food Mart,Westbound NE 8th AVE @ Farside NE 12th ST,29.65938254,-82.31019822
 627,Southbound NE 9th Street @ NE 7th Avenue,Southbound NE 9th ST @ Nearside NE 7th AVE,29.65863077,-82.31484769
 629,Southbound NE 9th Street @ NE 5th Avenue,Southbound NE 9th ST @ Nearside NE 5th AVE,29.6557811,-82.31483569
 630,Southbound NE 9th Street @ NE 3rd Avenue,Southbound NE 9th ST @ Nearside NE 3rd AVE,29.65409046,-82.31481333
@@ -477,11 +400,7 @@ stop_id,stop_name,stop_desc,Latitude,Longitude
 643,Ridgemar Apartments,Northbound SW 34th ST @ Nearside SW 35th AVE,29.62049311,-82.37252117
 644,Kangaroo @ SW 34th Street,Northbound SW 34th ST @ Farside SW 35th AVE,29.62244298,-82.3725812
 645,University Town Center,Northbound SW 34th ST @ Nearside Archer RD,29.62401594,-82.37227067
-652,Shands Hospital @ Helipad,Eastbound Shealy DR @ Farside Archer RD,29.63552261,-82.35100218
 653,Shands Hospital @ Parking Garage 9,Northbound Gale Lemerand DR @ Nearside Archer RD,29.63632261,-82.35007435
-654,Shands Hospital @ Davis Cancer Pavilion,Northbound Gale Lemerand DR @ Farside Archer RD,29.63775453,-82.35024279
-658,Shands Hospital @ Davis Cancer Pavilion,Southbound Gale Lemerand DR @ Nearside Archer RD,29.63768794,-82.35042318
-659,Shands Hospital @ Parking Garage 9,Southbound Gale Lemerand DR @ Farside Archer RD,29.6359891,-82.3501354
 661,Regions Bank @ SW 37th Boulevard,Southbound SW 37th BLVD @ Nearside SW 38th ST,29.61992269,-82.37979749
 662,McKnight Brain Institute,Southbound Newell DR @ Farside Museum RD,29.64244602,-82.3437283
 663,Shands Hospital @ East Parking Garage,Southbound Newell DR @ Nearside SW Archer RD,29.64099944,-82.34266468
@@ -490,7 +409,6 @@ stop_id,stop_name,stop_desc,Latitude,Longitude
 667,Summit House Condominiums,Eastbound SW 16th AVE @ Farside SW 16th ST,29.63574727,-82.34248185
 668,Ronald McDonald House of Gainesville,Eastbound SW 16th AVE @ Nearside SW 14th ST,29.63628827,-82.34034635
 669,Bros Auto Shop,Southbound SW 13th ST @ Nearside SW 18th PL,29.63470811,-82.33951335
-670,Dollar General,Southbound SW 13th ST @ Nearside SW18th PL,29.63212594,-82.33952402
 671,Lakeshore Towers Apartments,Southbound SW 13th ST @ Nearside SW 25th PL,29.63032427,-82.33952002
 672,City College Gainesville,Southbound SW 13th ST @ Nearside SW 25th PL,29.62892638,-82.33950127
 673,Paramount Plaza Hotel & Suites,Southbound SW 13th ST @ Nearside SW 14th DR,29.62440561,-82.33955502
@@ -501,9 +419,6 @@ stop_id,stop_name,stop_desc,Latitude,Longitude
 680,Bridge House,Southbound SW 13th ST @ Nearside SW 45th LN,29.61141878,-82.34148502
 681,US441 South,Southbound SW 13th ST @ Farside Williston RD,29.60755573,-82.34214467
 682,Budget Inn,Northbound SW 13th ST @ Nearside Williston RD,29.61186779,-82.34110907
-683,Meridian Behavioral Healthcare,Northbound SW 13th ST @ Nearside Williston RD,29.61310682,-82.34090362
-684,Residence Inn,Northbound SW 13th ST @ Farside Williston RD,29.61571461,-82.34047902
-685,The Landings Apartments,Northbound SW 13th ST @ Farside SW 36th PL,29.61867278,-82.34007793
 686,Bivens Oak Apartments,Northbound SW 13th ST @ Nearside SW 36th PL,29.62037778,-82.33979885
 687,Bivens Cove Apartments,Northbound SW 13th ST @ Nearside SW 36th PL,29.62204928,-82.33955718
 688,Tanglewood Apartments,Northbound SW 13th ST @ Nearside SW 14th DR,29.62330344,-82.33934468
@@ -513,7 +428,6 @@ stop_id,stop_name,stop_desc,Latitude,Longitude
 692,Village Square Apartments,Northbound SW 13th ST @ Farside SW 25th PL,29.63028527,-82.33917835
 693,Bambi Motel,Northbound SW 13th ST @ Nearside SW 21st AVE,29.63199121,-82.33916864
 695,Oakbrook Walk Condominiums,Northbound SW 13th ST @ Nearside SW 14th AVE,29.63820861,-82.33924168
-696,University Police Department,Southbound Newell DR @ Farside Museum RD,29.64427811,-82.34360852
 699,Partnership for Strong Families,Northbound N Main ST @ Farside NE 6th AVE,29.65633995,-82.32492072
 700,Fire Stone @ N Main Street,Northbound N Main ST @ Nearside NE 8th AVE,29.6584631,-82.32491302
 701,CVS Pharmacy @ N Main Street,Northbound N Main ST @ Nearside NE 10th AVE,29.66049843,-82.32444935
@@ -550,31 +464,23 @@ stop_id,stop_name,stop_desc,Latitude,Longitude
 739,Eastbound NW 39th Avenue @ NW 10th Street,Eastbound NW 39th AVE @ Farside NW 10th ST,29.68842063,-82.33446234
 740,NW 39th Avenue @ NW 7th Street,Eastbound NW 39th AVE @ Nearside NW 7th ST,29.68842759,-82.33178468
 741,Gainesville Public Works,Eastbound NW 39th AVE @ Farside NW 6th ST,29.68836234,-82.3278297
-742,Meadowcrest Apartments,Eastbound NW 39th AVE @ Farside NW 1st TER,29.68833519,-82.32524606
 743,Pine Forest Homes,Eastbound NW 39th AVE @ Nearside NE 2nd ST,29.68831662,-82.32263953
 744,Wade Raulerson Honda Dealership,Eastbound NE 39th AVE @ Farside N Main ST,29.68830659,-82.31852102
 745,Highland Court Apartments,Eastbound NE 39th AVE @ Nearside NE 12th ST,29.6882554,-82.31056087
 746,Eden Park Apartments,Eastbound NE 39th AVE @ Nearside NE 14th ST,29.68824885,-82.30778442
 748,Family Services,Southbound NE 15th ST @ Farside NE 39th AVE,29.68657478,-82.30584958
-749,Village Green Apartments,Southbound NE 15th ST @ Farside NE 31st AVE,29.68351123,-82.30587477
 750,Southbound NE 15th Street @ NE 31 Avenue,Southbound NE 15th ST @ Nearside NE 31st AVE,29.68161311,-82.30586818
 752,NE 15th Street @ NE 26th Avenue,Southbound NE 15th ST @ Nearside NE 26th AVE,29.67664757,-82.30587685
-753,Smokey Bear Park,Southbound NE 15th ST @ Nearside NE 23rd AVE,29.6744329,-82.30591868
-754,YMCA @ NE 23rd Avenue,Westbound NE 23rd AVE @ Farside NE 14th ST,29.67389393,-82.30806669
 755,Highland Court Manor Neighborhood @ NE 23rd Avenue,Westbound NE 23rd AVE @ Nearside NE 11th TER,29.67391697,-82.31115488
 756,Westbound NE 23rd Avenue @ NE 9th Street,Westbound NE 23rd AVE @ Nearside NE 9th ST,29.67393235,-82.31461884
 757,NE 23rd Avenue @ NE 7th Terrace,Westbound NE 23rd AVE @ Farside NE 7th TER,29.67394919,-82.31690735
 758,David's BBQ,Southbound NE 2nd ST @ Farside NE 23rd AVE,29.67285138,-82.31984135
-759,Pine Grove Apartments,Southbound NE 2nd ST @ Farside NE 21st LN,29.67009777,-82.32138135
-760,Laundry Mart,Southbound NE 2nd ST @ Nearside NE 16th AVE,29.66733977,-82.32189769
 761,Plaza Coffee Shop,Westbound NE 16th AVE @ Nearside NE 2nd ST,29.6666841,-82.32311485
 762,Midas @ N Main Street,Southbound N Main ST @ Farside NE 16th AVE,29.66551477,-82.32459102
 763,Publix @ N Main Street,Southbound N Main ST @ Farside NE 14th AVE,29.66376429,-82.32458618
 764,Celebrity Cleaners,Southbound N Main ST @ Nearside NE 10th AVE,29.66158478,-82.32459438
-766,Fire Stone @ N Main Street,Southbound N Main ST @ Nearside NE 7th AV,29.65817014,-82.32511322
 768,Main Street Auto,Southbound N Main ST @ Farside NE 6th AVE,29.65604777,-82.32508802
 769,The Collier Companies,Southbound N Main ST @ Nearside NW 2nd AVE,29.65376363,-82.32512619
-773,Arbor Park Apartments,Eastbound SW 16th AVE @ Farside SW 6th ST,29.63614297,-82.32912344
 774,Treehouse Village Apartments,Eastbound SE 16th AVE @ Farside S Main ST,29.63272711,-82.32607719
 775,In the Pines Apartments,Eastbound SE 16th AVE @ Nearside Williston RD,29.63031268,-82.32411967
 776,Spring Hill Church,Northbound Williston RD @ Farside SE 1st ST,29.63235677,-82.32048619
@@ -585,15 +491,12 @@ stop_id,stop_name,stop_desc,Latitude,Longitude
 783,Chevron Gas Station @ Williston Road,Southbound Williston RD @ Farside SE 4th ST,29.63507215,-82.31778641
 784,Southbound Williston Road @ SE 1st Terrace,Southbound Williston RD @ Nearside SE 1st TER,29.63414577,-82.31912336
 785,Springhill Baptist Church,Southbound Williston RD @ Nearside SE 1st ST,29.63254559,-82.32071974
-786,In the Pines Apartments,Westbound SE 16th AVE @ Farside SE Williston RD,29.63043365,-82.32412812
-787,Treehouse Village Apartments,Westbound SE 16th AVE @ Nearside S Main ST,29.63288127,-82.32594652
 788,Winn Dixie @ SW 16th Avenue,Westbound SW 16th AVE @ Nearside SW 6th ST,29.63629061,-82.32859485
 789,Sun Bay Apartments,Westbound SW 16th AVE @ Farside SW 6th ST,29.63660794,-82.33246919
 790,Parklands Rehab & Nursing Center,Westbound SW 16th AVE @ Farside SW 10th TER,29.63668844,-82.33576635
 791,Oakbrook Walk Condominiums @ SW 16th Avenue,Westbound SW 16th AVE @ Nearside SW 13th ST,29.63656394,-82.33828968
 794,Sai Quick Stop,Eastbound SW 16th AVE @ Farside SW 13th ST,29.63637861,-82.33806602
 795,Sun Island Apartments,Eastbound SW 16th AVE @ Farside SW 10th TER,29.63648468,-82.33557044
-796,Sun Bay Apartments,Eastbound SW 16th AVE @ Nearside SW 6th ST,29.63639392,-82.3325412
 797,Hume Hall,Westbound Museum RD @ Farside Gale Lemerand DR,29.64495067,-82.35220232
 798,Sigma Alpha Epsilon,Westbound Museum RD @ Nearside Woodlawn DR,29.64497411,-82.35529526
 800,Corry Village,Southbound Museum RD @ Farside Village DR,29.64494161,-82.36071266
@@ -617,29 +520,19 @@ stop_id,stop_name,stop_desc,Latitude,Longitude
 821,Cypress Pointe Apartments,Northbound SW 62nd BLVD @ Farside SW 4th PL,29.64819527,-82.40204916
 822,Palm Garden of Gainesville,Northbound SW 62nd BLVD @ Nearside SW 4th PL,29.64988594,-82.40664133
 823,Hampton Oaks Apartments,Northbound SW 62nd BLVD @ Nearside NW 1st PL,29.65241577,-82.40879566
-824,Hampton Oaks Apartments,Southbound SW 62nd BLVD @ Farside NW 1st PL,29.65165844,-82.40897083
 825,Fairmont Oaks Apartments,Southbound SW 62nd BLVD @ Farside NW 4th PL,29.65005587,-82.40779139
-826,Cypress Pointe Apartments,Southbound SW 62nd BLVD @ Farside SW 4th PL,29.64781244,-82.40186366
 827,Lakewood Villas Apartments,Southbound SW 62nd BLVD @ Farside SW 52nd St,29.64632639,-82.40065519
-828,Rockwood Villas Apartments,Southbound SW 62nd BLVD @ Nearside SW 9th PL,29.64441677,-82.399106
 829,The District Apartments,Southbound SW 62nd BLVD @ Nearside SW 20th AVE,29.64155291,-82.39837926
-830,Cabana Beach Apartments,Eastbound SW 20th AVE @ Farside SW 52nd ST,29.63951711,-82.3952695
-832,Ventura Apartments,Eastbound SW 20th AVE @ Farside SW 42nd DR,29.63543861,-82.38808767
 833,Pine Rush Villas,Eastbound SW 20th AVE @ Nearside SW 40th TER,29.63429594,-82.3848395
 835,Kensington Apartments South,Eastbound SW 20th AVE @ Nearside SW 38th TER,29.63395828,-82.38189201
 837,Southwest Villas Apartments,Eastbound SW 20th AVE @ Nearside SW 37th WAY,29.63395094,-82.37771617
 838,The 34th Plaza,Eastbound SW 20th AVE @ Nearside SW 34th ST,29.63403933,-82.37515778
 839,Florida Department Of Agriculture,Northbound SW 34th ST @ Farside SW 20th AVE,29.63544611,-82.37237567
-840,Hilton University of Florida Conference Center,Northbound SW 34th ST @ Nearside Hull RD,29.63736094,-82.37235534
 841,Harn Museum,Eastbound Hull RD @ Farside Bledsoe DR,29.63755444,-82.37007734
-842,Southwest Recreation Center,Northbound Bledsoe DR @ Farside Hull RD,29.63817061,-82.36924684
 843,Southwest Softball Court,Northbound Bledsoe DR @ Nearside Hull RD,29.63940777,-82.36924834
 844,Maguire Field,Northbound Bledsoe DR @ Nearside Radio RD,29.6409678,-82.36924759
 845,Lakeside Residential Complex,Eastbound Radio RD @ Nearside Museum RD,29.64219911,-82.36609918
-846,Lakeside Residential Complex,Eastbound Radio RD @ Nearside Museum RD,29.64224077,-82.36428101
-847,Corry Village,Northbound Museum RD @ Nearside Village DR,29.64477438,-82.36087488
 848,Lake Alice Field,Eastbound Museum RD @ Farside Fraternity DR,29.64487467,-82.35671767
-849,Hume Hall,Eastbound Museum RD @ Nearside Gale Lemerand DR,29.64483661,-82.35198835
 850,GRU Administration Building,Eastbound SE 4th AVE @ Farside SE 4th ST,29.64831694,-82.32136902
 851,Eastbound SE 4th Avenue @ SE 8th Street,Eastbound SE 4th AVE @ Nearside SE 8th ST,29.64813677,-82.31655902
 852,Triangle Club,Eastbound SE 4th AVE @ Nearside 11th ST,29.64818319,-82.31267957
@@ -648,7 +541,6 @@ stop_id,stop_name,stop_desc,Latitude,Longitude
 856,Westcoast Sea Food,Northbound Waldo RD @ Farside NE 5th AVE,29.65501537,-82.30927575
 857,Little People's Palace,Northbound Waldo RD @ Nearside NE 8th AVE,29.65653916,-82.30825346
 858,Lakeside Housing Complex,Northbound Museum RD @ Nearside Radio RD,29.64123127,-82.36410034
-859,Cabana Beach Apartments,Westbound SW 52nd BLVD @ Nearside SW 20th AVE,29.63807828,-82.39798767
 863,Northbound NE 9th Street @ NE 10th Place,Northbound NE 9th ST @ Nearside NE 10th PL,29.66137286,-82.31471379
 864,Northbound NE 9th Street @ NE 14th Avenue,Northbound NE 9th ST @ Farside NE 14th AVE,29.66488793,-82.31469752
 865,Department of Children and Families,Eastbound NE 16th AVE @ Farside NE 9th ST,29.66648643,-82.31363686
@@ -670,27 +562,17 @@ stop_id,stop_name,stop_desc,Latitude,Longitude
 888,Invivo Imaging,Westbound NE 53rd AVE @ Farside Waldo RD,29.70306659,-82.2791107
 891,Lewis Place @ Ironwood Apartments,Southbound NE 15th Street @ Nearside NE 39th AVE,29.69138282,-82.30594187
 892,One Room School,Southbound NE 15th ST @ Nearside NE 39th AVE,29.68988843,-82.30583803
-893,Bertie Heating & Air,Eastbound NE 23rd AVE @ Nearside NE 17th TER,29.67372756,-82.30323922
-895,BP Gas Station @ NE 23rd Avenue,Eastbound NE 23rd AVE @ Nearside Waldo RD,29.67372909,-82.29801264
-896,University of Florida Eastside Campus @ Waldo Road,Southbound Waldo RD @ Farside NE 21st PL,29.67176736,-82.29833884
 897,Crab House,Southbound Waldo RD @ Farside Ne 18th PL,29.66803508,-82.30084745
 898,Rose Food Store,Westbound NE 16th AVE @ Nearside NE 16th WAY,29.66655025,-82.30327515
-899,Michelle Garden Apartments,Westbound NE 16th AVE @ Nearside NE 15th ST,29.66658375,-82.30568848
-900,Auto Audio,Westbound NE 16th AVE @ Nearside NE 12th ST,29.66661993,-82.31012186
-902,Department of Children and Families,Westbound NE 16th AVE @ Nearside NE 9th ST,29.66660264,-82.3137588
 903,Southbound NE 9th Street @ NE 14th Avenue,Southbound NE 9th ST @ Nearside NE 14th AVE,29.66496577,-82.31482819
 904,Southbound NE 9th Street @ Ne 10th Place,Southbound NE 9th ST @ Nearside NE 10th PL,29.66157739,-82.31484687
-909,Little People's Palace,Southbound Waldo RD @ Farside NE 8th AVE,29.65654393,-82.30849403
 910,Shands Eastside Community Practice,Southbound Waldo RD @ Farside NE 5th AVE,29.65502911,-82.30949489
 912,Kangaroo @ Waldo Road,Southbound Waldo RD @ Nearside E University AVE,29.65272095,-82.3110917
 913,Southbound SE 11th Street @ SE 2nd Avenue,Southbound SE 11th ST @ Nearside SE 2nd AVE,29.65031018,-82.31161287
-915,Triangle Club,Westbound SE 4th AVE @ Farside SE 11th ST,29.64828715,-82.31260031
 917,Westbound SE 4th Avenue @ SE 8th Street,Westbound SE 4th AVE @ Nearside SE 8th ST,29.64827988,-82.31635951
-920,GRU Administration Building,Westbound SE 4th AVE @ Nearside SE 4th ST,29.64841357,-82.32146051
 925,The HUB,Eastbound Stadium RD @ Nearside Buckman DR,29.6485296,-82.34495985
 926,Leigh Hall,Northbound Buckman DR @ Nearside W University AVE,29.65063778,-82.34467313
 927,Ben Hill Griffin Stadium North End Zone,Southbound Gale Lemerand DR @ Farside W Universit*,29.6510556,-82.34974301
-949,Lexington Crossing Apartments,Southbound SW 27th ST @ Farside SW 35th PL,29.61698278,-82.36263418
 929,O'Connell Center @ Stadium Road,Westbound Stadium RD @ Farside Gale Lemerand DR,29.6485231,-82.35048301
 930,Gale Lemerand Athletic Center,Westbound Stadium RD @ Nearside Woodlawn DR,29.6483911,-82.35373268
 932,UF Law School,Westbound SW 2nd AVE @ Nearside SW 26th ST,29.6504552,-82.35909502
@@ -704,30 +586,20 @@ stop_id,stop_name,stop_desc,Latitude,Longitude
 943,Kelly's Kwik Stop,Southbound SW 34th ST @ Farside SW 24th AVE,29.62974544,-82.37273201
 945,Ridgemar Commons,Eastbound SW 35th PL @ Farside SW 32nd TER,29.62156578,-82.37041567
 946,Victoria Station Apartments,Eastbound SW 35th PL @ Farside SW 32nd TER,29.62084845,-82.36842368
-947,Gainesville Place Apartments @ SW 35th Place,Eastbound SW 35th PL @ Farside SW 28th TER,29.61968251,-82.36507941
-950,Lexington Crossing Apartments,Southbound SW 27 PL @ Nearside SW 38th PL,29.61536761,-82.36244534
 951,Southbound SW 26th Drive @ SW 40th Place,Southbound SW 26th DR @ Nearside SW 40th PL,29.61413182,-82.36121169
 952,Gainesville Place Apartments,Northbound Gainesville Place Apartments @ Farside*,29.62192044,-82.36515984
-953,Gainesville Place Apartments,Northbound Gainesville Place Apartments @ Farside*,29.62347528,-82.36550084
 954,Enclave Apartments,Westbound SW 28th PL @ Farside SW 28th PL,29.625581,-82.36635733
-955,Gainesville Place Apartments,Northbound Old Archer RD @ Nearside SW 31st TER,29.62732828,-82.37072884
 956,Old Archer Road @ SW 34th Street,Westbound Old Archer RD @ Nearside SW 34th ST,29.62610628,-82.37217434
 957,Regency Oaks Apartments,Northbound SW 34th ST @ Farside Windmeadows BLVD,29.6293415,-82.37241262
-958,34th Street Plaza,Northbound SW 34th ST @ Nearside SW 20th AVE,29.63155861,-82.37240934
 959,Family Housing @ SW 34th Street,Northbound SW 34th ST @ Nearside Radio RD,29.64207044,-82.37232667
 960,34th Street Wall,Northbound SW 34th ST @ Nearside SW 2nd Ave,29.64625762,-82.37230727
 962,Keys Residential Complex,Eastbound Stadium RD @ Farside Woodlawn DR,29.64825078,-82.35474623
-963,Keys Residential Complex,Eastbound Stadium RD @ Nearside Woodlawn DR,29.64820944,-82.35300968
 965,Gator Corner Dining,Eastbound Stadium RD @ Nearside Gale Lemerand DR,29.64853144,-82.35011418
 966,Weimer Hall,Eastbound Stadium RD @ Farside Gale Lemerand DR,29.6485696,-82.34733385
-967,Hunters Run Apartments,Westbound Williston RD @ Farside SW 25th TER,29.6120404,-82.3593791
-968,Campus Lodge Apartments,Westbound Williston RD @ Nearside SW 29Th Dr,29.60890011,-82.36401368
 969,Nationwide Insurance @ Williston Road,Westbound Williston RD @ Farside SW 29Th Dr,29.6061827,-82.36775094
 970,Williston Plaza,Northbound SW 34th ST @ Farside Williston RD,29.60593628,-82.37105451
 971,US Post Office @ SW 34th Street,Northbound SW 34th ST @ Nearside SW 47th AVE,29.60899095,-82.37131384
 972,Laurels Apartments,Northbound SW 34th ST @ Farside SW 47th AVE,29.61150395,-82.37156334
-974,Dollar General,Northbound SW 34th ST @ Farside SW 42 PL,29.61481845,-82.37192334
-977,Millennium Center,Northbound NW 43rd ST @ Farside Newberry RD,29.65644027,-82.38992983
 978,Lenox Place Apartments,Northbound NW 43rd ST @ Nearside NW 9th Pl,29.66093494,-82.38884984
 979,Landmark Woods Neighborhood,Northbound NW 43rd ST @ Nearside NW 12th AVE,29.66328133,-82.38891734
 980,NW 14th Place @ NW 43rd Street,Northbound NW 43rd ST @ Nearside NW 14th PL,29.66538784,-82.38892077
@@ -749,37 +621,25 @@ stop_id,stop_name,stop_desc,Latitude,Longitude
 998,Springhill Professional Center,Southbound NW 83rd ST @ Farside NW 39th AVE,29.68795518,-82.4303727
 999,Northridge Neighborhood,Southbound NW 83rd ST @ Nearside NW 36th AVE,29.686069,-82.43036921
 "1,000",The Arc,Southbound NW 83rd ST @ Farside North RD,29.68383122,-82.43037969
-"1,001",Santa Fe College @ NW 83rd Street,Southbound NW 83rd ST @ Nearside Administration RD,29.68070888,-82.43039198
-"1,002",Santa Fe College @ NW 83rd Street,Northbound NW 83rd ST @ Nearside NW 31st AVE,29.68060993,-82.43026999
-"1,003",The Arc,Northbound NW 83rd ST @ Farside North RD,29.68389593,-82.43021649
-"1,004",Northridge Neighborhood,Northbound NW 83rd ST @ Farside NW 36th AVE,29.68579267,-82.43022521
-"1,005",Springhill Professional Center,Northbound NW 83rd ST @ Nearside NW 39th AVE,29.68865443,-82.43020666
-"1,006",Robin Lane Neighborhood,Eastbound NW 39th AVE @ Farside NW 75th ST,29.68870176,-82.42210866
 "1,007",Unicorn Hill Farm,Eastbound NW 39th AVE @ Nearside NW 69th ST,29.68867876,-82.41615716
 "1,008",Greystone Community,Eastbound NW 39th AVE @ Nearside NW 63rd ST,29.68868176,-82.40998049
-"1,009",Faith Presbyterian Church,Eastbound NW 39th AVE @ Farside NW 63rd ST,29.68865393,-82.40592283
-"1,010",Huntington Lakes Apartments,Eastbound NW 39th AVE @ Nearside NW 53rd ST,29.68859443,-82.40046483
 "1,011",NW Grille Seafood,Eastbound NW 39th AVE @ Nearside NW 51st ST,29.68852843,-82.397711
 "1,012",Autumn Woods Neighborhood,Eastbound NW 39th AVE @ Nearside NW 48th TER,29.68857376,-82.39488333
 "1,013",Pine Woods Apartments,Eastbound NW 39th AVE @ Nearside NW 45th ST,29.68854768,-82.39126286
 "1,014",Allstate Insurance,Southbound NW 43rd ST @ Nearside NW 37th PL,29.68773143,-82.38907083
 "1,015",Southbound NW 43rd Street @ NW 33rd Court,Southbound NW 43rd ST @ Nearside NW 33rd CT,29.684033,-82.38907333
-"1,016",Millhopper Branch Library,Southbound NW 43rd ST @ Farside NW 31st AVE,29.68126829,-82.38908428
 "1,017",Sunstate Insurance,Southbound NW 43rd ST @ Nearside NW 27th AVE,29.67644934,-82.38909345
 "1,018",Cedar River Seafood,Southbound NW 43rd ST @ Nearside NW 23rd AVE,29.67491241,-82.38909898
 "1,019",St. Michael's Day School,Southbound NW 43rd ST @ Farside NW 23rd AVE,29.67212113,-82.38910801
 "1,020",Southbound NW 43rd Street @ NW 19th Avenue,Southbound NW 43rd ST @ Nearside NW 19th AVE,29.67005892,-82.3891283
 "1,022",Southbound NW 43rd Street @ NW 15th Place,Southbound NW 43rd ST @ Nearside NW 15th PL,29.66678943,-82.3891125
 "1,023",Suburban Heights Neighborhood,Southbound NW 43rd ST @ Nearside NW 13th AVE,29.66487982,-82.38914371
-"1,024",Landmark Woods Neighborhood,Southbound NW 43rd ST @ Farside NW 12th AVE,29.66322427,-82.38917833
-"1,025",Landmark Woods Neighborhood,Southbound NW 43rd ST @ Nearside NW 9th PL,29.66139806,-82.38917626
 "1,026",Holy Faith Catholic Church,Southbound NW 43rd ST @ Farside NW 8th AVE,29.65838144,-82.38943867
 "1,027",Best Buy @ Butler Plaza,Southbound SW 37th BLVD @ Nearside Archer RD,29.62132828,-82.38091884
 "1,028",Texas Road House @ Butler Plaza,Westbound Archer RD @ Farside SW 37th BLVD,29.62015704,-82.38110275
 "1,033",Westbound Archer Road @ SW 50th Street,Westbound Archer RD @ Nearside SW 50th ST,29.61213662,-82.39635156
 "1,034",Madison Cove Apartments,Westbound Archer RD @ Nearside SW 56th TER,29.6094767,-82.40145213
 "1,035",Kanapaha Botanical Gardens,Westbound Archer RD @ Nearside SW 56th TER,29.60868089,-82.40295312
-"1,036",Westgate Mobile Manor Park,Westbound Archer RD @ Farside SW 58th DR,29.60730781,-82.40556093
 "1,038",A Child's Place,Westbound Archer RD @ Nearside SW 63rd BLVD,29.60552727,-82.40896546
 "1,039",Kanapaha Station Plaza,Westbound Archer RD @ Nearside SW 66th ST,29.60343675,-82.41295365
 "1,040",Town & Country Veterinarians,Westbound Archer RD @ Nearside SW 69th TER,29.60210729,-82.41547584
@@ -801,22 +661,16 @@ stop_id,stop_name,stop_desc,Latitude,Longitude
 "1,058",Shell Rock Villas Neighborhood,Northbound SW 61st ST @ Nearside SW 8th PL,29.64458307,-82.40916671
 "1,059",Linton Oaks Neighborhood @ SW 64th Terrace,Southbound SW 64th TER @ Farside SW 8th AVE,29.64472461,-82.41154916
 "1,061",Linton Oaks Neighborhood @ SW 63rd Terrace,Northbound SW 63rd TER @ Nearside SW 8th AVE,29.64471761,-82.41056
-"1,062",Linton Oaks Neighborhood @ SW 61st Street,Southbound SW 61st ST @ Nearside SW 10th PL,29.643025,-82.40822137
-"1,063",Linton Oaks Neighborhood,Southbound SW 61st ST @ Nearside SW 20th AVE,29.64045782,-82.40726909
 "1,064",The Grove Villas Apartments,Westbound SW 20th AVE @ Farside SW 61st ST,29.63935994,-82.41054966
-"1,065",Tower Oaks Glenn Apartments,Westbound SW 24th AVE @ Farside SW 19th CT,29.63480952,-82.41438111
 "1,066",KISS 105.3 FM Station,Westbound SW 24th AVE @ Farside SW 70th TER,29.63102836,-82.41807139
 "1,067",Carriage House Lane,Westbound SW 24th AVE @ Nearside SW 73rd TER,29.63058694,-82.42042299
 "1,068",CVS Pharmacy @ SW 75th Street,Northbound SW 75th ST @ Farside SW 24th AVE,29.63119994,-82.42237683
 "1,069",Sunrise Apartments,Northbound SW 75th ST @ Farside SW 19th PL,29.63549478,-82.42240916
-"1,071",The Woodlands Apartments,Northbound SW 75th ST @ Nearside SW 10th PL,29.64260511,-82.42238316
 "1,072",Sparrow Apartments,Eastbound SW 8th AVE @ Farside SW 75th ST,29.64506461,-82.42133833
 "1,074",Holly Heights Apartments,Northbound SW 70th TER @ Nearside SW 6th PL,29.64613944,-82.41768883
 "1,077",Eastbound SW 6th Place @ SW 67th Terrace,Eastbound SW 6th PL @ Nearside SW 67th TER,29.64660627,-82.41457849
 "1,078",Gordon Manor Neighborhood,Eastbound SW 67th TER @ Nearside SW 8th AVE,29.64526844,-82.41451516
 "1,079",Westbound SW 8th Avenue @ SW 70th Terrace,Westbound SW 8th AVE @ Farside SW 70th TER,29.64516254,-82.41686687
-"1,081",Sparrow Apartments,Westbound SW 8th AVE @ Farside SW 75th ST,29.64519577,-82.42140966
-"1,082",Sparrow Apartments,Northbound SW 75th ST @ Farside SW 8th AVE,29.64594477,-82.42232566
 "1,083",Cricket Club Apartments,Northbound SW 75th ST @ Farside SW 8th AVE,29.64793527,-82.42229716
 "1,084",Reflections Apartments,Northbound SW 75th ST @ Nearside SW 1st PL,29.65071116,-82.42226733
 "1,085",The Gardens Apartments,Northbound SW 75th ST @ Nearside W University AVE,29.65306977,-82.42224716
@@ -826,21 +680,16 @@ stop_id,stop_name,stop_desc,Latitude,Longitude
 "1,093",Park Place Car Wash,Westbound NW 4th BLVD @ Nearside SW 75th ST,29.65629527,-82.42137633
 "1,094",Clarion Inn,Northbound SW 75th ST @ Nearside Newberry RD,29.65934227,-82.42224133
 "1,096",Oaks Square Complex,Eastbound Newberry RD @ Farside NW 69th TER,29.65946677,-82.41602916
-"1,097",Oaks Mall,Eastbound Newberry RD @ Nearside Oaks Mall,29.6595136,-82.41387533
 "1,098",North Florida Regional Medical Center,Westbound Newberry RD @ Nearside NW 66th ST,29.65975009,-82.41200955
 "1,099",SUBWAY@ Newberry RD,Westbound Newberry RD @ Nearside Oaks Mall,29.65977394,-82.41347966
 "1,100",Shell Gas Station@ SW 75th Street,Westbound Newberry RD @ Nearside NW 69th TER,29.65976794,-82.41598699
 "1,101",Tower Plaza,Southbound NW 75th ST @ Farside Newberry RD,29.65816185,-82.42250356
 "1,102",Advance Auto Parts,Southbound NW 75th ST @ Farside NW 4th BLVD,29.65541772,-82.42251383
 "1,103",Tower Hill,Southbound NW 75th ST @ Nearside W University AVE,29.65354761,-82.42253183
-"1,104",The Gardens Apartments,Southbound SW 75th ST @ Nearside SW 1st PL,29.65186927,-82.42253433
-"1,105",Cricket Club Apartments,Southbound SW 75th ST @ Nearside SW 8th AVE,29.64811325,-82.42253801
 "1,106",The Woodlands Neighborhood,Southbound SW 75th ST @ Farside SW 10th PL,29.64268627,-82.42255766
-"1,108",Sunrise Apartments,Southbound SW 75th ST @ Farside SW 19th PL,29.63501228,-82.42248966
 "1,109",Tower 24 Shopping Center,Southbound SW 75th ST @ Nearside SW 26th AVE,29.62891728,-82.42259316
 "1,110",Tower Road Library,Southbound SW 75th ST @ Farside SW 26th AVE,29.62609157,-82.4225712
 "1,111",Kenwood Neighborhood,Southbound SW 75th ST @ Farside SW 36th AVE,29.62092178,-82.42260949
-"1,112",Kenwood Neighborhood,Southbound SW 75th ST @ Farside SW 42nd AVE,29.61553949,-82.42262195
 "1,113",Tower Village,Southbound SW 75th ST @ Farside SW 45th PL,29.61239305,-82.42263565
 "1,114",Haile Plantation Neighborhood,Southbound SW 75th ST @ Farside SW 46th BLVD,29.60947168,-82.42268738
 "1,115",Stillwind Neighborhood,Southbound SW 75th ST @ Farside SW 51st BLVD,29.60621978,-82.42272966
@@ -857,52 +706,33 @@ stop_id,stop_name,stop_desc,Latitude,Longitude
 "1,126",Haystacks Housing Complex,Eastbound Archer RD @ Nearside SW 47th TER,29.61312134,-82.3939459
 "1,127",The Reserve at Kanapaha,Eastbound Archer RD @ Nearside SW 44th ST,29.61473602,-82.39068014
 "1,133",Springs Residence Building,Westbound Fraternity Row @ Nearside W Fraternity *,29.64786727,-82.35799618
-"1,134",Reitz Student Union,Eastbound Museum RD @ Nearside Center DR,29.64477777,-82.34712135
 "1,135",Shands Visitor Parking,Westbound Mowry RD @ Farside Center DR,29.63963673,-82.3472878
 "1,136",Wilmot Gardens,Westbound Mowry RD @ Nearside Gale Lemerand DR,29.6395379,-82.34952644
 "1,137",Savannah Place Apartments,Westbound SW 35th PL @ Farside SW 23rd TER,29.62024928,-82.35669501
 "1,138",Arbor Apartments,Westbound SW 35th PL @ Farside SW 23rd TER,29.62010093,-82.35852871
 "1,139",Casablanca Apartments,Westbound SW 35th PL @ Nearside SW 27th ST,29.61991231,-82.36126334
 "1,140",Southbound SW 27th Street @ SW 35th Place,Southbound SW 27th ST @ Farside SW 35th PL,29.61930232,-82.36289011
-"1,141",Wilmot Gardens,Eastbound Mowry RD @ Farside Gale Lemerand DR,29.63938779,-82.34971485
 "1,144",Fraternity Row,Northbound Fraternity Row @ Farside Museum RD,29.64644677,-82.35797018
-"1,145",Fraternity Row,Eastbound Fraternity Row @ Farside W Fraternity R*,29.64831477,-82.35759684
-"1,146",Springs Residence Building,Eastbound Fraternity Row @ Nearside Woodlawn DR,29.64854344,-82.35643818
 "1,150",Criser Hall,Westbound Union RD @ Nearside SW 13th ST,29.64985429,-82.34175926
 "1,152",Florida Gym,Westbound Stadium RD @ Nearside Gale Lemerand DR,29.6486886,-82.34743618
 "1,153",Tolbert Residence Hall,Southbound Gale Lemerand DR @ Farside Stadium RD,29.64774577,-82.34980435
 "1,154",Graham Hall,Southbound Gale Lemerand DR @ Nearside Museum RD,29.64594194,-82.35043051
-"1,155",Spanish Trace Apartments,Westbound Windmeadows BLVD @ Farside SW 34th ST,29.62835676,-82.37445971
 "1,156",Windmeadows Apartments,Westbound Windmeadows BLVD @ Nearside SW 35th ST,29.6274583,-82.37816707
 "1,158",Walker Hall,Eastbound Union RD @ Farside Newell DR,29.64968846,-82.34155571
 "1,159",Phi Kappa Tau,Eastbound SW 2nd AVE @ Farside SW 13th ST,29.65018494,-82.33867202
-"1,161",Springs Residence Building,Westbound Fraternity Row @ Farside Woodlawn DR,29.64861427,-82.35656734
 "1,163",Sonny's Barbecue @ Waldo Road,Northbound Waldo RD @ Nearside NE 27th AVE,29.67595465,-82.29522281
 "1,164",Merita Bread Box,Northbound Waldo RD @ Farside NE 31st AVE,29.68146736,-82.29147611
 "1,165",Hills Mini Storage,Westbound NE 39th Ave @ Farside Waldo Rd,29.68572747,-82.29036362
-"1,166",Ironwood Golf Course,Westbound NE 39th AVE @ Nearside Waldo RD,29.68813302,-82.29698621
-"1,168",Northwood Oaks Neighborhood,Northbound NW 34th ST @ Farside NW 54th AVE,29.70400748,-82.36210877
-"1,169",Northwood Pines Neighborhood,Northbound NW 34th ST @ Nearside NW 25th TER,29.70495771,-82.35997493
-"1,170",Pine Ridge Apartments,Northbound NW 34th ST @ Nearside NW 23rd TER,29.70629198,-82.35698748
-"1,173",Southwest Recreation Center,Eastbound Hull RD @ Farside Bledsoe DR,29.63757261,-82.36858601
 "1,174",Lacrosse Field,Eastbound Hull RD @ Nearside Natural Area DR,29.63758708,-82.36517442
-"1,176",Fifield Hall,Eastbound Hull RD @ Nearside Mowry RD,29.63759058,-82.36000818
 "1,179",Pressly Softball Stadium,Westbound Hull RD @ Farside Natural Area DR,29.63769387,-82.36524344
-"1,180",Southwest Recreation Center,Westbound Hull RD @ Nearside Bledsoe DR,29.63778644,-82.36834551
 "1,181",UF Orthopaedics Institute,Westbound Hull RD @ Farside SW 34th ST,29.63782661,-82.37401184
 "1,182",Park and Ride II,Westbound Hull RD @ Farside SW 34th ST,29.63773595,-82.3764119
 "1,183",Cultural Plaza Park and Ride 1,Eastbound Hull RD @ Farside Bledsoe DR,29.63673627,-82.36795351
 "1,184",Weed Science Building,Northbound Museum RD @ Farside Hull RD,29.63879661,-82.36410284
 "1,185",Microbiology/Cell Science Building,Northbound Museum RD @ Farside Radio Rd,29.64026163,-82.36410017
 "1,186",Lakeside Residential Building,Southbound Museum RD @ Farside Radio RD,29.64125278,-82.36422348
-"1,187",Microbiology/Cell Science Building,Southbound Museum RD @ Nearside Radio RD,29.64035567,-82.36422788
 "1,188",Softball Stadium @ Museum Road,Southbound Museum RD @ Nearside Hull RD,29.63775971,-82.36423233
-"1,189",Corry Village,Westbound West Fraternity DR @ Nearside Village DR,29.64777227,-82.36005001
-"1,190",Family Housing,Southbound Family Housing @ Farside Bledsoe DR,29.64091514,-82.36959345
-"1,191",Family Housing,Southbound Family Housing @ Farside Hull RD,29.63941661,-82.37065234
 "1,192",Turlington Hall,Southbound Newell DR @ Farside Union RD,29.64839477,-82.34355845
-"1,193",Rawlings Hall,Southbound Newell DR @ Nearside McCarty DR,29.64660765,-82.34357212
-"1,194",Commuter Lot Parking Garage,Northbound Gale Lemerand DR @ Farside Museum RD,29.64204094,-82.35065685
 "1,196",Animal Science Building,Southbound Shealy DR @ Farside SW 16th AVE,29.63158944,-82.35143001
 "1,197",Webb Livestock Pavilion,Southbound Shealy DR @ Farside SW 16th AVE,29.63396811,-82.35122301
 "1,199",VA Hospital @ Archer Rd,Eastbound Archer RD @ Farside Center DR,29.63823338,-82.34558953
@@ -910,46 +740,27 @@ stop_id,stop_name,stop_desc,Latitude,Longitude
 "1,206",Arlington Square Apartments,Northbound SE 3rd ST @ Nearside SE 2nd PL,29.64951749,-82.32230172
 "1,207",Century Tower,Northbound Newell DR @ Nearside Stadium RD,29.6488896,-82.34342168
 "1,209",Oxford Terrace Apartments,Southbound SW 9th ST @ Nearside SW Depot AVE,29.64322572,-82.3337333
-"1,213",Lexington Crossing Apartments,Southbound SW 27th ST @ Nearside SW 40th PL,29.61353495,-82.36227118
-"1,214",Corry Village,Northbound Village DR @ Nearside W Fraternity Row,29.64761044,-82.36005034
-"1,215",Tigert Hall,Eastbound Union RD @ Nearside SW 13th ST,29.65015544,-82.33947418
-"1,216",Arlington Square Apartments,Southbound SE 3rd ST @ Nearside SE 2nd PL,29.64974377,-82.32248002
 "1,217",Schiebler Childrens Medical Facility,Westbound SW 16th AVE @ Nearside Shealy DR,29.63517394,-82.34565052
-"1,219",Webb Livestock Pavilion,Northbound Shealy DR @ Nearside SW 16th AVE,29.63398861,-82.35110535
 "1,221",Eastbound NW 23rd Avenue @ NW 13th Street,Eastbound NW 23rd AVE @ Farside NW 13th ST,29.67389077,-82.33804002
 "1,222",Hearing Aid Gainesville,Eastbound NW 23rd TER @ Nearside NW 10th ST,29.67386727,-82.33510752
 "1,223",Forest Meadows Funeral Home,Eastbound NW 23rd TER @ Nearside NW 6th ST,29.6738446,-82.33181568
 "1,224",Graduate Apartments,Eastbound SW 4th AVE @ Farside SW 13th ST,29.64839724,-82.33840265
-"1,226",Jefferson 2nd Avenue Apartments,Eastbound SW 4th AVE @ Nearside SW 5th TER,29.64827044,-82.32979985
-"1,227",Alachua County Courthouse,Eastbound SW 4th AVE @ Nearside SW 1st ST,29.64828767,-82.32591245
-"1,228",Alachua County Courthouse,Westbound SW 4th AVE @ Farside SW 1st ST,29.64840794,-82.32607369
-"1,229",Jefferson 2nd Avenue Apartments,Westbound SW 4th AVE @ Farside SW 5th ST,29.64839191,-82.3300345
-"1,231",Graduate Apartments,Westbound SW 4th AVE @ Nearside SW 13th ST,29.64850304,-82.33840277
 "1,234",Super Wal-mart @ NE 12th Avenue,Eastbound NE 12th AVE @ Farside Waldo RD,29.66261543,-82.30242286
-"1,235",Super Wal-mart @ NE 12th Avenue,Westbound NE 12th AVE @ Nearside Waldo RD,29.66283893,-82.30220653
-"1,236",Cabana Beach Apartments,Northbound SW 52nd BLVD @ Farside SW 20th AVE,29.63591311,-82.39788367
 "1,237",Museum Walk Apartments,Eastbound Hull RD @ Nearside SW 34th ST,29.63766157,-82.37479819
 "1,238",Sorority Row @ SW 11th Street,Northbound SW 11th ST @ Nearside E Panhellenic DR,29.64407144,-82.33568885
 "1,239",Caroline Manor Affordable Housing,Westbound E University AVE @ Nearside NE 25th ST,29.65200294,-82.2919187
 "1,240",Northbound NE 25th Street @ NE 3rd Place,Northbound NE 25th ST @ Nearside NE 3rd PL,29.65411694,-82.29226936
 "1,241",The Hub and Student Health Care Center,Westbound Stadium RD @ Farside Buckman DR,29.6486636,-82.34530635
-"1,243",GRU Administration Building,Westbound SE 4th AVE @ Farside SE 2nd ST,29.64843827,-82.32316285
-"1,244",Arlington Square Apartments,Eastbound SE 4th AVE @ Nearside SE 3rd ST,29.64832071,-82.32275388
 "1,248",Parkside II Apartments,Westbound Depot AVE @ Nearside SW 11th ST,29.64281262,-82.33558
 "1,249",Gainesville Ale House,Westbound Archer RD @ Nearside SW 40th BLVD,29.6194501,-82.38241633
-"1,251",The Reserve at Kanapaha,Westbound Archer RD @ Nearside SW 41st ST,29.61516878,-82.39051484
 "1,252",Gainesville Council on Aging,Westbound Archer RD @ Farside SW 47th ST,29.61328714,-82.39417543
-"1,253",Graham Hall,Northbound Gale Lemerand DR @ Farside Museum RD,29.64581027,-82.35025685
 "1,254",Gator Corner Dining Facility @ Gale Lemerand,Northbound Gale Lemerand DR @ Nearside Stadium RD,29.64816727,-82.34961785
 "1,257",Westbound SW 4th Avenue @ SW 10th Street,Westbound SW 4th AVE @ Nearside SW 10th ST,29.64848144,-82.33494202
 "1,258",Eastbound SW 4th Avenue @ SW 10th Street,Eastbound SW 4th AVE @ Nearside SW 10th ST,29.6483871,-82.3351452
 "1,259",Exxon Gas Station @ E University Avenue,Westbound E University AVE @ Farside SE 43rd ST,29.65196094,-82.27293445
 "1,261",Gardenia Garden Apartments,Westbound NE 8th AVE @ Farside NE 17th DR,29.65926381,-82.30263686
 "1,264",Cottage Grove Apartments at Gainesville,Southbound SW 13th ST @ Farside SW Williston RD,29.60950178,-82.34185652
-"1,267",University Commons Apartments,Westbound Old Archer RD @ Farside SW 23rd TER,29.63119394,-82.3632431
-"1,268",Brandywine Apartments,Westbound Old Archer RD @ Farside SW 28th PL,29.630199,-82.365372
 "1,269",Archer Court Apartments,Westbound Old Archer RD @ Nearside SW 28th Pl,29.62941028,-82.36710018
-"1,270",Gainesville Place Apartments,Southbound Gainesville Place Ent @ Old Archer RD,29.62718809,-82.3707817
 "1,271",Marchwood Townhomes,Southbound SW 43rd ST @ Farside SW 20th LN,29.63343694,-82.38938517
 "1,272",Eastbound SW 24th Avenue @ SW 43rd Street,Southbound SW 43rd St @ Nearside SW 24th AVE,29.63125011,-82.38934634
 "1,274",Krystal @ Newberry Road,Westbound Newberry RD @ Farside NW 76th ST,29.65983612,-82.42470931
@@ -958,37 +769,24 @@ stop_id,stop_name,stop_desc,Latitude,Longitude
 "1,277",Legacy @ Fort Clarke Apartments,Northbound Fort Clarke BLVD @ Farside NW 15th PL,29.66746594,-82.43511415
 "1,278",Northbound Fort Clarke Boulevard @ Eagle Point,Northbound Fort Clarke BLVD @ Nearside NW 17th PL,29.66885983,-82.43690493
 "1,279",Hidden Oak Elementary School,Northbound Fort Clarke BLVD @ Farside NW 89th DR,29.67088794,-82.43899993
-"1,280",Hidden Oak Elementary School,Southbound Fort Clarke BLVD @ Nearside NW 23rd AVE,29.67081143,-82.43910265
 "1,283",Ft Clarke Middle School,Northbound Fort Clarke BLVD @ Nearside NW 23rd AVE,29.67417243,-82.43913349
-"1,284",Ft Clarke Middle School,Southbound Fort Clarke BLVD @ Farside NW 23rd AVE,29.6735086,-82.43933399
 "1,285",Southbound Fort Clarke Boulevard @ Eagle Point,Southbound Fort Clarke BLVD @ Nearside NW 17th PL,29.66891262,-82.43713955
-"1,286",Legacy @ Fort Clarke Apartments,Southbound Fort Clarke BLVD @ Nearside NW 15th PL,29.66719827,-82.43508732
-"1,287",Paddock Club Apartments,Southbound Fort Clarke BLVD @ Nearside NW 8th AVE,29.6633858,-82.43365953
 "1,288",Eastbound Newberry Road @ Fort Clarke Boulevard,Eastbound Newberry RD @ Farside Fort Clarke BLVD,29.66023527,-82.43220382
 "1,289",Pepboys Auto @ Newberry RD,Eastbound Newberry RD @ Nearside NW 76th BLVD,29.65959694,-82.42497132
-"1,290",Alachua County Courthouse,Eastbound SW 2nd AVE @ Nearside S Main ST,29.65019807,-82.32515318
 "1,294",Southbound SW 10th ST at SW 4th Ave (Deco 39),Southbound SW 10th ST @ Nearside SW 4th AVE,29.64854346,-82.33509694
 "1,295",Stratford Court Apartments,Southbound SW 10th ST @ Nearside SW 6th AVE,29.64678659,-82.33506906
 "1,296",Ivy House Apartment,Southbound SW 10th ST @ Nearside SW 8th AVE,29.64503178,-82.33504168
 "1,297",RTS Administration Building,Southbound SE 10th AVE @ Farside SE 4th ST,29.64077194,-82.32199802
-"1,298",RTS Administration Building,Northbound SE 10th AVE @ Nearside SE 4th ST,29.64068294,-82.32202152
 "1,299",Kohl's Department Store @ SW 34th ST,Southbound SW 34th ST @ Nearside SW 35th PL,29.62349125,-82.37275221
 "1,300",HH Gregg @ SW 34th ST,Southbound SW 34th ST @ Farside SW 35th PL,29.62050895,-82.37289017
 "1,301",Stoneridge Apartments,Southbound SW 34th ST @ Nearside SW 39th BLVD,29.61851945,-82.37269734
-"1,302",Greenwich Green Apartments,Westbound SW 39th BLVD @ Nearside SW 34th ST,29.61770161,-82.37470051
 "1,303",O2B Kids @ SW 37th BLVD,Northbound SW 39th BLVD @ Nearside Archer RD,29.61773145,-82.37770201
 "1,304",Regions Bank @ Archer Road,Northbound SW 39th BLVD @ Nearside Archer RD,29.61976299,-82.37944741
-"1,305",Best Buy @ Butler Plaza,Northbound SW 37th BLVD @ Nearside Windmeadows BL*,29.6219488,-82.38113448
 "1,307",Alarion Bank @ 34th ST,Southbound SW 34th ST @ Farside SW 42nd PL,29.6139082,-82.37217239
-"1,308",US Post Office @ SW 34th Street,Southbound SW 34th ST @ Nearside SW 47th AVE,29.61099539,-82.3718525
-"1,309",Williston Plaza,Westbound SW 48th LN @ Nearside SW 34th ST,29.60638462,-82.37261401
 "1,310",Walker Furniture,Northbound SW 47th AVE @ Nearside SW 34th ST,29.60882961,-82.37349417
 "1,313",Bed and Breakfast District,Eastbound SE 2nd AVE @ Nearside SE 7th ST,29.65008869,-82.31843697
-"1,314",Bed and Breakfast District,Westbound SE 2nd AVE @ Farside SE 7th ST,29.65032694,-82.31871036
 "1,315",Super Wal-Mart @ Waldo Road,Northbound Waldo RD @ Farside NE 12th AVE,29.66403627,-82.30333386
-"1,316",Super Wal-Mart @ Waldo Road,Southbound Waldo RD @ Nearside NE 12th AVE,29.66377693,-82.30375186
 "1,317",GRACE Marketplace,Eastbound NE 39th AVE @ Farside Waldo RD,29.68330445,-82.28619051
-"1,318",GRACE Marketplace,Westbound NE 39th AVE @ Nearside Waldo RD,29.68357085,-82.28617224
 "1,319",Gainesville Regional Airport Outbound,Westbound Airport Access RD @ Nearside NE 39th AVE,29.67896676,-82.2766162
 "1,320",Gainesville Regional Airport,Westbound Airport Access RD @ Farside NE 39th AVE,29.68608393,-82.27632037
 "1,321",The Enclave Apartments,Westbound SW 35th PL @ Nearside SW 34th ST,29.62116078,-82.36882668
@@ -996,15 +794,11 @@ stop_id,stop_name,stop_desc,Latitude,Longitude
 "1,323",College Manor Apartments,Westbound SW 2nd AVE @ Nearside SW 13th ST,29.65033394,-82.33780135
 "1,324",Sorority Row,Northbound SW 11th ST @ Nearside SW 8th AVE,29.64482141,-82.33570469
 "1,325",Division of Blind Services,Southbound NW 43rd ST @ Nearside NW 36th AVE,29.68650376,-82.38906317
-"1,326",UF Counseling and Wellness Center,Eastbound Radio RD @ Farside Bledsoe DR,29.64214794,-82.36883417
 "1,327",Eastbound SW 7th AVE @ SW 12th ST,Eastbound SW 7th AVE @ Farside SW 12th ST,29.64570394,-82.33655681
 "1,328",Eastbound SW 7th AVE @ SW 10th ST,Eastbound SW 7th AVE @ Nearside SW 10th ST,29.64568438,-82.33510106
 "1,329",Alachua County Juvenile Detention,Eastbound NE 39th AVE @ Farside Waldo RD,29.68015559,-82.28020603
-"1,330",Alachua County Juvenile Detention,Westbound NE 39th AVE @ Farside Waldo RD,29.68018568,-82.2796301
 "1,333",Enclave 1,Eastbound SW 32nd Terrace @ E of Main Bldg,29.62541033,-82.36779262
 "1,337",Enclave 5,Southbound Gainesville Place Apartments @ Nearsid*,29.62183194,-82.36547951
-"1,338",Sonny's Barbecue @ Waldo Road,Southbound Waldo RD @ Farside NE 27th AVE,29.67630084,-82.29527206
-"1,339",Merita Bread Box,Southbound Waldo RD @ Nearside NE 31st AVE,29.68102392,-82.29205982
 "1,341",Enclave 4,Eastbound Enclave Apartments @ Nearside Enclave A*,29.62278261,-82.36676568
 "1,343",Gainesville Senior Recreational Center,Southbound NW 34th ST @ Farside NW 58th AVE,29.70792312,-82.35445424
 "1,349",Hilton Garden Inn,Eastbound SW 33rd PL @ Farside SW 42nd ST,29.62301617,-82.38571894
@@ -1033,9 +827,7 @@ stop_id,stop_name,stop_desc,Latitude,Longitude
 "1,384",Metrocorp Center,Westbound NW 39th AVE @ Nearside NW 43rd ST,29.68882193,-82.38607417
 "1,386",Breckenridge Neighborhood,Westbound NW 39th AVE @ Farside NW 37th TER,29.68879176,-82.378614
 "1,387",Sable Chase Neighborhood,Westbound NW 39th AVE @ Nearside NW 35th ST,29.68877336,-82.37455097
-"1,388",Sable Chase Neighborhood,Eastbound NW 39th AVE @ Farside NW 35th ST,29.68853842,-82.37453876
 "1,389",Eastbound NW 39th AVE @ NW 37th ST,Eastbound NW 39th AVE @ Farside NW 37th ST,29.68852499,-82.37769863
-"1,391",Metrocorp Center,Eastbound NW 39th AVE @ Nearside NW 40th TER,29.68854075,-82.38688465
 "1,392",Northbound NW 55th ST @ NW 9th LN,Northbound NW 55th ST @ Nearside NW 9th LN,29.66103827,-82.40149116
 "1,393",Northbound NW 55th ST @ NW 14th AVE,Northbound NW 55th ST @ Nearside NW 14th AVE,29.66523744,-82.40143733
 "1,394",Southbound NW 55th ST @ NW 14th AVE,Southbound NW 55th ST @ Farside NW 14th AVE,29.66490778,-82.40161758
@@ -1052,24 +844,18 @@ stop_id,stop_name,stop_desc,Latitude,Longitude
 "1,408",Eastbound NW 5th AVE @ NW 17th ST,Westbound NW 5th AVE @ Nearside NW 17th ST,29.65584739,-82.34454084
 "1,409",Northbound NW 17th ST @ NW 7th AVE,Northbound NW 17th ST @ Nearside NW 7th AVE,29.65749348,-82.34455613
 "1,412",College Park @ NW 5th AVE,Westbound NW 5th AVE @ Nearside NW 15th ST,29.65580888,-82.34164819
-"1,413",College Park @ NW 17th ST,Southbound NW 17th ST @ Nearside NW 3rd AVE,29.65370125,-82.34480072
 "1,414",Northbound NW 17th ST @ NW 5th AVE,Northbound NW 17th ST @ Farside NW 5th AVE,29.65598196,-82.34459189
 "1,415",Family Dollar @ NE 23rd AVE,Westbound NE 23rd AVE @  N Main ST,29.67397316,-82.32072408
 "1,420",Southbound SW 13th ST @ SW 13th AVE,Southbound SW 13 ST @ SW 13th AVE,29.63798059,-82.33942663
-"1,427",Holy Faith Catholic Church,Northbound NW 43rd ST @ Nearside NW 8th AVE,29.65840807,-82.38917748
 "1,428",FDOT Operations Center,Eastbound NW 39th AVE @ Nearside NE 52 ST,29.6734376,-82.2639662
 "1,430",NE 39th Ave @ Waldo Rd,Eastbound NW 39th AVE @ Nearside Waldo RD,29.68518209,-82.28982553
 "1,433",Walgreens,Southbound NW 91st ST @ Farside NW 39th AVE,29.68815343,-82.43909549
-"1,434",Walgreens,Northbound NW 91st ST @ Nearside NW 39th AVE,29.6880841,-82.43900149
 "1,435",Santa Fe Apt,Southbound NW 91st ST @ Nearside NW 31st PL,29.68470543,-82.43902399
 "1,436",Santa Fe West Entrance,Northbound NW 91st ST @ Farside NW 31st PL,29.6850816,-82.43888282
 "1,437",SF Fitness Center,Eastbound North RD @ Nearside SF Fitness Center,29.68305932,-82.43592773
-"1,438",SF Fitness Center,Westbound North RD @ Nearside SF Fitness Center,29.68321245,-82.43563566
 "1,439",Cohens Temple,Northbound NE 15th ST @ Nearside NE 5th PL,29.65597636,-82.30578885
 "1,440",Mt. Olive Primitive Baptist Church,Southbound NE 15th ST @ Farside NE 5th PL,29.65586079,-82.30591261
-"1,441",Lewis Place @ Ironwood Apartments,Northbound NE 15th ST @ Farside NE 13th AVE,29.6913847,-82.30571584
 "1,442",North Point @ Ironwood,Northbound NE 15th ST @ Nearside NE 47th PL,29.69786707,-82.30568372
-"1,443",North Point @ Ironwood,Southbound NE 15th ST @ Nearside NE 47th PL,29.69810012,-82.30586309
 "1,444",University House,Soundbound NW 12th ST @ Nearside NW 7th AVE,29.65797763,-82.33714947
 "1,447",Gardenia Gardens,Eastbound NE 8th AVE @ Farside NE 17th ST,29.65913486,-82.30267408
 "1,448",Northwest 8 Avenue @ farside NW 4th St,Northwest 8 Avenue @ farside NW 4th St Eastbound,29.65931603,-82.32817956
@@ -1079,18 +865,14 @@ stop_id,stop_name,stop_desc,Latitude,Longitude
 "1,452",La Mancha North,Southbound SW 9th ST @ Nearside SW 8th AV,29.64510333,-82.33370177
 "1,453",St. Patrick Catholic Church,Westbound NE 16th AVE @ Nearside NE 2 ST,29.66662447,-82.31937533
 "1,454",Northeast Park,Eastbound NE 16th AVE @ Farside NE 2 ST,29.6665055,-82.31944909
-"1,455",Walmart Northbound,Northbound NW 23rd ST @ Nearside NW 62nd AVE,29.70991592,-82.35582366
 "1,456",NE 49th AVE,Westbound NE 49th AVE @ Farside Waldo RD,29.69964419,-82.2782648
 "1,457",Physical Plant Radio Road,Westbound Radio RD @ Nearside SW 34 ST,29.64231286,-82.37073272
 "1,458",Northside Family Housing,Eastbound Radio RD @ Nearside SW 34 ST,29.64215105,-82.37072797
 "1,459",Kensington Apartments Eastside,Southbound SW 38th TER @ Farside SW 20th AVE,29.63360598,-82.38099979
 "1,461",Lake Wauburg North Entrance,Northbound Highway 441 @ Nearside Regatta Drive,29.53328681,-82.30862433
 "1,462",NE 18 ST @ NE 3 AVE,Northbound NE 18 ST @ Farside NE 3 AVE,29.65384922,-82.30163432
-"1,463",NE 18 ST @ NE 3 AVE,Southbound NE 18 ST @ Farside NE 3 AVE,29.65390144,-82.3017124
 "1,464",NE 18th St,Northbound NE 18th ST @ Farside NE 5th Ave,29.65589939,-82.30164414
-"1,465",NE 18th St,Southbound NE 18th ST @ Farside NE 5th Ave,29.65595465,-82.30173862
 "1,466",NE 18th St @ NE 8th Ave,Northbound NE 18th ST @ Nearside NE 8th Ave,29.65903474,-82.30159401
-"1,467",NE 18th St @ NE 8th Ave,Southbound NE 18th ST @ Nearside NE 8th Ave,29.65892469,-82.30173143
 "1,468",Gainesville Scooter,Westbound NW 14th Ave @ Farside Main Street,29.66484569,-82.32566755
 "1,469",Eastbound University Avenue @ SW 23rd DR,Eastbound W University AVE @ Nearside SW 23rd Dr,29.65216845,-82.35860125
 "1,470",Women's Club,Eastbound University Ave @ Farside NW 28th St,29.65203728,-82.36471246
@@ -1102,7 +884,6 @@ stop_id,stop_name,stop_desc,Latitude,Longitude
 "1,476",McDonalds,Westbound NW 39th Ave @ Nearside NW 92nd Ct,29.68904787,-82.44159272
 "1,477",Kangaroo Station,Eastbound NW 39th Ave @ Nearside NW 92nd Ct,29.68880361,-82.44220971
 "1,478",Great Lakes Carpet @ NW 53rd Avenue,Westbound NW 53rd AVE @ Nearside NW 19th ST,29.70332423,-82.34644194
-"1,479",Sorrento New Home Community,Westbound NW 53rd AVE @ Nearside NW 55th AVE,29.70335942,-82.35314126
 "1,480",Rahma Mercy Clinic,Southbound SW 13th St @ Farside SW 51st Ave,29.60480345,-82.34219331
 "1,481",Cancer/Genetics Research Complex,Eastbound Mowry Rd @ Farside SW 23 Dr,29.63832115,-82.35392637
 "1,482",Lake Alice Conservation Area,Westbound Mowry Rd @ Nearside SW 23 Dr,29.63847362,-82.35360223
@@ -1144,7 +925,6 @@ stop_id,stop_name,stop_desc,Latitude,Longitude
 "1,522",Southbound NW 34th St. @ NW 34th Ter,Southbound NW 34th St. @ Nearside NW 34th Ter,29.67640407,-82.37238512
 "1,523",Northbound NW 34th St. @ NW 31st Blvd,Northbound NW 34th St. @ Nearside NW 31st Blvd,29.6836004,-82.372286
 "1,524",Southbound NW 34th St. @ NW 33rd Ln,Southbound NW 34th St. @ Nearside NW 33rd Ln,29.68376501,-82.37242465
-"1,525",Northbound NW 34th St. @ NW 31st Blvd,Northbound NW 34th St. @ Nearside NW 31st Blvd,29.68658377,-82.3722623
 "1,526",Southbound NW 34th St. @ NW 37th Ave,Northbound NW 34th St. @ Nearside NW 37th Ave,29.68724539,-82.37241065
 "1,527",Northbound NW 43rd St. @ NW 39th Ave,Northbound NW 34th St. @ Farside NW 39th Ave,29.69021062,-82.38887837
 "1,528",Southbound NW 43rd St. @ NW 41st Pl,Southbound NW 43rd St. @ Farside NW 41st Pl,29.69044883,-82.38914127
@@ -1165,18 +945,13 @@ stop_id,stop_name,stop_desc,Latitude,Longitude
 "1,545",Fresenus Medical Care,Northbound N Main ST @ Nearside NE 1st Blvd,29.67103965,-82.32299946
 "1,546",The Clock Restaurant,Southbound N Main ST @ Nearside NE 1st Blvd,29.67148187,-82.3229951
 "1,547",Sam's Club,Westbound SW 33rd PL @ Farside SW 37th Blvd,29.62313306,-82.38378609
-"1,548",Sam's Club,Eastbound SW 33rd PL @ Nearside SW 37th Blvd,29.62299946,-82.38345284
-"1,549",Hilton Garden Inn,Westbound SW 33rd PL @ Nearside SW 42nd ST,29.62319396,-82.38657029
 "1,550",Westbound SW 16th AVE @ SW 14th ST,Westbound SW 16th AVE @ Farside SW 14th ST,29.63645428,-82.34110522
-"1,551",Social Security Administration,Southbound NW 13th ST @ Nearside NW 45th AVE,29.6967986,-82.33916185
 "1,552",Kangaroo Excpress @ Newberry/Tower Road,Eastbound Newberry RD @ Nearside NW 75th ST,29.65958521,-82.42257182
-"1,553",Alachua County Health Department,Southbound SE 24th ST @ Farside SE 2nd AVE,29.64916816,-82.29337887
 "1,554",Pod @ Plaza Blvd Westbound,Westbound Plaza Blvd @ Nearside SW 62nd Blvd,29.62790999,-82.38335998
 "1,555",Pod @ Plaza Blvd Eastbound,Eastbound Plaza Blvd @ Farside SW 62nd Blvd,29.62766031,-82.38312395
 "1,556",The Ridge @ SW 38th TER southbound,Southbound SW 38th TER @ Nearside SW 24th AVE,29.63154866,-82.38099193
 "1,557",The Ridge @ SW 38th TER northbound,Northbound SW 38th TER @ Farside SW 24th AVE,29.63162614,-82.38087486
 "1,559",Clark Butler BLVD @ Plaza southbound,Southbound Clark Butler BLVD @ Nearside Plaza BLVD,29.626896,-82.384952
-"1,560",Eastwood Meadows Community,Northbound SE 44th ST @ Farside SE 10th PL,29.642433,-82.271533
 "1,561",Haile Plantation I,Northbound SW 51st Rd @ Nearside SW 91st Ter,29.60716487,-82.4381515
 "1,564",Bulter Plaza Walmart Supercenter,Northbound SW 30th Ave @ Farside SW 42nd St,29.62597962,-82.38737271
 "1,565",Butler Plaza RTS,Southbound SW 30th Ave @ Nearside SW 42nd St,29.62570512,-82.38735392
