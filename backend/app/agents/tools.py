@@ -3,6 +3,7 @@ import json
 import pandas as pd
 import numpy as np
 import httpx
+import os 
 
 from langchain_core.tools import tool
 from app.services.pinecone_service import query_records
@@ -34,7 +35,8 @@ def get_tools():
         update_preference_embedding,
         swipe_on_listing,
         suggest_listing,
-        get_crimes_nearby
+        get_crimes_nearby,
+        get_distance_to_location
     ]
 
 
@@ -353,6 +355,107 @@ def decode_coordinates(location: str) :
         return {"success": False, "error": f"Error: {e}"}
 
     return {"success": True, "lat": center_lat, "lng": center_lon}
+
+
+@tool
+def get_distance_to_location(apartment_address: str, destination: str, mode: str = "driving") -> dict:
+    """
+    Calculate the distance and travel time between an apartment and a destination.
+    Call this when the user asks how far an apartment is from a location (e.g., Walmart, campus, etc.)
+    Args:
+        apartment_address: The full address of the apartment
+        destination: The destination (address or place name like "Walmart downtown Gainesville")
+        mode: Travel mode - 'driving', 'transit', 'walking', or 'bicycling' (default 'driving')
+    Returns:
+        Dict with 'distance_km', 'distance_miles', 'duration_minutes', or 'error'
+    """
+    
+    # Get API key from environment variable
+    api_key = os.getenv("GOOGLE_MAPS_API_KEY")
+    if not api_key:
+        return {
+            "success": False,
+            "error": "Google Maps API key not configured. Set GOOGLE_MAPS_API_KEY environment variable."
+        }
+    
+    # Validate mode
+    valid_modes = ["driving", "transit", "walking", "bicycling"]
+    if mode.lower() not in valid_modes:
+        return {
+            "success": False,
+            "error": f"Invalid mode. Must be one of: {', '.join(valid_modes)}"
+        }
+    
+    # Validate addresses
+    if not apartment_address or not apartment_address.strip():
+        return {"success": False, "error": "Apartment address is required"}
+    if not destination or not destination.strip():
+        return {"success": False, "error": "Destination is required"}
+    
+    BASE_URL = "https://maps.googleapis.com/maps/api/distancematrix/json"
+    HEADERS = {"User-Agent": "SwampFindr/1.0 University of Florida (ufl.edu)"}
+    
+    params = {
+        "origins": apartment_address.strip(),
+        "destinations": destination.strip(),
+        "mode": mode.lower(),
+        "key": api_key,
+        "units": "metric"  # Return distances in kilometers
+    }
+    
+    try:
+        with httpx.Client(timeout=10.0, headers=HEADERS) as client:
+            resp = client.get(BASE_URL, params=params)
+            resp.raise_for_status()
+            data = resp.json()
+    except httpx.ConnectTimeout:
+        return {"success": False, "error": "Connection timed out reaching Google Maps API"}
+    except httpx.HTTPStatusError as e:
+        return {"success": False, "error": f"API error {e.response.status_code}: {e.response.text}"}
+    except Exception as e:
+        return {"success": False, "error": f"Request failed: {e}"}
+    
+    # Check for API errors
+    if data.get("status") != "OK":
+        error_message = data.get("error_message", "Unknown error")
+        return {"success": False, "error": f"Google Maps API error: {error_message}"}
+    
+    # Extract distance and duration from response
+    try:
+        rows = data.get("rows", [])
+        if not rows or not rows[0].get("elements"):
+            return {"success": False, "error": "No route found between the two locations"}
+        
+        element = rows[0]["elements"][0]
+        
+        # Check if route is possible
+        if element.get("status") != "OK":
+            return {"success": False, "error": f"Route not found: {element.get('status', 'UNKNOWN')}"}
+        
+        distance_m = element.get("distance", {}).get("value", 0)
+        duration_s = element.get("duration", {}).get("value", 0)
+        
+        # Convert to user-friendly units
+        distance_km = distance_m / 1000
+        distance_miles = distance_km * 0.621371
+        duration_minutes = duration_s / 60
+        duration_hours = duration_minutes / 60
+        
+        return {
+            "success": True,
+            "apartment_address": apartment_address.strip(),
+            "destination": destination.strip(),
+            "mode": mode.lower(),
+            "distance_km": round(distance_km, 2),
+            "distance_miles": round(distance_miles, 2),
+            "duration_minutes": round(duration_minutes, 0),
+            "duration_hours": round(duration_hours, 1),
+            "duration_formatted": f"{int(duration_hours)}h {int(duration_minutes % 60)}m" if duration_hours >= 1 else f"{int(duration_minutes)}m"
+        }
+    except KeyError as e:
+        return {"success": False, "error": f"Unexpected API response format: {str(e)}"}
+    except Exception as e:
+        return {"success": False, "error": f"Error processing response: {str(e)}"}
 
 
 @tool
