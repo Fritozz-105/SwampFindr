@@ -11,7 +11,7 @@ import {
   onboardingSchema,
   type OnboardingData,
 } from "@/lib/validations/onboarding";
-import { createClient } from "@/lib/supabase/client";
+import { getToken } from "@/lib/supabase/client";
 import { ProfileStep } from "./steps/ProfileStep";
 import { PreferencesStep } from "./steps/PreferencesStep";
 import { AmenitiesStep } from "./steps/AmenitiesStep";
@@ -124,12 +124,9 @@ export function OnboardingForm() {
     setSubmitError("");
 
     try {
-      const supabase = createClient();
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+      const token = await getToken();
 
-      if (!session?.access_token) {
+      if (!token) {
         setSubmitError("Session expired. Please log in again.");
         setIsPending(false);
         return;
@@ -140,7 +137,7 @@ export function OnboardingForm() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${session.access_token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(result.data),
       });

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { getToken } from "@/lib/supabase/client";
 import {
   sendChatMessage,
   getThreads,
@@ -29,14 +29,6 @@ function parseHistoryContent(content: string | unknown[]): string {
   return String(content ?? "");
 }
 
-async function getToken(): Promise<string | null> {
-  const supabase = createClient();
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-  return session?.access_token ?? null;
-}
-
 export function useChat() {
   const [threads, setThreads] = useState<Thread[]>([]);
   const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
@@ -44,6 +36,7 @@ export function useChat() {
   const [isLoadingThreads, setIsLoadingThreads] = useState(true);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [isSending, setIsSending] = useState(false);
+  const isSendingRef = useRef(false);
   const [error, setError] = useState<string | null>(null);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const lastUserMessage = useRef<string>("");
@@ -139,7 +132,8 @@ export function useChat() {
 
   const sendMessage = useCallback(
     async (content: string) => {
-      if (!content.trim() || isSending) return;
+      if (!content.trim() || isSendingRef.current) return;
+      isSendingRef.current = true;
       setError(null);
       lastUserMessage.current = content;
 
@@ -151,6 +145,7 @@ export function useChat() {
         const token = await getToken();
         if (!token) {
           setError("Not authenticated.");
+          setMessages((prev) => prev.slice(0, -1));
           setIsSending(false);
           return;
         }
@@ -159,6 +154,7 @@ export function useChat() {
 
         if (!res.success) {
           setError(res.error ?? "Something went wrong. Try again.");
+          setMessages((prev) => prev.slice(0, -1));
           setIsSending(false);
           return;
         }
@@ -210,11 +206,13 @@ export function useChat() {
             ? err.message
             : "Could not connect to server. Check your connection.",
         );
+        setMessages((prev) => prev.slice(0, -1));
       } finally {
+        isSendingRef.current = false;
         setIsSending(false);
       }
     },
-    [activeThreadId, isSending, favorites],
+    [activeThreadId, favorites],
   );
 
   const retryLastMessage = useCallback(async () => {
@@ -286,7 +284,7 @@ export function useChat() {
 
     try {
       const token = await getToken();
-      if (!token) return;
+      if (!token) throw new Error("Not authenticated");
       await toggleFavorite(token, listingId);
     } catch {
       // Revert

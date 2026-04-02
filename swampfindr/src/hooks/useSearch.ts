@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { getToken } from "@/lib/supabase/client";
 import { searchListings, getSearchHistory, toggleFavorite } from "@/lib/api/flask";
 import type { Listing } from "@/types/listing";
 import type { SearchFilters as SearchFiltersType, SearchHistoryEntry } from "@/types/search";
@@ -48,12 +48,9 @@ export function useSearch() {
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const supabase = createClient();
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-        if (!session?.access_token) return;
-        const res = await getSearchHistory(session.access_token);
+        const token = await getToken();
+        if (!token) return;
+        const res = await getSearchHistory(token);
         setSearchHistory(res.data);
       } catch {
         // History is non-critical
@@ -99,23 +96,20 @@ export function useSearch() {
       }
 
       try {
-        const supabase = createClient();
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-        if (!session?.access_token) {
+        const token = await getToken();
+        if (!token) {
           setError("Not authenticated");
           return;
         }
 
-        const res = await searchListings(session.access_token, q, 50, isRestore);
+        const res = await searchListings(token, q, 50, isRestore);
         setResults(res.data);
         setFilters(defaultFilters);
         setPage(1);
 
         if (!isRestore) {
           try {
-            const historyRes = await getSearchHistory(session.access_token);
+            const historyRes = await getSearchHistory(token);
             setSearchHistory(historyRes.data);
           } catch {
             // Non-critical
@@ -140,12 +134,9 @@ export function useSearch() {
       prev.map((l) => (l.listing_id === listingId ? { ...l, is_favorited: !l.is_favorited } : l)),
     );
     try {
-      const supabase = createClient();
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (!session?.access_token) return;
-      await toggleFavorite(session.access_token, listingId);
+      const token = await getToken();
+      if (!token) return;
+      await toggleFavorite(token, listingId);
     } catch {
       setResults((prev) =>
         prev.map((l) => (l.listing_id === listingId ? { ...l, is_favorited: !l.is_favorited } : l)),

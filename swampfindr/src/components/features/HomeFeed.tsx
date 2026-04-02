@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { getToken } from "@/lib/supabase/client";
 import { getRecommendations, toggleFavorite } from "@/lib/api/flask";
 import { ListingCard } from "@/components/features/ListingCard";
 import { Pagination } from "@/components/features/Pagination";
@@ -72,14 +72,13 @@ export function HomeFeed() {
     setError(null);
 
     try {
-      const supabase = createClient();
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.access_token) {
+      const token = await getToken();
+      if (!token) {
         setError("Not authenticated");
         return;
       }
 
-      const res = await getRecommendations(session.access_token, p, 12);
+      const res = await getRecommendations(token, p, 12);
       setListings(res.data);
       setPagination(res.pagination);
     } catch (err) {
@@ -102,10 +101,9 @@ export function HomeFeed() {
     );
 
     try {
-      const supabase = createClient();
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.access_token) return;
-      await toggleFavorite(session.access_token, listingId);
+      const token = await getToken();
+      if (!token) return;
+      await toggleFavorite(token, listingId);
     } catch {
       // Revert on failure
       setListings((prev) =>
