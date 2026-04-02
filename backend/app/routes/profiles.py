@@ -96,6 +96,7 @@ thread_list_response_model = profiles.model("ThreadListResponse", {
 chat_history_message_model = profiles.model("ChatHistoryMessage", {
     "role": fields.String,
     "content": fields.Raw,
+    "listings": fields.List(fields.Raw, description="Listing objects from agent tool calls"),
 })
 
 chat_history_response_model = profiles.model("ChatHistoryResponse", {

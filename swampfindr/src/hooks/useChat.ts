@@ -104,6 +104,7 @@ export function useChat() {
           .map((m) => ({
             role: m.role === "human" || m.role === "user" ? "user" : "assistant",
             content: parseHistoryContent(m.content),
+            listings: m.listings?.length ? m.listings : undefined,
           }));
         setMessages(parsed);
 

@@ -135,16 +135,24 @@ def get_history(thread_id: str) -> list:
         "system": "system",
     }
     history = []
+    pending_listings: list = []
     for m in state.values["messages"]:
-        if m.type in ("tool",):
+        if m.type == "tool":
+            parsed = _parse_tool_content(m.content)
+            if isinstance(parsed, dict) and parsed.get("success") and "listings" in parsed:
+                pending_listings.extend(parsed["listings"])
             continue
         content = m.content
         if not content:
             continue
-        history.append({
+        entry: dict = {
             "role":    role_map.get(m.type, m.type),
             "content": content,
-        })
+        }
+        if pending_listings:
+            entry["listings"] = pending_listings
+            pending_listings = []
+        history.append(entry)
     return history
 
 

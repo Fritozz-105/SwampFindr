@@ -38,5 +38,6 @@ export interface ChatHistoryResponse {
   data: {
     role: string;
     content: string | unknown[];
+    listings?: Listing[];
   }[];
 }
