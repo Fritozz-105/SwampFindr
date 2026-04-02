@@ -1,5 +1,6 @@
 import type { RecommendationResponse, Listing } from "@/types/listing";
 import type { SearchResponse, SearchHistoryResponse } from "@/types/search";
+import type { SendMessageResponse, ThreadsResponse, ChatHistoryResponse } from "@/types/chat";
 
 const FLASK_API_URL = process.env.NEXT_PUBLIC_FLASK_API_URL ?? "http://localhost:8080";
 
@@ -75,4 +76,36 @@ export async function searchListings(
 
 export async function getSearchHistory(token: string): Promise<SearchHistoryResponse> {
   return flaskFetch<SearchHistoryResponse>("/search/history", { token });
+}
+
+export async function sendChatMessage(
+  token: string,
+  query: string,
+  threadId?: string,
+): Promise<SendMessageResponse> {
+  const body: Record<string, string> = { query };
+  if (threadId) body.thread_id = threadId;
+  return flaskFetch<SendMessageResponse>("/chat/", {
+    token,
+    method: "POST",
+    body,
+  });
+}
+
+export async function getThreads(token: string): Promise<ThreadsResponse> {
+  return flaskFetch<ThreadsResponse>("/profiles/threads", { token });
+}
+
+export async function getChatHistory(
+  token: string,
+  threadId: string,
+): Promise<ChatHistoryResponse> {
+  return flaskFetch<ChatHistoryResponse>(`/profiles/chathistory?thread_id=${threadId}`, { token });
+}
+
+export async function deleteThread(
+  token: string,
+  threadId: string,
+): Promise<{ success: boolean }> {
+  return flaskFetch(`/profiles/threads/${threadId}`, { token, method: "DELETE" });
 }

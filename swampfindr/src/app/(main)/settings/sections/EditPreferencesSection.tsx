@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { getToken } from "@/lib/supabase/client";
 import { preferencesUpdateSchema } from "@/lib/validations/settings";
 import { settings } from "@/data/settings";
 import { errors } from "@/data/errors";
@@ -75,12 +75,9 @@ export function EditPreferencesSection({ preferences, onUpdate }: EditPreference
     setSuccess("");
 
     try {
-      const supabase = createClient();
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+      const token = await getToken();
 
-      if (!session?.access_token) {
+      if (!token) {
         setError("Session expired. Please log in again.");
         setSaving(false);
         return;
@@ -90,7 +87,7 @@ export function EditPreferencesSection({ preferences, onUpdate }: EditPreference
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${session?.access_token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(parsed.data),
       });
