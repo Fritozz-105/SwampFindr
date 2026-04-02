@@ -35,7 +35,7 @@ def user_owns_thread(user_id: str, thread_id: str) -> bool:
     """Return True when thread_id belongs to user_id and is not soft-deleted."""
     collection = _get_collection()
     if collection is None:
-        return True
+        return False
     return collection.find_one(
         {"user_id": user_id, "thread_id": thread_id, "deleted_at": {"$exists": False}}
     ) is not None

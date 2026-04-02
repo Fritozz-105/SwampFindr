@@ -79,27 +79,31 @@ def suggest_listing(top_k: int = 1) -> dict:
         listings_col = get_listings_collection()
         units_col = get_units_collection()
 
+        hit_ids = [h["fields"].get("listing_id") for h in hits if h["fields"].get("listing_id")]
+        score_map = {h["fields"].get("listing_id"): h["_score"] for h in hits}
+
+        listings_docs = {doc["listing_id"]: doc for doc in listings_col.find({"listing_id": {"$in": hit_ids}})}
+        units_by_listing: dict[str, list] = {}
+        for u in units_col.find({"listing_id": {"$in": hit_ids}}):
+            u["_id"] = str(u["_id"])
+            units_by_listing.setdefault(u["listing_id"], []).append(u)
+
         listings = []
-        for hit in hits:
-            listing_id = hit["fields"].get("listing_id")
-            if not listing_id:
-                continue
-            listing = listings_col.find_one({"listing_id": listing_id})
+        for lid in hit_ids:
+            listing = listings_docs.get(lid)
             if not listing:
                 continue
-
             listing["_id"] = str(listing["_id"])
-            units = list(units_col.find({"listing_id": listing_id}))
-            for u in units:
-                u["_id"] = str(u["_id"])
-            listing["units"] = units
-            listing["match_score"] = hit["_score"]
+            listing["units"] = units_by_listing.get(lid, [])
+            listing["match_score"] = score_map.get(lid, 0)
             listings.append(listing)
 
         return json.dumps({"success": True, "listings": listings, "count": len(listings)}, default=str)
 
     except Exception as e:
-        return json.dumps({"success": False, "error": str(e)})
+        import logging
+        logging.getLogger(__name__).error("suggest_listing error: %s", e, exc_info=True)
+        return json.dumps({"success": False, "error": "Failed to fetch listing suggestions"})
 
 
 @tool
@@ -151,7 +155,9 @@ def update_preference_embedding(
             "data": profile
         }
     except Exception as e:
-        return {"success": False, "error": f"Error with updating preferences | {str(e)}"}
+        import logging
+        logging.getLogger(__name__).error("update_preference_embedding error: %s", e, exc_info=True)
+        return {"success": False, "error": "Failed to update preferences"}
 
 
 @tool
@@ -193,15 +199,23 @@ def swipe_on_listing(listing_id: str, action: str) -> dict:
         new_excerpt = new_excerpt[-200:]
 
         data = PreferencesUpdateRequest(
-            **{k: existing_prefs[k] for k in existing_prefs if k != "excerpt"},
-            excerpt=new_excerpt
+            bedrooms=existing_prefs.get("bedrooms", 1),
+            bathrooms=existing_prefs.get("bathrooms", 1),
+            price_min=existing_prefs.get("price_min", 500),
+            price_max=existing_prefs.get("price_max", 2000),
+            distance_from_campus=existing_prefs.get("distance_from_campus", "any"),
+            roommates=existing_prefs.get("roommates", 0),
+            amenities=existing_prefs.get("amenities", []),
+            excerpt=new_excerpt,
         )
 
         update_preferences(user_id, data)
         return {"success" : True, "excerpt": new_excerpt}
 
     except Exception as e:
-        return {"success": False, "error": str(e)}
+        import logging
+        logging.getLogger(__name__).error("swipe_on_listing error: %s", e, exc_info=True)
+        return {"success": False, "error": "Failed to record swipe action"}
 
 
 @tool
@@ -286,10 +300,10 @@ def get_crimes_nearby(lat: float, lng: float, radius_m: float = 800, limit: int 
             data = resp.json()
     except httpx.ConnectTimeout:
         return {"success": False, "error": "Connection timed out reaching crime data API"}
-    except httpx.HTTPStatusError as e:
-        return {"success": False, "error": f"API error {e.response.status_code}: {e.response.text}"}
-    except Exception as e:
-        return {"success": False, "error": f"Request failed: {e}"}
+    except httpx.HTTPStatusError:
+        return {"success": False, "error": "Crime data API returned an error"}
+    except Exception:
+        return {"success": False, "error": "Failed to fetch crime data"}
 
     if not data:
         return {"success": True, "incidents": [], "count": 0, "summary": {}}
@@ -349,8 +363,8 @@ def decode_coordinates(location: str) :
             center_lat = float(geocode_data[0]["lat"])
             center_lon = float(geocode_data[0]["lon"])
 
-    except Exception as e:
-        return {"success": False, "error": f"Error: {e}"}
+    except Exception:
+        return {"success": False, "error": "Failed to geocode location"}
 
     return {"success": True, "lat": center_lat, "lng": center_lon}
 

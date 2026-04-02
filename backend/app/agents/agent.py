@@ -7,7 +7,7 @@ import httpx
 import time
 import ast
 import json
-import re
+import logging
 from dotenv import load_dotenv
 from app.agents.prompts import SYSTEM_PROMPT
 from app.agents.tools import get_tools as tools
@@ -31,7 +31,7 @@ if openai_api_key:
         base_url=openai_base_url,
     )
 else:
-    print("OPENAI_API_KEY not set. Using Ollama (llama3-groq-tool-use:latest).")
+    logging.getLogger(__name__).warning("OPENAI_API_KEY not set. Using Ollama (llama3-groq-tool-use:latest).")
     model = ChatOllama(
         model="llama3-groq-tool-use:latest",
         base_url=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434"),
@@ -45,7 +45,9 @@ try:
         db_name="UserData",
     )
 except Exception as e:
-    print(f"MongoDB checkpointer initialization failed: {e}. Falling back to in-memory checkpointer.")
+    logging.getLogger(__name__).error("MongoDB checkpointer initialization failed: %s", e)
+    if not os.getenv("FLASK_DEBUG"):
+        raise
     checkpointer = InMemorySaver()
 
 agent = create_agent(
@@ -81,18 +83,6 @@ def _as_text(content) -> str:
         return "".join(parts).strip()
     return str(content or "")
 
-# next 3 functions are tools to return listings in agent chat
-def _python_repr_to_json(s: str) -> str:
-    """Best-effort conversion of a Python repr string to valid JSON."""
-    s = re.sub(r'datetime\.datetime\([^)]*\)', 'null', s)
-    s = re.sub(r"ObjectId\(['\"]([^'\"]*)['\"\)]\)", r'"\1"', s)
-    s = re.sub(r'\bTrue\b', 'true', s)
-    s = re.sub(r'\bFalse\b', 'false', s)
-    s = re.sub(r'\bNone\b', 'null', s)
-    s = s.replace("'", '"')
-    return s
-
-
 def _parse_tool_content(raw) -> dict | list | None:
     """Parse tool message content that may be a dict, JSON string, or Python repr string."""
     if isinstance(raw, dict):
@@ -110,10 +100,6 @@ def _parse_tool_content(raw) -> dict | list | None:
         if isinstance(result, (dict, list)):
             return result
     except (ValueError, SyntaxError):
-        pass
-    try:
-        return json.loads(_python_repr_to_json(raw))
-    except (json.JSONDecodeError, ValueError):
         pass
     return None
 
@@ -181,12 +167,14 @@ def run_agent(user_query: str, thread_id: str) -> dict:
                 "error_type" : 'timeout',
                 "thread_id" : thread_id,
             }
+        import logging
+        logging.getLogger(__name__).error("Agent error for thread %s: %s", thread_id, e, exc_info=True)
         return {
             "success" : False,
             "response" : "",
             "listings" : [],
-            "error" : f"Agent error | {e}",
-            "error_type" : type(e).__name__,
+            "error" : "Something went wrong. Please try again.",
+            "error_type" : "internal",
             "thread_id" : thread_id,
         }
     finally:
@@ -228,7 +216,9 @@ def run_agent_stream(user_query: str, thread_id: str):
         if _is_timeout_error(e):
             yield "[error: timed out]"
             return
-        yield f"[error: {e}]"
+        import logging
+        logging.getLogger(__name__).error("Stream error for thread %s: %s", thread_id, e, exc_info=True)
+        yield "[error: something went wrong]"
     finally:
         reset_current_user_id(tkn)
 

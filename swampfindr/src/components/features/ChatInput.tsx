@@ -41,6 +41,7 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
             if (e.key === "Enter") handleSubmit();
           }}
           placeholder="Ask about housing near UF..."
+          maxLength={2000}
           disabled={disabled}
           style={{
             flex: 1,
