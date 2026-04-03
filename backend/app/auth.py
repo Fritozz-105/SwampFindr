@@ -46,8 +46,8 @@ def require_auth(f):
             )
         except jwt.ExpiredSignatureError:
             return {"success": False, "error": "Token has expired"}, 401
-        except jwt.InvalidTokenError as e:
-            return {"success": False, "error": f"Invalid token: {e}"}, 401
+        except jwt.InvalidTokenError:
+            return {"success": False, "error": "Invalid token"}, 401
 
         g.user_id = payload["sub"]
         return f(*args, **kwargs)

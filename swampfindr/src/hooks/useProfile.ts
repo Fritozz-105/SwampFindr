@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { getToken } from "@/lib/supabase/client";
 import type { ProfileData } from "@/types/profile";
 
 const API_URL = process.env.NEXT_PUBLIC_FLASK_API_URL ?? "http://localhost:8080";
@@ -15,19 +15,16 @@ export function useProfile() {
     setLoading(true);
     setError(null);
     try {
-      const supabase = createClient();
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+      const token = await getToken();
 
-      if (!session?.access_token) {
+      if (!token) {
         setError("Not authenticated");
         setLoading(false);
         return;
       }
 
       const res = await fetch(`${API_URL}/api/v1/profiles/me`, {
-        headers: { Authorization: `Bearer ${session.access_token}` },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (!res.ok) {
