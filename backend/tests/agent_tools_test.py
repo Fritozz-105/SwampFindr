@@ -55,18 +55,50 @@ def test_bus_stops_uf_campus():
 def test_bus_stops_downtown():
     result = closest_bus_stops.invoke({"lat": 29.6520, "lng": -82.3250, "radius_m": 500})
     assert "stops" in result
+    assert 'count' in result
 
 
 def test_bus_stops_large_radius():
     result = closest_bus_stops.invoke({"lat": UF_LATITUDE, "lng": UF_LONGITUDE, "radius_m": 5000})
+    assert "stops" in result
     assert result["count"] >= 0
 
 
 def test_bus_stops_default_radius():
     result = closest_bus_stops.invoke({"lat": UF_LATITUDE, "lng": UF_LONGITUDE})
     assert "stops" in result
+    assert 'count' in result
 
 
 def test_bus_stops_tiny_radius_empty():
     result = closest_bus_stops.invoke({"lat": UF_LATITUDE, "lng": UF_LONGITUDE, "radius_m": 1})
     assert result["stops"] == []
+    assert 'count' in result
+    assert result['count'] == 0
+
+
+def test_bus_stops_invalid_lat():
+    result = closest_bus_stops.invoke({"lat": 999, "lng": UF_LONGITUDE})
+    assert "error" in result
+
+def test_bus_stops_invalid_lng():
+    result = closest_bus_stops.invoke({"lat": UF_LATITUDE, "lng": 999})
+    assert "error" in result
+
+def test_bus_stops_radius_too_large():
+    result = closest_bus_stops.invoke({"lat": UF_LATITUDE, "lng": UF_LONGITUDE, "radius_m": 99999})
+    assert "error" in result
+
+
+def test_bus_stops_have_distance_field():
+    result = closest_bus_stops.invoke({"lat": UF_LATITUDE, "lng": UF_LONGITUDE, "radius_m": 1000})
+    if result["count"] > 0:
+        assert "distance_m" in result["stops"][0]
+
+
+def test_bus_stops_sorted_by_distance():
+    result = closest_bus_stops.invoke({"lat": UF_LATITUDE, "lng": UF_LONGITUDE, "radius_m": 2000})
+    if result["count"] > 1:
+        distances = [s["distance_m"] for s in result["stops"]]
+        assert distances == sorted(distances)
+
