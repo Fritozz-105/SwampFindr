@@ -5,6 +5,7 @@ from app.config import Config, _DEFAULT_SECRET
 from app.routes import register_blueprints
 from app.database import init_db, close_db
 import atexit
+import os
 
 
 def create_app(config_class=Config):
@@ -16,6 +17,11 @@ def create_app(config_class=Config):
         raise RuntimeError(
             "SECRET_KEY is set to the default insecure value. "
             "Set the SECRET_KEY environment variable before deploying to production."
+        )
+
+    if not os.getenv("SUPABASE_URL", "").strip():
+        raise RuntimeError(
+            "SUPABASE_URL is not set. Auth will not work without it."
         )
 
     # Enable CORS

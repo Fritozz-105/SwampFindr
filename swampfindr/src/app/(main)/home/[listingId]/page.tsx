@@ -15,7 +15,7 @@ import {
   Dog,
 } from "lucide-react";
 import { getListingDetail, toggleFavorite } from "@/lib/api/flask";
-import { createClient } from "@/lib/supabase/client";
+import { getToken } from "@/lib/supabase/client";
 import type { Listing } from "@/types/listing";
 
 function ImageGallery({ photos, address }: { photos: string[]; address: string }) {
@@ -200,12 +200,9 @@ export default function ListingDetailPage() {
     if (!listing) return;
     setFavorited((prev) => !prev);
     try {
-      const supabase = createClient();
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (!session?.access_token) return;
-      await toggleFavorite(session.access_token, listing.listing_id);
+      const token = await getToken();
+      if (!token) return;
+      await toggleFavorite(token, listing.listing_id);
     } catch {
       setFavorited((prev) => !prev);
     }

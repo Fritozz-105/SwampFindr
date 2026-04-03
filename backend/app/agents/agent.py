@@ -5,6 +5,9 @@ from langchain_ollama import ChatOllama
 import os
 import httpx
 import time
+import ast
+import json
+import logging
 from dotenv import load_dotenv
 from app.agents.prompts import SYSTEM_PROMPT
 from app.agents.tools import get_tools as tools
@@ -20,20 +23,20 @@ openai_api_key = (os.getenv("OPENAI_API_KEY") or "").strip()
 openai_base_url = (os.getenv("OPENAI_BASE_URL") or "").strip() or None # make base_url empty in .env then it will use OPENAI url
 if openai_api_key:
     model = ChatOpenAI(
-        model="gpt-4o-mini",
+        model="gpt-oss-120b",
         temperature=0.1,
-        max_tokens=256,
+        max_tokens=2048,
         timeout=30,
         api_key=openai_api_key,
         base_url=openai_base_url,
     )
 else:
-    print("OPENAI_API_KEY not set. Using Ollama (llama3-groq-tool-use:latest).")
+    logging.getLogger(__name__).warning("OPENAI_API_KEY not set. Using Ollama (llama3-groq-tool-use:latest).")
     model = ChatOllama(
         model="llama3-groq-tool-use:latest",
         base_url=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434"),
         temperature=0.1,
-        num_predict=256,
+        num_predict=2048,
     )
 
 try:
@@ -42,7 +45,9 @@ try:
         db_name="UserData",
     )
 except Exception as e:
-    print(f"MongoDB checkpointer initialization failed: {e}. Falling back to in-memory checkpointer.")
+    logging.getLogger(__name__).error("MongoDB checkpointer initialization failed: %s", e)
+    if not os.getenv("FLASK_DEBUG"):
+        raise
     checkpointer = InMemorySaver()
 
 agent = create_agent(
@@ -78,6 +83,45 @@ def _as_text(content) -> str:
         return "".join(parts).strip()
     return str(content or "")
 
+def _parse_tool_content(raw) -> dict | list | None:
+    """Parse tool message content that may be a dict, JSON string, or Python repr string."""
+    if isinstance(raw, dict):
+        return raw
+    if isinstance(raw, list):
+        return raw
+    if not isinstance(raw, str):
+        return None
+    try:
+        return json.loads(raw)
+    except (json.JSONDecodeError, ValueError):
+        pass
+    try:
+        result = ast.literal_eval(raw)
+        if isinstance(result, (dict, list)):
+            return result
+    except (ValueError, SyntaxError):
+        pass
+    return None
+
+
+def _extract_listings(messages: list) -> list:
+    """Extract listing data from ToolMessage objects after the last user message."""
+    # Only look at messages from the current turn (after the last human/user message)
+    last_human_idx = -1
+    for i, m in enumerate(messages):
+        if m.type in ("human",):
+            last_human_idx = i
+    recent = messages[last_human_idx + 1:] if last_human_idx >= 0 else messages
+
+    listings = []
+    for m in recent:
+        if m.type != "tool":
+            continue
+        content = _parse_tool_content(m.content)
+        if isinstance(content, dict) and content.get("success") and "listings" in content:
+            listings.extend(content["listings"])
+    return listings
+
 
 # Return thread history
 def get_history(thread_id: str) -> list:
@@ -91,16 +135,24 @@ def get_history(thread_id: str) -> list:
         "system": "system",
     }
     history = []
+    pending_listings: list = []
     for m in state.values["messages"]:
-        if m.type in ("tool",):
+        if m.type == "tool":
+            parsed = _parse_tool_content(m.content)
+            if isinstance(parsed, dict) and parsed.get("success") and "listings" in parsed:
+                pending_listings.extend(parsed["listings"])
             continue
         content = m.content
         if not content:
             continue
-        history.append({
+        entry: dict = {
             "role":    role_map.get(m.type, m.type),
             "content": content,
-        })
+        }
+        if pending_listings:
+            entry["listings"] = pending_listings
+            pending_listings = []
+        history.append(entry)
     return history
 
 
@@ -118,15 +170,19 @@ def run_agent(user_query: str, thread_id: str) -> dict:
             return {
                 "success" : False,
                 "response" : "",
+                "listings" : [],
                 "error" : "Request timed out",
                 "error_type" : 'timeout',
                 "thread_id" : thread_id,
             }
+        import logging
+        logging.getLogger(__name__).error("Agent error for thread %s: %s", thread_id, e, exc_info=True)
         return {
             "success" : False,
             "response" : "",
-            "error" : f"Agent error | {e}",
-            "error_type" : type(e).__name__,
+            "listings" : [],
+            "error" : "Something went wrong. Please try again.",
+            "error_type" : "internal",
             "thread_id" : thread_id,
         }
     finally:
@@ -137,6 +193,7 @@ def run_agent(user_query: str, thread_id: str) -> dict:
         return {
             "success" : False,
             "response" : "",
+            "listings" : [],
             "error" : "No messages received",
             "error_type" : "Empty payload",
             "thread_id" : thread_id,
@@ -144,6 +201,7 @@ def run_agent(user_query: str, thread_id: str) -> dict:
     return {
         "success" : True,
         "response" : _as_text(msgs[-1].content),
+        "listings" : _extract_listings(msgs),
         "error" : None,
         "error_type" : None,
         "thread_id" : thread_id,
@@ -166,7 +224,9 @@ def run_agent_stream(user_query: str, thread_id: str):
         if _is_timeout_error(e):
             yield "[error: timed out]"
             return
-        yield f"[error: {e}]"
+        import logging
+        logging.getLogger(__name__).error("Stream error for thread %s: %s", thread_id, e, exc_info=True)
+        yield "[error: something went wrong]"
     finally:
         reset_current_user_id(tkn)
 

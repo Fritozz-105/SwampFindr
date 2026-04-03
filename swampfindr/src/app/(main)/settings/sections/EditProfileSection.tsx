@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { getToken } from "@/lib/supabase/client";
 import { profileUpdateSchema } from "@/lib/validations/settings";
 import { settings } from "@/data/settings";
 import { errors } from "@/data/errors";
@@ -50,12 +50,9 @@ export function EditProfileSection({ username, phone, onUpdate }: EditProfileSec
     setSuccess("");
 
     try {
-      const supabase = createClient();
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+      const token = await getToken();
 
-      if (!session?.access_token) {
+      if (!token) {
         setError("Session expired. Please log in again.");
         setSaving(false);
         return;
@@ -65,7 +62,7 @@ export function EditProfileSection({ username, phone, onUpdate }: EditProfileSec
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${session?.access_token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(parsed.data),
       });

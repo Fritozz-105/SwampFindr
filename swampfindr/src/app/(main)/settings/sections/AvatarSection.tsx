@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import Image from "next/image";
-import { createClient } from "@/lib/supabase/client";
+import { createClient, getToken } from "@/lib/supabase/client";
 import { settings } from "@/data/settings";
 import { errors } from "@/data/errors";
 import { Alert } from "@/components/ui";
@@ -68,15 +68,18 @@ export function AvatarSection({ username, avatarUrl, onUpdate }: AvatarSectionPr
 
       const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(path);
 
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+      const token = await getToken();
+      if (!token) {
+        setError("Not authenticated. Please refresh and try again.");
+        setUploading(false);
+        return;
+      }
 
       const res = await fetch(`${API_URL}/api/v1/profiles/me`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${session?.access_token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ avatar_url: urlData.publicUrl }),
       });
@@ -104,12 +107,9 @@ export function AvatarSection({ username, avatarUrl, onUpdate }: AvatarSectionPr
     setSuccess("");
 
     try {
-      const supabase = createClient();
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+      const token = await getToken();
 
-      if (!session) {
+      if (!token) {
         setError("Not authenticated. Please refresh and try again.");
         setUploading(false);
         return;
@@ -119,7 +119,7 @@ export function AvatarSection({ username, avatarUrl, onUpdate }: AvatarSectionPr
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${session.access_token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ avatar_url: null }),
       });
