@@ -281,7 +281,10 @@ class UserThread(Resource):
 @profiles.route("/chathistory")
 class ChatHistory(Resource):
     @profiles.doc(security="Bearer")
-    @profiles.doc(params={"thread_id": "Conversation thread id"})
+    @profiles.doc(params={
+        "thread_id": "Conversation thread id",
+        "limit": "Max messages to return (default 200)",
+    })
     @profiles.marshal_with(chat_history_response_model)
     @require_auth
     def get(self):
@@ -292,8 +295,14 @@ class ChatHistory(Resource):
         if not user_owns_thread(g.user_id, thread_id):
             return {"success": False, "error": "thread_id not found for user"}, 404
 
+        try:
+            limit = int(request.args.get("limit", 200))
+            limit = max(1, min(limit, 500))
+        except (ValueError, TypeError):
+            limit = 200
+
         return {
             "success": True,
             "thread_id": thread_id,
-            "data": get_history(thread_id),
+            "data": get_history(thread_id, limit=limit),
         }, 200

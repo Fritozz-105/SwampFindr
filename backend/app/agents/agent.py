@@ -123,8 +123,11 @@ def _extract_listings(messages: list) -> list:
     return listings
 
 
-# Return thread history
-def get_history(thread_id: str) -> list:
+MAX_HISTORY_MESSAGES = 200
+
+
+# Return thread history (capped to prevent unbounded fetch)
+def get_history(thread_id: str, limit: int = MAX_HISTORY_MESSAGES) -> list:
     config = {"configurable": {"thread_id": thread_id}}
     state  = agent.get_state(config)
     if not state or not state.values.get("messages"):
@@ -134,9 +137,15 @@ def get_history(thread_id: str) -> list:
         "ai": "assistant",
         "system": "system",
     }
+
+    # Cap the raw messages to the most recent `limit` entries
+    all_messages = state.values["messages"]
+    if limit > 0 and len(all_messages) > limit:
+        all_messages = all_messages[-limit:]
+
     history = []
     pending_listings: list = []
-    for m in state.values["messages"]:
+    for m in all_messages:
         if m.type == "tool":
             parsed = _parse_tool_content(m.content)
             if isinstance(parsed, dict) and parsed.get("success") and "listings" in parsed:

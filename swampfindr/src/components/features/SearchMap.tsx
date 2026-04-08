@@ -11,6 +11,7 @@ import {
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import type { Listing } from "@/types/listing";
+import { getListingPhotos } from "@/lib/utils/listing-photos";
 
 interface SearchMapProps {
   listings: Listing[];
@@ -131,8 +132,8 @@ function SearchMapInner({ listings, onListingClick }: SearchMapProps) {
                       borderRadius: "6px 6px 0 0",
                       overflow: "hidden",
                       background:
-                        listing.photos.length > 0
-                          ? `url(${listing.photos[0]}) center/cover`
+                        getListingPhotos(listing).length > 0
+                          ? `url(${getListingPhotos(listing)[0]}) center/cover`
                           : "linear-gradient(135deg, #4F3CC9, #FF6B2C)",
                       position: "relative",
                     }}

@@ -29,9 +29,14 @@ function parseHistoryContent(content: string | unknown[]): string {
   return String(content ?? "");
 }
 
+const THREAD_STORAGE_KEY = "swampfindr_active_thread";
+
 export function useChat() {
   const [threads, setThreads] = useState<Thread[]>([]);
-  const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
+  const [activeThreadId, setActiveThreadId] = useState<string | null>(() => {
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem(THREAD_STORAGE_KEY);
+  });
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoadingThreads, setIsLoadingThreads] = useState(true);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
@@ -41,7 +46,16 @@ export function useChat() {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const lastUserMessage = useRef<string>("");
 
-  // Fetch threads on mount
+  // Sync activeThreadId to localStorage
+  useEffect(() => {
+    if (activeThreadId) {
+      localStorage.setItem(THREAD_STORAGE_KEY, activeThreadId);
+    } else {
+      localStorage.removeItem(THREAD_STORAGE_KEY);
+    }
+  }, [activeThreadId]);
+
+  // Fetch threads on mount, restore saved thread if valid
   useEffect(() => {
     const fetchThreads = async () => {
       try {
@@ -49,12 +63,19 @@ export function useChat() {
         if (!token) return;
         const res = await getThreads(token);
         if (res.success) {
-          setThreads(
-            res.data.map((t) => ({
-              ...t,
-              title: "Conversation",
-            })),
-          );
+          const fetched = res.data.map((t) => ({
+            ...t,
+            title: "Conversation",
+          }));
+          setThreads(fetched);
+
+          // Restore saved thread if it still exists in the user's thread list
+          const savedId = localStorage.getItem(THREAD_STORAGE_KEY);
+          if (savedId && fetched.some((t) => t.thread_id === savedId)) {
+            selectThread(savedId);
+          } else {
+            localStorage.removeItem(THREAD_STORAGE_KEY);
+          }
         }
       } catch {
         // Non-critical, sidebar will be empty
@@ -63,6 +84,7 @@ export function useChat() {
       }
     };
     fetchThreads();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Fetch favorites from profile on mount
