@@ -11,9 +11,6 @@ import logging
 from dotenv import load_dotenv
 from app.database.mongo import get_agent_traces_collection
 from datetime import datetime
-
-# Remove file-based logger for Heroku
-
 from app.agents.prompts import SYSTEM_PROMPT
 from app.agents.tools import get_tools as tools
 from app.agents.user_context import set_current_user_id, reset_current_user_id
