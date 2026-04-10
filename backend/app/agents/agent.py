@@ -258,6 +258,7 @@ def run_agent_stream(user_query: str, thread_id: str):
         reset_current_user_id(tkn)
 
 
+
 if __name__ == "__main__":
     thread_id = "test-1"
     print("Agent started... Type 'QUIT' to exit.\n")
@@ -268,7 +269,5 @@ if __name__ == "__main__":
         if not query:
             continue
         print("Agent: ", end="", flush=True)
-        for chunk in run_agent_stream(query, thread_id=thread_id):
-            print(chunk, end="", flush=True)
-            time.sleep(0.01)
+        run_agent(user_query=query, thread_id=thread_id)
         print("\n")

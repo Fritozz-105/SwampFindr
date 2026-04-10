@@ -66,7 +66,7 @@ def download_image_as_array(url: str, save_path: str = 'save.jpg', mode: str = "
 
 def optimize_img(img, res_increase: int = 4):
     """
-    Blur the image to aesthetically hide grainy features. This is done via a guassian filter.
+    Blur the image to aesthetically hide grainy features. This is done via a gaussian filter & upsampling.
 
     Args:
         img: The image to be blurred.

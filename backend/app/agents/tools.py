@@ -13,10 +13,28 @@ from app.agents.user_context import get_current_user_id
 
 from pathlib import Path
 
+from openai import OpenAI
+from typing import cast
+from openai.types.chat import ChatCompletionMessageParam
+from openai.types.shared_params import ResponseFormatJSONObject
+
 
 _bus_stops_df = pd.read_csv(Path(__file__).parent / 'gnv-bus-stops.csv')
 MAX_SUGGEST_TOP_K = 20
 MAX_BUS_RADIUS_M = 10_000
+
+_openai_client = None
+
+
+def _get_openai_client():
+    if _openai_client is not None:
+        return _openai_client
+
+    else:
+        try:
+            return OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+        except Exception as e:
+            return f"Could not connect to OpenAI {e}"
 
 
 def _require_user_id() -> str:
@@ -39,8 +57,50 @@ def get_tools():
         suggest_listing,
         get_crimes_nearby,
         get_distance_to_location,
-        get_distances_batch
+        get_distances_batch,
+        get_contact_info
     ]
+
+
+@tool
+def get_contact_info(query: str) -> dict:
+    """
+    Query the apartment contact information & return it in JSON format
+    Accepts natural language queries like 'Get contact info for Sunset Apartments'.
+    Args:
+        query: The apartment details like "On20 apartments on 20th ave"
+    Returns:
+        dict: Result with the apartment information in JSON format
+    """
+    messages = cast(list[ChatCompletionMessageParam], cast(object, [
+        {"role": "system",
+         "content": """You are a helpful assistant that returns apartment contact information strictly as JSON.
+         Always respond with valid JSON only — no extra text, no markdown.
+         Format:
+        {
+            "apartment_name": "...",
+            "address": "...",
+            "phone": "...",
+            "email": "...",
+            "website": "...",
+            "office_hours": "..."
+        }
+        If not found, return: {"error": "Apartment not found", "query": "<original query>"}"""
+         },
+        {"role": "user",
+         "content": f"Get contact info for: {query}"
+         }
+    ]))
+    response = _get_openai_client().chat.completions.create(
+        model="gpt-4o",
+        messages=messages,
+        response_format=ResponseFormatJSONObject(type="json_object")
+    )
+
+    raw = response.choices[0].message.content
+    return json.loads(raw)
+
+
 
 
 @tool
