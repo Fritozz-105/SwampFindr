@@ -41,22 +41,29 @@ else:
         num_predict=2048,
     )
 
-try:
-    checkpointer = MongoDBSaver(
-        client=get_mongo_client(),
-        db_name="UserData",
-    )
-except Exception as e:
-    logging.getLogger(__name__).error("MongoDB checkpointer initialization failed: %s", e)
-    if not os.getenv("FLASK_DEBUG"):
-        raise
-    checkpointer = InMemorySaver()
+_checkpointer=None
+
+def _get_checkpointer():
+    """Lazily initialize checkpointer"""
+    global _checkpointer
+    if _checkpointer is not None:
+        return _checkpointer
+
+    try:
+        _checkpointer = MongoDBSaver(
+            client=get_mongo_client(),
+            db_name="UserData",
+        )
+    except Exception as e:
+        _checkpointer = InMemorySaver()
+
+    return _checkpointer
 
 agent = create_agent(
     model,
     tools=tools(),
     system_prompt=SYSTEM_PROMPT,
-    checkpointer =checkpointer,
+    checkpointer =_get_checkpointer(),
 )
 
 
