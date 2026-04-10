@@ -258,6 +258,7 @@ def run_agent_stream(user_query: str, thread_id: str):
         reset_current_user_id(tkn)
 
 
+
 if __name__ == "__main__":
     thread_id = "test-1"
     print("Agent started... Type 'QUIT' to exit.\n")

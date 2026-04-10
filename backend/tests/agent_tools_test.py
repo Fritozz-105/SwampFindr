@@ -100,9 +100,11 @@ class TestBusStops:
         result = closest_bus_stops.invoke({"lat": 999, "lng": UF_LONGITUDE})
         assert "error" in result
 
+
     def test_bus_stops_invalid_lng(self):
         result = closest_bus_stops.invoke({"lat": UF_LATITUDE, "lng": 999})
         assert "error" in result
+
 
     def test_bus_stops_radius_too_large(self):
         result = closest_bus_stops.invoke({"lat": UF_LATITUDE, "lng": UF_LONGITUDE, "radius_m": 99999})
@@ -160,6 +162,7 @@ class TestCrimesNearby:
         assert result['radius_m'] == 800
         assert 'source' in result
 
+
     @patch('httpx.Client')
     def test_crimes_nearby_empty(self, mock_client_class):
         '''Test when no crimes are found in the area'''
@@ -179,25 +182,30 @@ class TestCrimesNearby:
         assert len(result['incidents']) == 0
         assert result['summary'] == {}
 
+
     def test_crimes_nearby_invalid_latitude_too_high(self):
         result = get_crimes_nearby.invoke({"lat": 100, "lng": UF_LONGITUDE})
         assert result["success"] is False
         assert "Latitude must be between -90 and 90" in result["error"]
+
 
     def test_crimes_nearby_invalid_latitude_too_low(self):
         result = get_crimes_nearby.invoke({"lat": -100, "lng": UF_LONGITUDE})
         assert result["success"] is False
         assert "Latitude must be between -90 and 90" in result["error"]
 
+
     def test_crimes_nearby_invalid_longitude_too_high(self):
         result = get_crimes_nearby.invoke({"lat": UF_LATITUDE, "lng": 200})
         assert result["success"] is False
         assert "Longitude must be between -180 and 180" in result["error"]
 
+
     def test_crimes_nearby_invalid_longitude_too_low(self):
         result = get_crimes_nearby.invoke({"lat": UF_LATITUDE, "lng": -200})
         assert result["success"] is False
         assert "Longitude must be between -180 and 180" in result["error"]
+
 
     def test_crimes_nearby_invalid_radius_negative(self):
         result = get_crimes_nearby.invoke({
@@ -207,6 +215,7 @@ class TestCrimesNearby:
         })
         assert result["success"] is False
         assert "radius_m must be between 0 and 5000" in result["error"]
+
 
     def test_crimes_nearby_invalid_radius_zero(self):
         """Test rejection of zero radius."""
@@ -218,6 +227,7 @@ class TestCrimesNearby:
         assert result["success"] is False
         assert "radius_m must be between 0 and 5000" in result["error"]
 
+
     def test_crimes_nearby_invalid_radius_too_large(self):
         """Test rejection of radius > 5000m."""
         result = get_crimes_nearby.invoke({
@@ -227,6 +237,7 @@ class TestCrimesNearby:
         })
         assert result["success"] is False
         assert "radius_m must be between 0 and 5000" in result["error"]
+
 
     @patch('app.agents.tools.httpx.Client')
     def test_crimes_nearby_timeout(self, mock_client_class):
@@ -240,3 +251,71 @@ class TestCrimesNearby:
 
         assert result["success"] is False
         assert "Connection timed out" in result["error"]
+
+
+    @patch('app.agents.tools.httpx.Client')
+    def test_crimes_nearby_http_error(self, mock_client_class):
+        """Test handling of connection error."""
+        mock_response = MagicMock()
+
+        mock_response.raise_for_status.side_effect = httpx.HTTPStatusError(
+            '400 Bad Request',
+            request=MagicMock(),
+            response=MagicMock()
+        )
+
+        mock_client_class.return_value.__enter__.return_value.get.return_value = mock_response
+
+        result = get_crimes_nearby.invoke({
+            "lat": UF_LATITUDE,
+            "lng": UF_LONGITUDE
+        })
+
+        assert result["success"] is False
+        assert "Crime data API returned an error" in result["error"]
+
+
+    @patch('app.agents.tools.httpx.Client')
+    def test_crimes_nearby_generic_exception(self, mock_client_class):
+        """Test handling of generic exceptions during API call."""
+        mock_client_class.return_value.__enter__.return_value.get.side_effect = Exception("Generic error")
+
+        result = get_crimes_nearby.invoke({
+            "lat": UF_LATITUDE,
+            "lng": UF_LONGITUDE
+        })
+
+        assert result["success"] is False
+        assert "Failed to fetch crime data" in result["error"]
+
+
+    @patch('app.agents.tools.httpx.Client')
+    def test_crimes_nearby_incident_format(self, mock_client_class):
+        """Test that incidents are formatted right"""
+        mock_response = MagicMock()
+        mock_response.json.return_value = [
+            {
+                "report_date": "2024-01-15T14:30:00Z",
+                "offense_date": "2024-01-15",
+                "narrative": "Vehicle Theft",
+                "address": "123 Best City Ave, Gainesville, FL",
+                "latitude": 29.6436,
+                "longitude": -82.3549,
+            },
+        ]
+        mock_response.raise_for_status.return_value = None
+        mock_client_class.return_value.__enter__.return_value.get.return_value = mock_response
+
+        result = get_crimes_nearby.invoke({"lat": UF_LATITUDE, "lng": UF_LONGITUDE})
+
+        assert result["success"] is True
+        incident = result["incidents"][0]
+        assert "date" in incident
+        assert "offense" in incident
+        assert "address" in incident
+        assert "lat" in incident
+        assert "lng" in incident
+        assert incident["offense"] == "Vehicle Theft"
+        assert incident["address"] == "123 Best City Ave, Gainesville, FL"
+        assert incident["lat"] == 29.6436
+        assert incident["lng"] == -82.3549
