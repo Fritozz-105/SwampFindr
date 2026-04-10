@@ -9,6 +9,8 @@ import ast
 import json
 import logging
 from dotenv import load_dotenv
+from app.database.mongo import get_agent_traces_collection
+from datetime import datetime
 from app.agents.prompts import SYSTEM_PROMPT
 from app.agents.tools import get_tools as tools
 from app.agents.user_context import set_current_user_id, reset_current_user_id
@@ -160,12 +162,28 @@ def get_history(thread_id: str) -> list:
 def run_agent(user_query: str, thread_id: str) -> dict:
     config = {"configurable": {"thread_id": thread_id}}
     tkn = set_current_user_id(get_user_id_for_thread(thread_id))
+    trace_doc = {
+        "thread_id": thread_id,
+        "user_query": user_query,
+        "timestamp": datetime.utcnow(),
+        "steps": [],
+        "error": None,
+        "final_response": None
+    }
     try:
         response = agent.invoke(
             {"messages": [{"role": "user", "content": user_query}]},
             config=config
         )
+        msgs = response.get('messages', [])
+        for msg in msgs:
+            if hasattr(msg, 'type') and msg.type == 'ai':
+                trace_doc["steps"].append({"type": "reasoning", "content": msg.content})
+            elif hasattr(msg, 'type') and msg.type == 'tool':
+                trace_doc["steps"].append({"type": "tool_call", "content": msg.content})
     except Exception as e:
+        trace_doc["error"] = str(e)
+        get_agent_traces_collection().insert_one(trace_doc)
         if _is_timeout_error(e):
             return {
                 "success" : False,
@@ -175,8 +193,6 @@ def run_agent(user_query: str, thread_id: str) -> dict:
                 "error_type" : 'timeout',
                 "thread_id" : thread_id,
             }
-        import logging
-        logging.getLogger(__name__).error("Agent error for thread %s: %s", thread_id, e, exc_info=True)
         return {
             "success" : False,
             "response" : "",
@@ -190,6 +206,8 @@ def run_agent(user_query: str, thread_id: str) -> dict:
 
     msgs = response.get('messages', [])
     if not msgs:
+        trace_doc["error"] = "No messages received"
+        get_agent_traces_collection().insert_one(trace_doc)
         return {
             "success" : False,
             "response" : "",
@@ -198,6 +216,8 @@ def run_agent(user_query: str, thread_id: str) -> dict:
             "error_type" : "Empty payload",
             "thread_id" : thread_id,
         }
+    trace_doc["final_response"] = _as_text(msgs[-1].content)
+    get_agent_traces_collection().insert_one(trace_doc)
     return {
         "success" : True,
         "response" : _as_text(msgs[-1].content),
