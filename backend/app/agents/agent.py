@@ -51,7 +51,7 @@ def _get_checkpointer():
 
     try:
         _checkpointer = MongoDBSaver(
-            client=get_mongo_client(),  # ✅ Only runs when CALLED, not at import
+            client=get_mongo_client(),
             db_name="UserData",
         )
     except Exception as e:

@@ -124,7 +124,6 @@ class TestBusStops:
 
 class TestCrimesNearby:
     '''Tests get_crimes_nearby tool'''
-
     @patch('httpx.Client')
     def test_crimes_nearby_valid(self, mock_client_class):
         mock_response = MagicMock()
