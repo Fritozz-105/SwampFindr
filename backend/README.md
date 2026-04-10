@@ -209,6 +209,7 @@ FLASK_ENV=development
 DEBUG=True
 SECRET_KEY=your-secret-key-here
 PORT=8080
+CONFIDENT_API_KEY=optional-for-deepeval-traces
 
 # Add database URL when ready
 # DATABASE_URL=postgresql://user:password@localhost:5432/swampfindr

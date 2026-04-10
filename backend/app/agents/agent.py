@@ -4,13 +4,12 @@ from langchain_openai import ChatOpenAI
 from langchain_ollama import ChatOllama
 import os
 import httpx
-import time
 import ast
 import json
 import logging
 from dotenv import load_dotenv
-from app.database.mongo import get_agent_traces_collection
-from datetime import datetime
+from deepeval.tracing import observe, update_current_span, update_current_trace
+from deepeval.test_case import ToolCall
 from app.agents.prompts import SYSTEM_PROMPT
 from app.agents.tools import get_tools as tools
 from app.agents.user_context import set_current_user_id, reset_current_user_id
@@ -113,6 +112,73 @@ def _parse_tool_content(raw) -> dict | list | None:
     return None
 
 
+def _normalize_tool_args(raw) -> dict | None:
+    if isinstance(raw, dict):
+        return raw
+    parsed = _parse_tool_content(raw)
+    if isinstance(parsed, dict):
+        return parsed
+    if raw is None:
+        return None
+    return {"value": raw}
+
+
+def _extract_reasoning_steps(messages: list) -> list[str]:
+    steps: list[str] = []
+    for msg in messages:
+        if getattr(msg, "type", None) != "ai":
+            continue
+        text = _as_text(getattr(msg, "content", ""))
+        if text:
+            steps.append(text)
+    return steps
+
+
+def _extract_tool_calls(messages: list) -> list[ToolCall]:
+    tool_requests_by_id: dict[str, dict] = {}
+    for msg in messages:
+        if getattr(msg, "type", None) != "ai":
+            continue
+
+        reasoning = _as_text(getattr(msg, "content", ""))
+        for call in getattr(msg, "tool_calls", []) or []:
+            if not isinstance(call, dict):
+                continue
+
+            call_id = str(call.get("id") or "")
+            if not call_id:
+                continue
+
+            tool_requests_by_id[call_id] = {
+                "name": str(call.get("name") or "unknown_tool"),
+                "reasoning": reasoning or None,
+                "input_parameters": _normalize_tool_args(call.get("args")),
+            }
+
+    tool_calls: list[ToolCall] = []
+    for msg in messages:
+        if getattr(msg, "type", None) != "tool":
+            continue
+
+        tool_call_id = str(getattr(msg, "tool_call_id", "") or "")
+        request = tool_requests_by_id.get(tool_call_id, {})
+        tool_name = str(getattr(msg, "name", "") or request.get("name") or "unknown_tool")
+
+        parsed_output = _parse_tool_content(getattr(msg, "content", None))
+        output = parsed_output if parsed_output is not None else _as_text(getattr(msg, "content", ""))
+
+        tool_calls.append(
+            ToolCall(
+                name=tool_name,
+                reasoning=request.get("reasoning"),
+                input_parameters=request.get("input_parameters"),
+                output=output,
+            )
+        )
+
+    return tool_calls
+
+
 def _extract_listings(messages: list) -> list:
     """Extract listing data from ToolMessage objects after the last user message."""
     # Only look at messages from the current turn (after the last human/user message)
@@ -130,6 +196,26 @@ def _extract_listings(messages: list) -> list:
         if isinstance(content, dict) and content.get("success") and "listings" in content:
             listings.extend(content["listings"])
     return listings
+
+
+@observe(type="llm", name="agent_reasoning")
+def _invoke_agent_with_trace(user_query: str, config: dict) -> tuple[list, str, list[str], list[ToolCall]]:
+    response = agent.invoke(
+        {"messages": [{"role": "user", "content": user_query}]},
+        config=config
+    )
+    msgs = response.get("messages", [])
+    final_response = _as_text(msgs[-1].content) if msgs else ""
+    reasoning_steps = _extract_reasoning_steps(msgs)
+    tool_calls = _extract_tool_calls(msgs)
+
+    update_current_span(
+        input=user_query,
+        output=final_response,
+        context=reasoning_steps,
+        tools_called=tool_calls,
+    )
+    return msgs, final_response, reasoning_steps, tool_calls
 
 
 # Return thread history
@@ -166,31 +252,23 @@ def get_history(thread_id: str) -> list:
 
 
 # Simple invocation of the agent
+@observe(type="agent", name="run_agent")
 def run_agent(user_query: str, thread_id: str) -> dict:
     config = {"configurable": {"thread_id": thread_id}}
     tkn = set_current_user_id(get_user_id_for_thread(thread_id))
-    trace_doc = {
-        "thread_id": thread_id,
-        "user_query": user_query,
-        "timestamp": datetime.utcnow(),
-        "steps": [],
-        "error": None,
-        "final_response": None
-    }
+    msgs: list = []
+    final_response = ""
+    reasoning_steps: list[str] = []
+    tool_calls: list[ToolCall] = []
     try:
-        response = agent.invoke(
-            {"messages": [{"role": "user", "content": user_query}]},
-            config=config
-        )
-        msgs = response.get('messages', [])
-        for msg in msgs:
-            if hasattr(msg, 'type') and msg.type == 'ai':
-                trace_doc["steps"].append({"type": "reasoning", "content": msg.content})
-            elif hasattr(msg, 'type') and msg.type == 'tool':
-                trace_doc["steps"].append({"type": "tool_call", "content": msg.content})
+        msgs, final_response, reasoning_steps, tool_calls = _invoke_agent_with_trace(user_query, config)
     except Exception as e:
-        trace_doc["error"] = str(e)
-        get_agent_traces_collection().insert_one(trace_doc)
+        update_current_trace(
+            input=user_query,
+            output="",
+            context=reasoning_steps,
+            tools_called=tool_calls,
+        )
         if _is_timeout_error(e):
             return {
                 "success" : False,
@@ -211,10 +289,13 @@ def run_agent(user_query: str, thread_id: str) -> dict:
     finally:
         reset_current_user_id(tkn)
 
-    msgs = response.get('messages', [])
     if not msgs:
-        trace_doc["error"] = "No messages received"
-        get_agent_traces_collection().insert_one(trace_doc)
+        update_current_trace(
+            input=user_query,
+            output="",
+            context=reasoning_steps,
+            tools_called=tool_calls,
+        )
         return {
             "success" : False,
             "response" : "",
@@ -223,11 +304,16 @@ def run_agent(user_query: str, thread_id: str) -> dict:
             "error_type" : "Empty payload",
             "thread_id" : thread_id,
         }
-    trace_doc["final_response"] = _as_text(msgs[-1].content)
-    get_agent_traces_collection().insert_one(trace_doc)
+
+    update_current_trace(
+        input=user_query,
+        output=final_response,
+        context=reasoning_steps,
+        tools_called=tool_calls,
+    )
     return {
         "success" : True,
-        "response" : _as_text(msgs[-1].content),
+        "response" : final_response,
         "listings" : _extract_listings(msgs),
         "error" : None,
         "error_type" : None,
