@@ -20,4 +20,5 @@ TOOLS:
 - Use suggest_listing to suggest a listing to the user
 - Use get_distance_to_location to calculate how far an apartment is from a destination like campus, grocery stores, or another place name
 - Use get_crimes_nearby to find crimes near to a given pair of coordinates
+- Use get_contact_info to find contact details pertaining to an apartment 
 """
