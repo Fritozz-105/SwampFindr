@@ -34,7 +34,7 @@ if openai_api_key:
 else:
     logging.getLogger(__name__).warning("OPENAI_API_KEY not set. Using Ollama (llama3-groq-tool-use:latest).")
     model = ChatOllama(
-        model="llama3-groq-tool-use:latest",
+        model="qwen3.5:latest",
         base_url=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434"),
         temperature=0.1,
         num_predict=2048,
@@ -136,6 +136,7 @@ def _extract_reasoning_steps(messages: list) -> list[str]:
 
 def _extract_tool_calls(messages: list) -> list[ToolCall]:
     tool_requests_by_id: dict[str, dict] = {}
+    ordered_requests: list[dict] = []
     for msg in messages:
         if getattr(msg, "type", None) != "ai":
             continue
@@ -146,16 +147,20 @@ def _extract_tool_calls(messages: list) -> list[ToolCall]:
                 continue
 
             call_id = str(call.get("id") or "")
-            if not call_id:
-                continue
-
-            tool_requests_by_id[call_id] = {
+            request = {
+                "id": call_id or None,
                 "name": str(call.get("name") or "unknown_tool"),
                 "reasoning": reasoning or None,
                 "input_parameters": _normalize_tool_args(call.get("args")),
             }
+            ordered_requests.append(request)
 
-    tool_calls: list[ToolCall] = []
+            if call_id:
+                tool_requests_by_id[call_id] = request
+
+    tool_outputs_by_id: dict[str, object] = {}
+    unmatched_tool_outputs_by_name: dict[str, list[object]] = {}
+    orphan_outputs: list[tuple[str, object]] = []
     for msg in messages:
         if getattr(msg, "type", None) != "tool":
             continue
@@ -167,11 +172,49 @@ def _extract_tool_calls(messages: list) -> list[ToolCall]:
         parsed_output = _parse_tool_content(getattr(msg, "content", None))
         output = parsed_output if parsed_output is not None else _as_text(getattr(msg, "content", ""))
 
+        if tool_call_id:
+            tool_outputs_by_id[tool_call_id] = output
+            continue
+
+        if tool_name and tool_name != "unknown_tool":
+            unmatched_tool_outputs_by_name.setdefault(tool_name, []).append(output)
+            continue
+
+        orphan_outputs.append((tool_name, output))
+
+    tool_calls: list[ToolCall] = []
+    for request in ordered_requests:
+        output = None
+        req_id = request.get("id")
+        req_name = request.get("name")
+
+        if req_id and req_id in tool_outputs_by_id:
+            output = tool_outputs_by_id.pop(req_id)
+        elif req_name in unmatched_tool_outputs_by_name and unmatched_tool_outputs_by_name[req_name]:
+            output = unmatched_tool_outputs_by_name[req_name].pop(0)
+
         tool_calls.append(
             ToolCall(
-                name=tool_name,
+                name=str(req_name or "unknown_tool"),
                 reasoning=request.get("reasoning"),
                 input_parameters=request.get("input_parameters"),
+                output=output,
+            )
+        )
+
+    # Preserve tool outputs that had no matching request metadata.
+    for tool_name, output in orphan_outputs:
+        tool_calls.append(ToolCall(name=tool_name or "unknown_tool", output=output))
+
+    for tool_name, outputs in unmatched_tool_outputs_by_name.items():
+        for output in outputs:
+            tool_calls.append(ToolCall(name=tool_name or "unknown_tool", output=output))
+
+    for tool_call_id, output in tool_outputs_by_id.items():
+        tool_calls.append(
+            ToolCall(
+                name="unknown_tool",
+                input_parameters={"tool_call_id": tool_call_id},
                 output=output,
             )
         )
@@ -204,10 +247,20 @@ def _invoke_agent_with_trace(user_query: str, config: dict) -> tuple[list, str, 
         {"messages": [{"role": "user", "content": user_query}]},
         config=config
     )
+    print("\n=== AGENT RAW RESPONSE ===")
+    print(response)
     msgs = response.get("messages", [])
     final_response = _as_text(msgs[-1].content) if msgs else ""
     reasoning_steps = _extract_reasoning_steps(msgs)
     tool_calls = _extract_tool_calls(msgs)
+
+    print("=== AGENT EXTRACTED FINAL RESPONSE ===")
+    print(final_response)
+    print("=== AGENT EXTRACTED REASONING STEPS ===")
+    print(reasoning_steps)
+    print("=== AGENT EXTRACTED TOOL CALLS ===")
+    print(tool_calls)
+    print("=== END AGENT RAW RESPONSE ===\n")
 
     update_current_span(
         input=user_query,

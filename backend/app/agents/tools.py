@@ -6,6 +6,7 @@ import httpx
 import os 
 
 from langchain_core.tools import tool
+from deepeval.tracing import observe
 from app.services.pinecone_service import query_records
 from app.services.profile_service import PreferencesUpdateRequest, update_preferences, get_profile_by_user_id
 from app.database import get_listings_collection, get_units_collection
@@ -63,6 +64,7 @@ def get_tools():
 
 
 @tool
+@observe(type="tool")
 def get_contact_info(query: str) -> dict:
     """
     Query the apartment contact information & return it in JSON format
@@ -104,6 +106,7 @@ def get_contact_info(query: str) -> dict:
 
 
 @tool
+@observe(type="tool")
 def suggest_listing(top_k: int = 1) -> dict:
     """
        Suggest apartment listings based on the user's  preferences embedding.
@@ -172,6 +175,7 @@ def suggest_listing(top_k: int = 1) -> dict:
 
 
 @tool
+@observe(type="tool")
 def update_preference_embedding(
         bedrooms: int = 1,
         bathrooms: int = 1,
@@ -226,6 +230,7 @@ def update_preference_embedding(
 
 
 @tool
+@observe(type="tool")
 def swipe_on_listing(listing_id: str, action: str) -> dict:
     """
     Track the user's interest via a swipe on a listing (like/dislike/pass)
@@ -284,6 +289,7 @@ def swipe_on_listing(listing_id: str, action: str) -> dict:
 
 
 @tool
+@observe(type="tool")
 def closest_bus_stops(lat: float, lng: float, radius_m: float = 350) -> dict:
     """
     Find all bus stops within a given radius of a location.
@@ -328,6 +334,7 @@ def closest_bus_stops(lat: float, lng: float, radius_m: float = 350) -> dict:
 
 
 @tool
+@observe(type="tool")
 def get_crimes_nearby(lat: float, lng: float, radius_m: float = 800, limit: int = 50) -> dict:
     """
     Fetch recent crime incidents near a given pair of coordinates via the GNV open data portal.
@@ -398,6 +405,7 @@ def get_crimes_nearby(lat: float, lng: float, radius_m: float = 800, limit: int 
 
 
 @tool
+@observe(type="tool")
 def decode_coordinates(location: str) :
     """
     Geocode a location to get its longitude and latitude coordinates
@@ -435,6 +443,7 @@ def decode_coordinates(location: str) :
 
 
 @tool
+@observe(type="tool")
 def resolve_destination(placeholder: str, location_bias: str = None) -> dict:
     """
     Resolve a general place name (like 'Walmart') to a specific location using Google Places API.
@@ -509,6 +518,7 @@ def resolve_destination(placeholder: str, location_bias: str = None) -> dict:
 
 
 @tool
+@observe(type="tool")
 def get_distances_batch(origins: list[str], destination: str, mode: str = "driving") -> dict:
     """
     Calculate distances from multiple origins to the same destination in a single API call.
@@ -625,6 +635,7 @@ def get_distances_batch(origins: list[str], destination: str, mode: str = "drivi
 
 
 @tool
+@observe(type="tool")
 def get_distance_to_location(apartment_address: str, destination: str, mode: str = "driving") -> dict:
     """
     Calculate the distance and travel time between an apartment and a destination.
