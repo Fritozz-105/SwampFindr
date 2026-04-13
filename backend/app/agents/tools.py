@@ -50,6 +50,7 @@ def get_tools():
     """Return a list of all the tools available"""
     return [
         semantic_search,
+        render_listing_cards,
         closest_bus_stops,
         decode_coordinates,
         resolve_destination,
@@ -61,6 +62,66 @@ def get_tools():
         get_distances_batch,
         get_contact_info
     ]
+
+
+@tool
+@observe(type="tool")
+def render_listing_cards(listing_ids: list[str]) -> dict:
+    """
+    Convert listing IDs into full listing objects so the chat UI can render interactive listing cards.
+    Args:
+        listing_ids: Ordered list of listing IDs to render.
+    Returns:
+        JSON string with success/listings/count or an error payload.
+    """
+    if not isinstance(listing_ids, list) or not listing_ids:
+        return json.dumps({"success": False, "error": "listing_ids must be a non-empty list"})
+
+    ordered_ids: list[str] = []
+    seen: set[str] = set()
+    for raw_id in listing_ids:
+        if raw_id is None:
+            continue
+        lid = str(raw_id).strip()
+        if not lid or lid in seen:
+            continue
+        seen.add(lid)
+        ordered_ids.append(lid)
+
+    if not ordered_ids:
+        return json.dumps({"success": False, "error": "No valid listing IDs provided"})
+
+    try:
+        listings_col = get_listings_collection()
+        units_col = get_units_collection()
+
+        listing_docs = {
+            doc["listing_id"]: doc
+            for doc in listings_col.find({"listing_id": {"$in": ordered_ids}})
+        }
+        units_by_listing: dict[str, list] = {}
+        for unit in units_col.find({"listing_id": {"$in": ordered_ids}}):
+            unit["_id"] = str(unit["_id"])
+            units_by_listing.setdefault(unit["listing_id"], []).append(unit)
+
+        listings: list[dict] = []
+        for listing_id in ordered_ids:
+            listing = listing_docs.get(listing_id)
+            if not listing:
+                continue
+            listing["_id"] = str(listing["_id"])
+            listing["units"] = units_by_listing.get(listing_id, [])
+            listings.append(listing)
+
+        if not listings:
+            return json.dumps({"success": False, "error": "No listings found for provided IDs"})
+
+        return json.dumps({"success": True, "listings": listings, "count": len(listings)}, default=str)
+
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).error("render_listing_cards error: %s", e, exc_info=True)
+        return json.dumps({"success": False, "error": "Failed to render listing cards"})
 
 
 @tool
@@ -882,6 +943,7 @@ def _geocode_with_nominatim_fallback(destination: str, mode: str, apartment_addr
 
 
 @tool
+@observe(type="tool")
 def semantic_search(query: str):
     """
     Find k=3 matching vectors from the database that align with the query vector.
