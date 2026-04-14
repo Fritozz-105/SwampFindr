@@ -96,7 +96,7 @@ def get_contact_info(query: str) -> dict:
          }
     ]))
     response = _get_openai_client().chat.completions.create(
-        model="gpt-4o",
+        model="gpt-oss-120b",
         messages=messages,
         response_format=ResponseFormatJSONObject(type="json_object")
     )
