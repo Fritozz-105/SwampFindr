@@ -1,170 +1,107 @@
-"""Image enhancement pipeline using Stable Diffusion x4 upscaler.
-
-SD upscaler generates plausible detail from very low-res sources (120x80),
-unlike traditional upscalers that just sharpen existing pixels.
-
-Usage:
-    uv run --extra enhance python scripts/img_enhance.py --limit 5
-    uv run --extra enhance python scripts/img_enhance.py --listing-id <id>
-"""
-import base64
-import logging
-import argparse
-import sys
-import os
-from datetime import datetime, timezone
-from io import BytesIO
+import numpy as np
 
 import requests
 from PIL import Image
-
-logger = logging.getLogger(__name__)
-
-# Lazy-loaded singleton
-_pipeline = None
-
-
-def _get_device() -> str:
-    """Auto-detect best available torch device."""
-    import torch
-
-    if torch.cuda.is_available():
-        return "cuda"
-    if hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
-        return "mps"
-    return "cpu"
+from io import BytesIO
+from pathlib import Path
+import base64
+from datetime import datetime, timezone
+import argparse
+import sys
+import os
 
 
-def _get_pipeline():
-    """Lazy-load the Stable Diffusion x4 upscaler pipeline (singleton)."""
-    global _pipeline
-    if _pipeline is not None:
-        return _pipeline
 
-    import torch
-    from diffusers import StableDiffusionUpscalePipeline
-
-    device = _get_device()
-    dtype = torch.float16 if device != "cpu" else torch.float32
-
-    logger.info("Loading SD x4 upscaler on %s (dtype=%s)...", device, dtype)
-    _pipeline = StableDiffusionUpscalePipeline.from_pretrained(
-        "stabilityai/stable-diffusion-x4-upscaler",
-        torch_dtype=dtype,
-    )
-    _pipeline = _pipeline.to(device)
-    _pipeline.set_progress_bar_config(disable=True)
-    logger.info("SD x4 upscaler loaded.")
-    return _pipeline
+import matplotlib.pyplot as plt
+from scipy.ndimage import gaussian_filter
 
 
-def download_image(url: str) -> Image.Image:
-    """Download an image from a URL and return as a PIL Image."""
+def blur_url(url: str):
+    """
+    Apply the guassian blur filter & increase resolution
+
+    Args:
+        url: Direct URL to the image.
+
+    Returns:
+        blurred image
+    """
+    return optimize_img(download_image_as_array(url))
+
+
+def download_image_as_array(url: str, save_path: str = 'save.jpg', mode: str = "RGB",) -> np.ndarray:
+    """
+    Download an image from a URL and return it as a numpy array.
+
+    Args:
+        url:       Direct URL to the image.
+        save_path: File path to save the image (e.g. "img.png").
+        mode:      PIL colour mode — "RGB", "RGBA", "L" (grayscale), etc.
+
+    Returns:
+        numpy array of shape (H, W, C) for RGB/RGBA or (H, W) for grayscale.
+        dtype is uint8, values in [0, 255].
+
+    Raises:
+        requests.HTTPError: if the download fails.
+        ValueError:         if the response is not a valid image.
+    """
     headers = {"User-Agent": "Mozilla/5.0"}
-    response = requests.get(url, headers=headers, timeout=15)
+    response = requests.get(url, headers=headers, timeout=10)
     response.raise_for_status()
+
     try:
-        return Image.open(BytesIO(response.content)).convert("RGB")
+        img = Image.open(BytesIO(response.content)).convert(mode)
     except Exception as exc:
         raise ValueError(f"Could not decode image from {url!r}: {exc}") from exc
 
+    Path(save_path).parent.mkdir(parents=True, exist_ok=True)
+    img.save(save_path)
+    print(f"Saved → {save_path}")
 
-def _upscale_tiled(
-    img: Image.Image,
-    pipe,
-    prompt: str,
-    tile_size: int = 128,
-    overlap: int = 16,
-) -> Image.Image:
-    """Upscale 4x by processing overlapping tiles to stay within VRAM limits.
+    arr = np.array(img)
+    print(f"Array shape: {arr.shape}  dtype: {arr.dtype}")
+    return arr
 
-    Each tile is tile_size x tile_size pixels from the input, producing a
-    (tile_size*4) x (tile_size*4) output tile. Overlapping regions are
-    blended with a linear gradient to avoid visible seams.
+
+def optimize_img(img, res_increase: int = 4):
     """
-    import numpy as np
+    Blur the image to aesthetically hide grainy features. This is done via a guassian filter.
 
-    w, h = img.size
-    out_scale = 4
-    out_w, out_h = w * out_scale, h * out_scale
-    output = np.zeros((out_h, out_w, 3), dtype=np.float64)
-    weights = np.zeros((out_h, out_w, 1), dtype=np.float64)
+    Args:
+        img: The image to be blurred.
+        res_increase: the multiplicative increase of the # of pixels
 
-    step = tile_size - overlap
-    tiles_x = max(1, (w - overlap + step - 1) // step)
-    tiles_y = max(1, (h - overlap + step - 1) // step)
-    total = tiles_x * tiles_y
-    count = 0
-
-    for ty in range(tiles_y):
-        for tx in range(tiles_x):
-            # Input tile coordinates (clamped to image bounds)
-            x1 = min(tx * step, max(0, w - tile_size))
-            y1 = min(ty * step, max(0, h - tile_size))
-            x2 = min(x1 + tile_size, w)
-            y2 = min(y1 + tile_size, h)
-
-            tile = img.crop((x1, y1, x2, y2))
-            result = pipe(prompt=prompt, image=tile)
-            tile_out = np.array(result.images[0], dtype=np.float64)
-
-            # Output tile coordinates
-            ox1, oy1 = x1 * out_scale, y1 * out_scale
-            th, tw = tile_out.shape[:2]
-
-            # Build a blend weight mask (feather edges in overlap region)
-            mask = np.ones((th, tw, 1), dtype=np.float64)
-            feather = overlap * out_scale
-            if feather > 0:
-                for i in range(min(feather, th)):
-                    mask[i, :, :] *= i / feather
-                    mask[th - 1 - i, :, :] *= i / feather
-                for j in range(min(feather, tw)):
-                    mask[:, j, :] *= j / feather
-                    mask[:, tw - 1 - j, :] *= j / feather
-
-            output[oy1:oy1 + th, ox1:ox1 + tw] += tile_out * mask
-            weights[oy1:oy1 + th, ox1:ox1 + tw] += mask
-
-            count += 1
-            logger.info("  tile %d/%d", count, total)
-
-    # Normalize by weight and convert back
-    weights = np.maximum(weights, 1e-8)
-    final = np.clip(output / weights, 0, 255).astype(np.uint8)
-    return Image.fromarray(final)
-
-
-def upscale_image(
-    img: Image.Image,
-    passes: int = 2,
-    prompt: str = "a high quality photo of an apartment building exterior",
-    tile_size: int = 128,
-    overlap: int = 16,
-) -> Image.Image:
-    """Upscale a low-res PIL Image using the SD x4 upscaler with tiling.
-
-    Each pass does 4x using tiled processing to stay within VRAM.
-    passes=2 on a 120x80 source gives 1920x1280 (16x total).
+    Returns:
+        blurred_img: The blurred image
     """
-    pipe = _get_pipeline()
-    current = img
-    for i in range(passes):
-        current = _upscale_tiled(current, pipe, prompt, tile_size, overlap)
-        logger.info("  pass %d/%d complete: %dx%d", i + 1, passes,
-                    current.width, current.height)
-    return current
+    mult = int(res_increase ** 0.5)
+
+    high_res = np.zeros((img.shape[0] * mult, img.shape[1] * mult, 3), dtype=np.float64)
+
+    for i in range(img.shape[0]):
+        for j in range(img.shape[1]):
+            high_res[i * mult:(i + 1) * mult, j * mult:(j + 1) * mult] = img[i, j]
+
+    blurred_img = gaussian_filter(high_res, sigma=1.2)
+    return np.clip(blurred_img, 0, 255).astype(np.uint8)
 
 
-def image_to_jpeg_bytes(img: Image.Image, quality: int = 90) -> bytes:
+def array_to_jpeg_bytes(img: np.ndarray, quality: int = 90) -> bytes:
+    pil_img = Image.fromarray(img.astype(np.uint8))
     buff = BytesIO()
-    img.save(buff, format="JPEG", quality=quality)
+    pil_img.save(buff, format="JPEG", quality=quality)
     return buff.getvalue()
 
 
-def upload_cleaned_image_default(img: Image.Image) -> str:
-    """Store as base64 data URI in Mongo. Replace with CDN/S3 upload for production."""
-    encoded = base64.b64encode(image_to_jpeg_bytes(img)).decode("ascii")
+def upload_cleaned_image_default(img: np.ndarray) -> str:
+    """
+    Default "upload back" implementation:
+    store as base64 data URI string directly in Mongo listing doc.
+
+    Replace this function if you want real CDN/S3 upload and return hosted URL.
+    """
+    encoded = base64.b64encode(array_to_jpeg_bytes(img)).decode("ascii")
     return f"data:image/jpeg;base64,{encoded}"
 
 
@@ -178,17 +115,16 @@ def get_listings_collection():
 def process_listings_images(
     listing_id: str | None = None,
     limit: int = 0,
-    passes: int = 2,
     upload_fn=upload_cleaned_image_default,
 ):
     """
     Pipeline:
     1) Pull listings from Mongo
     2) Download each image
-    3) Upscale via SD x4 upscaler
+    3) Clean via optimize_img (numpy)
     4) Upload cleaned image (upload_fn)
-    5) Write cleaned_photos back to listing ONLY if at least one image succeeded
-       Failed images are skipped entirely (not written to cleaned_photos)
+    5) Write cleaned_photos back to listing
+       Fallback: if any image fails, keep original URL for that image
     """
     listings_collection = get_listings_collection()
 
@@ -205,42 +141,32 @@ def process_listings_images(
         lid = listing.get("listing_id")
         photos = listing.get("photos", []) or []
         cleaned_photos = []
-        listing_failures = 0
 
         for idx, url in enumerate(photos):
             try:
-                img = download_image(url)
-                upscaled = upscale_image(img, passes=passes)
-                uploaded = upload_fn(upscaled)
+                arr = download_image_as_array(url, save_path=f"tmp/original_{lid}_{idx}.jpg")
+                cleaned = optimize_img(arr)
+                uploaded = upload_fn(cleaned)
                 cleaned_photos.append(uploaded)
                 processed_images += 1
-                logger.info("[OK] %s photo#%d upscaled (%dx%d -> %dx%d)",
-                            lid, idx, img.width, img.height,
-                            upscaled.width, upscaled.height)
             except Exception as exc:
-                logger.warning("[WARN] %s photo#%d failed: %s", lid, idx, exc)
-                listing_failures += 1
+                print(f"[WARN] {lid} photo#{idx} failed: {exc}")
+                cleaned_photos.append(url)  # Fallback to original URL
                 failed_images += 1
-
-        # Only update Mongo if at least one image was successfully enhanced
-        if not cleaned_photos:
-            print(f"[SKIP] Listing {lid}: all {len(photos)} images failed, not updating")
-            continue
 
         listings_collection.update_one(
             {"_id": listing["_id"]},
             {"$set": {
                 "cleaned_photos": cleaned_photos,
                 "image_cleanup_meta": {
-                    "updated_at": datetime.now(timezone.utc).isoformat(),
+                    "updated_at": datetime.now(timezone.utc),
                     "total_images": len(photos),
-                    "enhanced_images": len(cleaned_photos),
-                    "failed_images": listing_failures,
+                    "failed_images": sum(1 for i, p in enumerate(cleaned_photos) if i < len(photos) and p == photos[i]),
                 },
             }},
         )
         processed_listings += 1
-        print(f"[OK] Updated listing {lid} ({len(cleaned_photos)}/{len(photos)} images enhanced)")
+        print(f"[OK] Updated listing {lid} ({len(photos)} images)")
 
     summary = {
         "processed_listings": processed_listings,
@@ -252,16 +178,12 @@ def process_listings_images(
 
 
 def main():
-    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
-    parser = argparse.ArgumentParser(
-        description="Upscale listing images using SD x4 and write cleaned_photos to Mongo."
-    )
+    parser = argparse.ArgumentParser(description="Clean listing images and upload cleaned URLs back to Mongo.")
     parser.add_argument("--listing-id", type=str, default=None, help="Only process one listing_id")
     parser.add_argument("--limit", type=int, default=0, help="Process first N listings (0 = no limit)")
-    parser.add_argument("--passes", type=int, default=2, help="Number of 4x upscale passes (default 2 = 16x)")
     args = parser.parse_args()
 
-    process_listings_images(listing_id=args.listing_id, limit=args.limit, passes=args.passes)
+    process_listings_images(listing_id=args.listing_id, limit=args.limit)
 
 
 if __name__ == "__main__":

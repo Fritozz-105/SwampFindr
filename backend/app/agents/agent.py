@@ -1,5 +1,6 @@
 from langchain.agents import create_agent
-from langchain_core.messages import HumanMessage
+from langchain.agents.middleware import AgentMiddleware, ModelRequest, ModelResponse
+from langchain_core.messages import HumanMessage, trim_messages
 from langchain_openai import ChatOpenAI
 from langchain_ollama import ChatOllama
 import os
@@ -7,12 +8,13 @@ import httpx
 import ast
 import json
 import logging
+from datetime import datetime
 from dotenv import load_dotenv
 from deepeval.tracing import observe, update_current_span, update_current_trace
 from deepeval.test_case import ToolCall
 from app.agents.prompts import SYSTEM_PROMPT
 from app.agents.tools import get_tools as tools
-from app.agents.user_context import set_current_user_id, reset_current_user_id
+from app.agents.user_context import set_user_for_thread, clear_user_for_thread
 from app.database.mongo import get_mongo_client
 from app.services.conversation_service import get_user_id_for_thread
 from langgraph.checkpoint.memory import InMemorySaver
@@ -39,6 +41,24 @@ else:
         num_predict=2048,
     )
 
+MAX_HISTORY_TOKENS = 100_000
+
+
+class TrimHistoryMiddleware(AgentMiddleware):
+    """Trim conversation history before each model call to stay within context limits. This issue was responsible for erroring out."""
+
+    def wrap_model_call(self, request, handler):
+        request.messages = trim_messages(
+            request.messages,
+            max_tokens=MAX_HISTORY_TOKENS,
+            token_counter="approximate",
+            strategy="last",
+            include_system=True,
+            allow_partial=False,
+        )
+        return handler(request)
+
+
 _checkpointer=None
 
 def _get_checkpointer():
@@ -61,6 +81,7 @@ agent = create_agent(
     model,
     tools=tools(),
     system_prompt=SYSTEM_PROMPT,
+    middleware=[TrimHistoryMiddleware()],
     checkpointer =_get_checkpointer(),
 )
 
@@ -221,8 +242,25 @@ def _extract_tool_calls(messages: list) -> list[ToolCall]:
     return tool_calls
 
 
+def _serialize_doc(doc: dict) -> dict:
+    """Make a MongoDB document JSON-serializable (ObjectId, datetime)."""
+    for k, v in doc.items():
+        if isinstance(v, datetime):
+            doc[k] = v.isoformat()
+        elif isinstance(v, list):
+            for item in v:
+                if isinstance(item, dict):
+                    _serialize_doc(item)
+    return doc
+
+
 def _extract_listings(messages: list) -> list:
-    """Extract listing data from ToolMessage objects after the last user message."""
+    """Extract listing data from ToolMessage objects after the last user message.
+
+    Tool responses are intentionally slim (no photos/binary data) to avoid
+    blowing the LLM context window. This function re-enriches listings from
+    MongoDB so the frontend gets the full data including photos.
+    """
     # Only look at messages from the current turn (after the last human/user message)
     last_human_idx = -1
     for i, m in enumerate(messages):
@@ -230,14 +268,47 @@ def _extract_listings(messages: list) -> list:
             last_human_idx = i
     recent = messages[last_human_idx + 1:] if last_human_idx >= 0 else messages
 
-    listings = []
+    slim_listings = []
     for m in recent:
         if m.type != "tool":
             continue
         content = _parse_tool_content(m.content)
         if isinstance(content, dict) and content.get("success") and "listings" in content:
-            listings.extend(content["listings"])
-    return listings
+            slim_listings.extend(content["listings"])
+
+    if not slim_listings:
+        return []
+
+    # Re-fetch full listings (with photos) from MongoDB
+    from app.database import get_listings_collection, get_units_collection
+    listing_ids = [l["listing_id"] for l in slim_listings if "listing_id" in l]
+    score_map = {l["listing_id"]: l.get("match_score", 0) for l in slim_listings}
+
+    try:
+        listings_col = get_listings_collection()
+        full_docs = {
+            doc["listing_id"]: doc
+            for doc in listings_col.find({"listing_id": {"$in": listing_ids}})
+        }
+        units_col = get_units_collection()
+        units_by_listing: dict[str, list] = {}
+        for u in units_col.find({"listing_id": {"$in": listing_ids}}):
+            u["_id"] = str(u["_id"])
+            units_by_listing.setdefault(u["listing_id"], []).append(u)
+
+        listings = []
+        for lid in listing_ids:
+            doc = full_docs.get(lid)
+            if not doc:
+                continue
+            doc["_id"] = str(doc["_id"])
+            doc["units"] = units_by_listing.get(lid, [])
+            doc["match_score"] = score_map.get(lid, 0)
+            listings.append(_serialize_doc(doc))
+        return listings
+    except Exception:
+        # Fallback to slim listings if MongoDB is unavailable
+        return slim_listings
 
 
 @observe(type="llm", name="agent_reasoning")
@@ -280,13 +351,48 @@ def get_history(thread_id: str, limit: int = MAX_HISTORY_MESSAGES) -> list:
     if limit > 0 and len(all_messages) > limit:
         all_messages = all_messages[-limit:]
 
+    # First pass: collect all listing_ids from tool messages
+    all_listing_ids: list[str] = []
+    for m in all_messages:
+        if m.type != "tool":
+            continue
+        parsed = _parse_tool_content(m.content)
+        if isinstance(parsed, dict) and parsed.get("success") and "listings" in parsed:
+            for l in parsed["listings"]:
+                if "listing_id" in l:
+                    all_listing_ids.append(l["listing_id"])
+
+    # Batch-fetch full listings with photos from MongoDB
+    full_listing_map: dict[str, dict] = {}
+    if all_listing_ids:
+        try:
+            from app.database import get_listings_collection, get_units_collection
+            listings_col = get_listings_collection()
+            for doc in listings_col.find({"listing_id": {"$in": all_listing_ids}}):
+                doc["_id"] = str(doc["_id"])
+                full_listing_map[doc["listing_id"]] = _serialize_doc(doc)
+            units_col = get_units_collection()
+            for u in units_col.find({"listing_id": {"$in": all_listing_ids}}):
+                u["_id"] = str(u["_id"])
+                _serialize_doc(u)
+                lid = u["listing_id"]
+                if lid in full_listing_map:
+                    full_listing_map[lid].setdefault("units", []).append(u)
+        except Exception:
+            pass
+
+    # Second pass: build history with enriched listings
     history = []
     pending_listings: list = []
     for m in all_messages:
         if m.type == "tool":
             parsed = _parse_tool_content(m.content)
             if isinstance(parsed, dict) and parsed.get("success") and "listings" in parsed:
-                pending_listings.extend(parsed["listings"])
+                for l in parsed["listings"]:
+                    lid = l.get("listing_id", "")
+                    enriched = full_listing_map.get(lid, l)
+                    enriched["match_score"] = l.get("match_score", 0)
+                    pending_listings.append(enriched)
             continue
         content = m.content
         if not content:
@@ -306,7 +412,9 @@ def get_history(thread_id: str, limit: int = MAX_HISTORY_MESSAGES) -> list:
 @observe(type="agent", name="run_agent")
 def run_agent(user_query: str, thread_id: str) -> dict:
     config = {"configurable": {"thread_id": thread_id}}
-    tkn = set_current_user_id(get_user_id_for_thread(thread_id))
+    user_id = get_user_id_for_thread(thread_id)
+    if user_id:
+        set_user_for_thread(thread_id, user_id)
     msgs: list = []
     final_response = ""
     reasoning_steps: list[str] = []
@@ -338,7 +446,7 @@ def run_agent(user_query: str, thread_id: str) -> dict:
             "thread_id" : thread_id,
         }
     finally:
-        reset_current_user_id(tkn)
+        clear_user_for_thread(thread_id)
 
     if not msgs:
         update_current_trace(
@@ -375,7 +483,9 @@ def run_agent(user_query: str, thread_id: str) -> dict:
 # Stream the agent responses as structured event dicts
 def run_agent_stream(user_query: str, thread_id: str):
     config = {"configurable": {"thread_id": thread_id}}
-    tkn = set_current_user_id(get_user_id_for_thread(thread_id))
+    user_id = get_user_id_for_thread(thread_id)
+    if user_id:
+        set_user_for_thread(thread_id, user_id)
     try:
         for chunk, metadata in agent.stream(
             {"messages": [HumanMessage(content=user_query)]},
@@ -392,7 +502,7 @@ def run_agent_stream(user_query: str, thread_id: str):
         yield {"type": "error", "error": "Something went wrong. Please try again.", "error_type": "internal"}
         return
     finally:
-        reset_current_user_id(tkn)
+        clear_user_for_thread(thread_id)
 
     # Extract listings from the final agent state
     state = agent.get_state(config)
