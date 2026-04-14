@@ -272,7 +272,7 @@ class ProfileFavoritesListings(Resource):
             prefs = profile.get("preferences", {})
             try:
                 query_text = _build_preference_query(prefs)
-                results = query_records(query_text, ns="main", top_k=len(favorite_ids))
+                results = query_records(query_text, ns="main", top_k=100)
                 for hit in results.get("result", {}).get("hits", []):
                     lid = hit.get("fields", {}).get("listing_id")
                     if lid and lid in favorite_ids:
