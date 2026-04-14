@@ -45,9 +45,11 @@ export function useChat() {
   const [error, setError] = useState<string | null>(null);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const lastUserMessage = useRef<string>("");
+  const activeThreadIdRef = useRef(activeThreadId);
 
-  // Sync activeThreadId to localStorage
+  // Keep ref in sync so sendMessage always reads the latest value
   useEffect(() => {
+    activeThreadIdRef.current = activeThreadId;
     if (activeThreadId) {
       localStorage.setItem(THREAD_STORAGE_KEY, activeThreadId);
     } else {
@@ -148,6 +150,7 @@ export function useChat() {
   }, []);
 
   const startNewChat = useCallback(() => {
+    activeThreadIdRef.current = null;
     setActiveThreadId(null);
     setMessages([]);
     setError(null);
@@ -173,7 +176,7 @@ export function useChat() {
           return;
         }
 
-        const res = await sendChatMessage(token, content, activeThreadId ?? undefined);
+        const res = await sendChatMessage(token, content, activeThreadIdRef.current ?? undefined);
 
         if (!res.success) {
           setError(res.error ?? "Something went wrong. Try again.");
@@ -201,6 +204,7 @@ export function useChat() {
         // Handle new thread
         if (res.is_new_thread) {
           const title = content.length > 40 ? content.slice(0, 40) + "..." : content;
+          activeThreadIdRef.current = res.thread_id;
           setActiveThreadId(res.thread_id);
           setThreads((prev) => [
             {
@@ -235,7 +239,7 @@ export function useChat() {
         setIsSending(false);
       }
     },
-    [activeThreadId, favorites],
+    [favorites],
   );
 
   const retryLastMessage = useCallback(async () => {
