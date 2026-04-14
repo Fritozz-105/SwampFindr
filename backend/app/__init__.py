@@ -2,6 +2,7 @@
 from flask import Flask
 from flask_cors import CORS
 from app.config import Config, _DEFAULT_SECRET
+from app.extensions import limiter
 from app.routes import register_blueprints
 from app.database import init_db, close_db
 import atexit
@@ -26,6 +27,9 @@ def create_app(config_class=Config):
 
     # Enable CORS
     CORS(app, resources={r"/api/*": {"origins": "*"}})
+
+    # Initialize rate limiter
+    limiter.init_app(app)
 
     # Initialize MongoDB connection
     init_db(app)

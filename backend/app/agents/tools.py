@@ -3,7 +3,7 @@ import json
 import pandas as pd
 import numpy as np
 import httpx
-import os 
+import os
 
 from langchain_core.tools import tool
 from deepeval.tracing import observe
@@ -11,6 +11,7 @@ from app.services.pinecone_service import query_records
 from app.services.profile_service import PreferencesUpdateRequest, update_preferences, get_profile_by_user_id
 from app.database import get_listings_collection, get_units_collection
 from app.agents.user_context import get_current_user_id
+from app.utils.geo import haversine_km
 
 from pathlib import Path
 
@@ -28,14 +29,15 @@ _openai_client = None
 
 
 def _get_openai_client():
+    global _openai_client
     if _openai_client is not None:
         return _openai_client
 
-    else:
-        try:
-            return OpenAI(api_key=os.environ["OPENAI_API_KEY"])
-        except Exception as e:
-            return f"Could not connect to OpenAI {e}"
+    try:
+        _openai_client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+        return _openai_client
+    except Exception as e:
+        return f"Could not connect to OpenAI {e}"
 
 
 def _require_user_id() -> str:
@@ -94,7 +96,7 @@ def get_contact_info(query: str) -> dict:
          }
     ]))
     response = _get_openai_client().chat.completions.create(
-        model="gpt-4o",
+        model="gpt-oss-120b",
         messages=messages,
         response_format=ResponseFormatJSONObject(type="json_object")
     )
@@ -103,18 +105,39 @@ def get_contact_info(query: str) -> dict:
     return json.loads(raw)
 
 
-
-
 @tool
 @observe(type="tool")
-def suggest_listing(top_k: int = 1) -> dict:
-    """
-       Suggest apartment listings based on the user's  preferences embedding.
-       Call this when the user asks for recommendations, suggestions, or wants to find apartments.
-       Args:
-           top_k: Number of listings to return (default 3)
-       Returns:
-           Dict with 'listings' (list of matched listings with units) or 'error'
+def suggest_listing(
+    top_k: int = 3,
+    bedrooms: int | None = None,
+    bathrooms: int | None = None,
+    price_min: int | None = None,
+    price_max: int | None = None,
+    exclude_listing_ids: list[str] | None = None,
+    near_lat: float | None = None,
+    near_lng: float | None = None,
+    max_distance_km: float | None = None,
+) -> dict:
+    """Suggest apartment listings using the user's preference embedding plus optional hard filters.
+    Call this when the user asks for recommendations, suggestions, or wants to find apartments.
+
+    IMPORTANT: When the user states explicit requirements in conversation (e.g. "I want a 2 bed
+    1 bath under $1200"), pass those as filter params here. They override the stored profile.
+    Unspecified filters fall back to the user's saved preferences.
+
+    Args:
+        top_k: Number of listings to return (default 3, max 20).
+        bedrooms: Only return listings with at least this many bedrooms. Pass when user specifies.
+        bathrooms: Only return listings with at least this many bathrooms. Pass when user specifies.
+        price_min: Only return listings priced at or above this amount ($/mo).
+        price_max: Only return listings priced at or below this amount ($/mo).
+        exclude_listing_ids: Listing IDs to exclude (e.g. previously rejected listings).
+        near_lat: Latitude to filter by proximity. Use with near_lng and max_distance_km.
+        near_lng: Longitude to filter by proximity. Use with near_lat and max_distance_km.
+        max_distance_km: Max distance in km from (near_lat, near_lng). Default 3.0 when lat/lng provided.
+
+    Returns:
+        Dict with 'listings' (list of matched listings with units) or 'error'.
     """
     if top_k < 1 or top_k > MAX_SUGGEST_TOP_K:
         return {
@@ -130,29 +153,59 @@ def suggest_listing(top_k: int = 1) -> dict:
 
         prefs = profile.get("preferences", {})
 
+        # Build query text: explicit params override stored prefs
+        q_beds = bedrooms if bedrooms is not None else prefs.get("bedrooms", 1)
+        q_price_min = price_min if price_min is not None else prefs.get("price_min", 500)
+        q_price_max = price_max if price_max is not None else prefs.get("price_max", 1800)
+
         query = (
-            f"{prefs.get('bedrooms', 1)} bedroom apartment, "
-            f"${prefs.get('price_min', 500)}-${prefs.get('price_max', 1800)}/mo, "
+            f"{q_beds} bedroom apartment, "
+            f"${q_price_min}-${q_price_max}/mo, "
             f"distance from campus: {prefs.get('distance_from_campus', 'any')}, "
             f"amenities: {', '.join(prefs.get('amenities', []) or [])}. "
             f"{prefs.get('excerpt', '')}"
         )
 
-        results = query_records(query, ns = "main", top_k=top_k)
+        # Fetch extra candidates so post-filtering still yields enough results
+        pinecone_k = min(max(top_k * 4, 20), 50)
+        results = query_records(query, ns="main", top_k=pinecone_k)
         hits = results.get("result", {}).get("hits", [])
 
         if not hits:
             return {"success": False, "error": "No results"}
 
-        listings_col = get_listings_collection()
-        units_col = get_units_collection()
-
         hit_ids = [h["fields"].get("listing_id") for h in hits if h["fields"].get("listing_id")]
         score_map = {h["fields"].get("listing_id"): h["_score"] for h in hits}
 
-        listings_docs = {doc["listing_id"]: doc for doc in listings_col.find({"listing_id": {"$in": hit_ids}})}
+        # Exclude rejected listings before MongoDB query
+        exclude_set = set(exclude_listing_ids or [])
+        if exclude_set:
+            hit_ids = [lid for lid in hit_ids if lid not in exclude_set]
+
+        if not hit_ids:
+            return {"success": False, "error": "No results after exclusions"}
+
+        # MongoDB query with optional filters
+        mongo_filter: dict = {"listing_id": {"$in": hit_ids}}
+        if bedrooms is not None:
+            mongo_filter["beds_max"] = {"$gte": bedrooms}
+            mongo_filter["beds_min"] = {"$lte": bedrooms}
+        if bathrooms is not None:
+            mongo_filter["baths_max"] = {"$gte": bathrooms}
+            mongo_filter["baths_min"] = {"$lte": bathrooms}
+        if price_min is not None:
+            mongo_filter["list_price_max"] = {"$gte": price_min}
+        if price_max is not None:
+            mongo_filter["list_price_min"] = {"$lte": price_max}
+
+        listings_col = get_listings_collection()
+        units_col = get_units_collection()
+
+        listings_docs = {doc["listing_id"]: doc for doc in listings_col.find(mongo_filter)}
+        filtered_ids = list(listings_docs.keys())
+
         units_by_listing: dict[str, list] = {}
-        for u in units_col.find({"listing_id": {"$in": hit_ids}}):
+        for u in units_col.find({"listing_id": {"$in": filtered_ids}}):
             u["_id"] = str(u["_id"])
             units_by_listing.setdefault(u["listing_id"], []).append(u)
 
@@ -166,12 +219,34 @@ def suggest_listing(top_k: int = 1) -> dict:
             listing["match_score"] = score_map.get(lid, 0)
             listings.append(listing)
 
-        return json.dumps({"success": True, "listings": listings, "count": len(listings)}, default=str)
+        # Geographic post-filter
+        if near_lat is not None and near_lng is not None:
+            dist_km = max_distance_km if max_distance_km is not None else 3.0
+            filtered = []
+            for l in listings:
+                lat = l.get("latitude")
+                lng = l.get("longitude")
+                if lat is None or lng is None:
+                    continue
+                d = haversine_km(near_lat, near_lng, lat, lng)
+                l["distance_km"] = round(d, 2)
+                if d <= dist_km:
+                    filtered.append(l)
+            filtered.sort(key=lambda x: x["distance_km"])
+            listings = filtered
+
+        # Trim to requested count
+        listings = listings[:top_k]
+
+        if not listings:
+            return {"success": False, "error": "No listings match the applied filters"}
+
+        return {"success": True, "listings": listings, "count": len(listings)}
 
     except Exception as e:
         import logging
         logging.getLogger(__name__).error("suggest_listing error: %s", e, exc_info=True)
-        return json.dumps({"success": False, "error": "Failed to fetch listing suggestions"})
+        return {"success": False, "error": "Failed to fetch listing suggestions"}
 
 
 @tool
@@ -450,8 +525,7 @@ def resolve_destination(placeholder: str, location_bias: str = None) -> dict:
     This is called when the destination doesn't appear to be a full address (no street number).
     Args:
         placeholder: The destination name/place query (e.g., 'Walmart', 'Marston Library')
-        location_bias: Optional location bias for results (e.g., apartment address) to prefer
-            nearby results
+        location_bias: Optional lat,lng string (e.g., "29.6516,-82.3248") to prefer nearby results
     Returns:
         Dict with resolved place details (formatted_address) or error
     """
@@ -475,9 +549,9 @@ def resolve_destination(placeholder: str, location_bias: str = None) -> dict:
         "key": api_key,
     }
 
-    # Add location bias if provided
+    # Add location bias if provided as "lat,lng" coordinates
     if location_bias and location_bias.strip():
-        params["locationbias"] = f"radius:{location_bias}"
+        params["locationbias"] = f"point:{location_bias.strip()}"
 
     headers = {"User-Agent": user_agent}
 
@@ -687,10 +761,9 @@ def get_distance_to_location(apartment_address: str, destination: str, mode: str
 
     # If destination doesn't have a clear street number, try to resolve it first
     if not has_street_number and not has_full_address:
-        # Try to resolve the destination using Places API with location bias
+        # Try to resolve the destination using Places API (no location_bias since we only have an address string)
         resolution_result = resolve_destination.invoke({
             "placeholder": destination.strip(),
-            "location_bias": apartment_address.strip()
         })
 
         if not resolution_result.get("success"):

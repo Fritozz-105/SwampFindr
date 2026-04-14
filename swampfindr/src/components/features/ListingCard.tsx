@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Heart, ArrowRight, Bed, Bath, Maximize } from "lucide-react";
 import type { Listing } from "@/types/listing";
+import { getListingPhotos } from "@/lib/utils/listing-photos";
 
 interface ListingCardProps {
   listing: Listing;
@@ -14,7 +15,8 @@ interface ListingCardProps {
 
 export function ListingCard({ listing, onFavoriteToggle, basePath = "/home" }: ListingCardProps) {
   const [hovered, setHovered] = useState(false);
-  const hasPhoto = listing.photos.length > 0;
+  const photos = getListingPhotos(listing);
+  const hasPhoto = photos.length > 0;
   const matchPercent = listing.match_score !== null ? Math.round(listing.match_score * 100) : null;
 
   const priceLabel =
@@ -55,7 +57,7 @@ export function ListingCard({ listing, onFavoriteToggle, basePath = "/home" }: L
       {/* Background image */}
       {hasPhoto ? (
         <Image
-          src={listing.photos[0]}
+          src={photos[0]}
           alt={listing.address}
           fill
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"

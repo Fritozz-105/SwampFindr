@@ -2,6 +2,7 @@ from flask import request, g
 from flask_restx import Namespace, Resource, fields, marshal
 from app.agents.agent import run_agent
 from app.auth import require_auth
+from app.extensions import limiter
 from app.services.conversation_service import (
     create_thread_for_user,
     touch_thread,
@@ -33,6 +34,8 @@ response_model = agent.model('Response', {
 @agent.route('/')
 class AgentChat(Resource):
     """Agent chat endpoint."""
+    decorators = [limiter.limit("10/minute")]
+
     @agent.expect(query_model)
     @agent.doc(security="Bearer")
     @agent.marshal_with(response_model)

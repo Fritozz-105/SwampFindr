@@ -17,6 +17,7 @@ import {
 import { getListingDetail, toggleFavorite } from "@/lib/api/flask";
 import { getToken } from "@/lib/supabase/client";
 import type { Listing } from "@/types/listing";
+import { getListingPhotos } from "@/lib/utils/listing-photos";
 
 function ImageGallery({ photos, address }: { photos: string[]; address: string }) {
   const [current, setCurrent] = useState(0);
@@ -302,7 +303,7 @@ export default function ListingDetailPage() {
       </button>
 
       {/* Photo gallery */}
-      <ImageGallery photos={listing.photos} address={listing.address} />
+      <ImageGallery photos={getListingPhotos(listing)} address={listing.address} />
 
       {/* Header */}
       <div

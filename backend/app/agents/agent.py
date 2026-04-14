@@ -26,7 +26,6 @@ if openai_api_key:
     model = ChatOpenAI(
         model="gpt-oss-120b",
         temperature=0.1,
-        max_tokens=2048,
         timeout=30,
         api_key=openai_api_key,
         base_url=openai_base_url,
@@ -247,20 +246,10 @@ def _invoke_agent_with_trace(user_query: str, config: dict) -> tuple[list, str, 
         {"messages": [{"role": "user", "content": user_query}]},
         config=config
     )
-    print("\n=== AGENT RAW RESPONSE ===")
-    print(response)
     msgs = response.get("messages", [])
     final_response = _as_text(msgs[-1].content) if msgs else ""
     reasoning_steps = _extract_reasoning_steps(msgs)
     tool_calls = _extract_tool_calls(msgs)
-
-    print("=== AGENT EXTRACTED FINAL RESPONSE ===")
-    print(final_response)
-    print("=== AGENT EXTRACTED REASONING STEPS ===")
-    print(reasoning_steps)
-    print("=== AGENT EXTRACTED TOOL CALLS ===")
-    print(tool_calls)
-    print("=== END AGENT RAW RESPONSE ===\n")
 
     update_current_span(
         input=user_query,
@@ -271,8 +260,11 @@ def _invoke_agent_with_trace(user_query: str, config: dict) -> tuple[list, str, 
     return msgs, final_response, reasoning_steps, tool_calls
 
 
-# Return thread history
-def get_history(thread_id: str) -> list:
+MAX_HISTORY_MESSAGES = 200
+
+
+# Return thread history (capped to prevent unbounded fetch)
+def get_history(thread_id: str, limit: int = MAX_HISTORY_MESSAGES) -> list:
     config = {"configurable": {"thread_id": thread_id}}
     state  = agent.get_state(config)
     if not state or not state.values.get("messages"):
@@ -282,9 +274,15 @@ def get_history(thread_id: str) -> list:
         "ai": "assistant",
         "system": "system",
     }
+
+    # Cap the raw messages to the most recent `limit` entries
+    all_messages = state.values["messages"]
+    if limit > 0 and len(all_messages) > limit:
+        all_messages = all_messages[-limit:]
+
     history = []
     pending_listings: list = []
-    for m in state.values["messages"]:
+    for m in all_messages:
         if m.type == "tool":
             parsed = _parse_tool_content(m.content)
             if isinstance(parsed, dict) and parsed.get("success") and "listings" in parsed:
@@ -374,7 +372,7 @@ def run_agent(user_query: str, thread_id: str) -> dict:
     }
 
 
-# Stream the agent responses
+# Stream the agent responses as structured event dicts
 def run_agent_stream(user_query: str, thread_id: str):
     config = {"configurable": {"thread_id": thread_id}}
     tkn = set_current_user_id(get_user_id_for_thread(thread_id))
@@ -385,17 +383,23 @@ def run_agent_stream(user_query: str, thread_id: str):
             stream_mode="messages"
         ):
             if chunk.type == "AIMessageChunk" and chunk.content:
-                yield chunk.content
+                yield {"type": "token", "content": _as_text(chunk.content)}
     except Exception as e:
         if _is_timeout_error(e):
-            yield "[error: timed out]"
+            yield {"type": "error", "error": "Request timed out", "error_type": "timeout"}
             return
-        import logging
         logging.getLogger(__name__).error("Stream error for thread %s: %s", thread_id, e, exc_info=True)
-        yield "[error: something went wrong]"
+        yield {"type": "error", "error": "Something went wrong. Please try again.", "error_type": "internal"}
+        return
     finally:
         reset_current_user_id(tkn)
 
+    # Extract listings from the final agent state
+    state = agent.get_state(config)
+    if state and state.values.get("messages"):
+        listings = _extract_listings(state.values["messages"])
+        if listings:
+            yield {"type": "listings", "listings": listings}
 
 
 if __name__ == "__main__":
@@ -408,5 +412,11 @@ if __name__ == "__main__":
         if not query:
             continue
         print("Agent: ", end="", flush=True)
-        run_agent(user_query=query, thread_id=thread_id)
+        for event in run_agent_stream(query, thread_id=thread_id):
+            if event["type"] == "token":
+                print(event["content"], end="", flush=True)
+            elif event["type"] == "listings":
+                print(f"\n[{len(event['listings'])} listings found]", flush=True)
+            elif event["type"] == "error":
+                print(f"\n[Error: {event['error']}]", flush=True)
         print("\n")

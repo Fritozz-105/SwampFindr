@@ -85,13 +85,15 @@ export function ChatView() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isSending]);
 
-  // Auto-select most recent thread on initial load only
+  // Auto-select most recent thread on initial load only (skip if thread restored from localStorage)
   useEffect(() => {
     if (!isLoadingThreads && threads.length > 0 && !hasInitiallyLoaded.current) {
       hasInitiallyLoaded.current = true;
-      selectThread(threads[0].thread_id);
+      if (!activeThreadId) {
+        selectThread(threads[0].thread_id);
+      }
     }
-  }, [isLoadingThreads, threads, selectThread]);
+  }, [isLoadingThreads, threads, selectThread, activeThreadId]);
 
   const hasMessages = messages.length > 0;
   const showEmptyState = !activeThreadId && !isLoadingHistory && !hasMessages;

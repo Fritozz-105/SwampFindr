@@ -26,6 +26,7 @@ export interface Listing {
   cats: boolean | null;
   dogs: boolean | null;
   photos: string[];
+  cleaned_photos?: string[];
   details: string;
   units: Unit[];
   match_score: number | null;
