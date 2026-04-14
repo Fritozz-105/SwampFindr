@@ -29,14 +29,15 @@ _openai_client = None
 
 
 def _get_openai_client():
+    global _openai_client
     if _openai_client is not None:
         return _openai_client
 
-    else:
-        try:
-            return OpenAI(api_key=os.environ["OPENAI_API_KEY"])
-        except Exception as e:
-            return f"Could not connect to OpenAI {e}"
+    try:
+        _openai_client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+        return _openai_client
+    except Exception as e:
+        return f"Could not connect to OpenAI {e}"
 
 
 def _require_user_id() -> str:
@@ -240,12 +241,12 @@ def suggest_listing(
         if not listings:
             return {"success": False, "error": "No listings match the applied filters"}
 
-        return json.dumps({"success": True, "listings": listings, "count": len(listings)}, default=str)
+        return {"success": True, "listings": listings, "count": len(listings)}
 
     except Exception as e:
         import logging
         logging.getLogger(__name__).error("suggest_listing error: %s", e, exc_info=True)
-        return json.dumps({"success": False, "error": "Failed to fetch listing suggestions"})
+        return {"success": False, "error": "Failed to fetch listing suggestions"}
 
 
 @tool
@@ -524,8 +525,7 @@ def resolve_destination(placeholder: str, location_bias: str = None) -> dict:
     This is called when the destination doesn't appear to be a full address (no street number).
     Args:
         placeholder: The destination name/place query (e.g., 'Walmart', 'Marston Library')
-        location_bias: Optional location bias for results (e.g., apartment address) to prefer
-            nearby results
+        location_bias: Optional lat,lng string (e.g., "29.6516,-82.3248") to prefer nearby results
     Returns:
         Dict with resolved place details (formatted_address) or error
     """
@@ -549,9 +549,9 @@ def resolve_destination(placeholder: str, location_bias: str = None) -> dict:
         "key": api_key,
     }
 
-    # Add location bias if provided
+    # Add location bias if provided as "lat,lng" coordinates
     if location_bias and location_bias.strip():
-        params["locationbias"] = f"radius:{location_bias}"
+        params["locationbias"] = f"point:{location_bias.strip()}"
 
     headers = {"User-Agent": user_agent}
 
@@ -761,10 +761,9 @@ def get_distance_to_location(apartment_address: str, destination: str, mode: str
 
     # If destination doesn't have a clear street number, try to resolve it first
     if not has_street_number and not has_full_address:
-        # Try to resolve the destination using Places API with location bias
+        # Try to resolve the destination using Places API (no location_bias since we only have an address string)
         resolution_result = resolve_destination.invoke({
             "placeholder": destination.strip(),
-            "location_bias": apartment_address.strip()
         })
 
         if not resolution_result.get("success"):
