@@ -226,11 +226,11 @@ export function FavoritesView() {
         </p>
       )}
 
-      {/* Grid: 3 per row */}
+      {/* Grid: responsive – auto-fills based on screen width */}
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(3, 1fr)",
+          gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
           gap: 20,
         }}
       >
