@@ -27,6 +27,7 @@ dependencies = [
     "gunicorn>=21.2.0",
     "Pillow>=10.0.0",
     "requests>=2.31.0",
+    "deepeval>=3.9.6",
 ]
 
 [project.optional-dependencies]
