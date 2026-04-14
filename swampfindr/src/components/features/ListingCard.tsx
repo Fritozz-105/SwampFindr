@@ -17,7 +17,7 @@ export function ListingCard({ listing, onFavoriteToggle, basePath = "/home" }: L
   const [hovered, setHovered] = useState(false);
   const photos = getListingPhotos(listing);
   const hasPhoto = photos.length > 0;
-  const matchPercent = listing.match_score !== null ? Math.round(listing.match_score * 100) : null;
+  const matchPercent = listing.match_score != null ? Math.round(listing.match_score * 100) : null;
 
   const priceLabel =
     listing.list_price_min === listing.list_price_max

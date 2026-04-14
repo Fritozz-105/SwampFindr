@@ -250,8 +250,10 @@ class ProfileFavoritesListings(Resource):
     @profiles.doc(security="Bearer")
     @require_auth
     def get(self):
-        """Get the current user's favorited listings with full details."""
+        """Get the current user's favorited listings with full details and match scores."""
         from app.services.listing_utils import attach_units
+        from app.services.recommendation_service import _build_preference_query
+        from app.services.pinecone_service import query_records
 
         favorite_ids = get_favorites(g.user_id)
         if not favorite_ids:
@@ -263,13 +265,28 @@ class ProfileFavoritesListings(Resource):
             {"_id": 0},
         ))
 
+        # Get match scores from Pinecone using user preferences
+        score_map: dict[str, float] = {}
+        profile = get_profile_by_user_id(g.user_id)
+        if profile:
+            prefs = profile.get("preferences", {})
+            try:
+                query_text = _build_preference_query(prefs)
+                results = query_records(query_text, ns="main", top_k=len(favorite_ids))
+                for hit in results.get("result", {}).get("hits", []):
+                    lid = hit.get("fields", {}).get("listing_id")
+                    if lid and lid in favorite_ids:
+                        score_map[lid] = hit.get("_score", 0)
+            except Exception as e:
+                logger.warning("Pinecone unavailable for favorites scoring: %s", e)
+
         # Preserve the order from the favorites list
         listing_map = {l["listing_id"]: l for l in listings}
         ordered = [listing_map[lid] for lid in favorite_ids if lid in listing_map]
 
-        # Mark all as favorited
         for l in ordered:
             l["is_favorited"] = True
+            l["match_score"] = score_map.get(l["listing_id"])
 
         attach_units(ordered)
 
