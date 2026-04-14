@@ -3,6 +3,7 @@ export const navigation = {
     { label: "Home", href: "/home", icon: "home" },
     { label: "Search", href: "/search", icon: "search" },
     { label: "Chat", href: "/chat", icon: "chat" },
+    { label: "Favorites", href: "/favorites", icon: "favorites" },
     { label: "Settings", href: "/settings", icon: "settings" },
   ],
 } as const;

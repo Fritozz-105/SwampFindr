@@ -6,12 +6,13 @@ import Image from "next/image";
 import { navigation } from "@/data/navigation";
 import { branding } from "@/data/branding";
 import { logout } from "@/app/auth/actions";
-import { HomeIcon, SearchIcon, ChatIcon, SettingsIcon, LogoutIcon } from "@/components/ui/icons";
+import { HomeIcon, SearchIcon, ChatIcon, FavoritesIcon, SettingsIcon, LogoutIcon } from "@/components/ui/icons";
 
 const iconMap: Record<string, React.ComponentType<React.SVGProps<SVGSVGElement>>> = {
   home: HomeIcon,
   search: SearchIcon,
   chat: ChatIcon,
+  favorites: FavoritesIcon,
   settings: SettingsIcon,
 };
 

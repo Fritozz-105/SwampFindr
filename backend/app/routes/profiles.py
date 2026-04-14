@@ -245,6 +245,37 @@ class ProfileFavorites(Resource):
         return {"success": True, "data": favorites, "count": len(favorites)}
 
 
+@profiles.route("/me/favorites/listings")
+class ProfileFavoritesListings(Resource):
+    @profiles.doc(security="Bearer")
+    @require_auth
+    def get(self):
+        """Get the current user's favorited listings with full details."""
+        from app.services.listing_utils import attach_units
+
+        favorite_ids = get_favorites(g.user_id)
+        if not favorite_ids:
+            return {"success": True, "data": [], "count": 0}
+
+        listings_col = get_listings_collection()
+        listings = list(listings_col.find(
+            {"listing_id": {"$in": favorite_ids}},
+            {"_id": 0},
+        ))
+
+        # Preserve the order from the favorites list
+        listing_map = {l["listing_id"]: l for l in listings}
+        ordered = [listing_map[lid] for lid in favorite_ids if lid in listing_map]
+
+        # Mark all as favorited
+        for l in ordered:
+            l["is_favorited"] = True
+
+        attach_units(ordered)
+
+        return {"success": True, "data": ordered, "count": len(ordered)}
+
+
 @profiles.route("/status")
 class ProfileStatus(Resource):
     @profiles.doc(security="Bearer")

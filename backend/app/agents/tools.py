@@ -76,6 +76,10 @@ def get_contact_info(query: str) -> dict:
     Returns:
         dict: Result with the apartment information in JSON format
     """
+    client = _get_openai_client()
+    if isinstance(client, str):
+        return {"success": False, "error": client}
+
     messages = cast(list[ChatCompletionMessageParam], cast(object, [
         {"role": "system",
          "content": """You are a helpful assistant that returns apartment contact information strictly as JSON.
@@ -95,14 +99,18 @@ def get_contact_info(query: str) -> dict:
          "content": f"Get contact info for: {query}"
          }
     ]))
-    response = _get_openai_client().chat.completions.create(
-        model="gpt-oss-120b",
-        messages=messages,
-        response_format=ResponseFormatJSONObject(type="json_object")
-    )
-
-    raw = response.choices[0].message.content
-    return json.loads(raw)
+    try:
+        response = client.chat.completions.create(
+            model="gpt-oss-120b",
+            messages=messages,
+            response_format=ResponseFormatJSONObject(type="json_object")
+        )
+        raw = response.choices[0].message.content
+        return json.loads(raw)
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).error("get_contact_info error: %s", e, exc_info=True)
+        return {"success": False, "error": "Failed to fetch contact information. Please try again."}
 
 
 @tool
@@ -153,18 +161,29 @@ def suggest_listing(
 
         prefs = profile.get("preferences", {})
 
-        # Build query text: explicit params override stored prefs
-        q_beds = bedrooms if bedrooms is not None else prefs.get("bedrooms", 1)
-        q_price_min = price_min if price_min is not None else prefs.get("price_min", 500)
-        q_price_max = price_max if price_max is not None else prefs.get("price_max", 1800)
+        # Resolve effective filters: explicit params override stored prefs
+        eff_beds = bedrooms if bedrooms is not None else prefs.get("bedrooms")
+        eff_baths = bathrooms if bathrooms is not None else prefs.get("bathrooms")
+        eff_price_min = price_min if price_min is not None else prefs.get("price_min")
+        eff_price_max = price_max if price_max is not None else prefs.get("price_max")
 
-        query = (
-            f"{q_beds} bedroom apartment, "
-            f"${q_price_min}-${q_price_max}/mo, "
-            f"distance from campus: {prefs.get('distance_from_campus', 'any')}, "
-            f"amenities: {', '.join(prefs.get('amenities', []) or [])}. "
-            f"{prefs.get('excerpt', '')}"
-        )
+        # Build query text for Pinecone similarity search
+        query_parts = []
+        if eff_beds:
+            query_parts.append(f"{eff_beds} bedroom")
+        if eff_baths:
+            query_parts.append(f"{eff_baths} bathroom")
+        query_parts.append("apartment")
+        if eff_price_min or eff_price_max:
+            query_parts.append(f"${eff_price_min or 0}-${eff_price_max or 9999}/mo")
+        query_parts.append(f"distance from campus: {prefs.get('distance_from_campus', 'any')}")
+        amenities = prefs.get("amenities", []) or []
+        if amenities:
+            query_parts.append(f"amenities: {', '.join(amenities)}")
+        excerpt = prefs.get("excerpt", "")
+        if excerpt:
+            query_parts.append(excerpt)
+        query = ", ".join(query_parts)
 
         # Fetch extra candidates so post-filtering still yields enough results
         pinecone_k = min(max(top_k * 4, 20), 50)
@@ -185,18 +204,18 @@ def suggest_listing(
         if not hit_ids:
             return {"success": False, "error": "No results after exclusions"}
 
-        # MongoDB query with optional filters
+        # MongoDB query (always apply effective filters as hard constraints)
         mongo_filter: dict = {"listing_id": {"$in": hit_ids}}
-        if bedrooms is not None:
-            mongo_filter["beds_max"] = {"$gte": bedrooms}
-            mongo_filter["beds_min"] = {"$lte": bedrooms}
-        if bathrooms is not None:
-            mongo_filter["baths_max"] = {"$gte": bathrooms}
-            mongo_filter["baths_min"] = {"$lte": bathrooms}
-        if price_min is not None:
-            mongo_filter["list_price_max"] = {"$gte": price_min}
-        if price_max is not None:
-            mongo_filter["list_price_min"] = {"$lte": price_max}
+        if eff_beds is not None:
+            mongo_filter["beds_max"] = {"$gte": eff_beds}
+            mongo_filter["beds_min"] = {"$lte": eff_beds}
+        if eff_baths is not None:
+            mongo_filter["baths_max"] = {"$gte": eff_baths}
+            mongo_filter["baths_min"] = {"$lte": eff_baths}
+        if eff_price_min is not None:
+            mongo_filter["list_price_max"] = {"$gte": eff_price_min}
+        if eff_price_max is not None:
+            mongo_filter["list_price_min"] = {"$lte": eff_price_max}
 
         listings_col = get_listings_collection()
         units_col = get_units_collection()
@@ -241,7 +260,10 @@ def suggest_listing(
         if not listings:
             return {"success": False, "error": "No listings match the applied filters"}
 
-        return {"success": True, "listings": listings, "count": len(listings)}
+        return json.dumps(
+            {"success": True, "listings": listings, "count": len(listings)},
+            default=str,
+        )
 
     except Exception as e:
         import logging

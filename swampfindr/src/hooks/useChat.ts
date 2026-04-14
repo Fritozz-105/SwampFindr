@@ -57,7 +57,7 @@ export function useChat() {
     }
   }, [activeThreadId]);
 
-  // Fetch threads on mount, restore saved thread if valid
+  // Fetch threads on mount, derive titles from first user message, restore saved thread
   useEffect(() => {
     const fetchThreads = async () => {
       try {
@@ -65,11 +65,48 @@ export function useChat() {
         if (!token) return;
         const res = await getThreads(token);
         if (res.success) {
-          const fetched = res.data.map((t) => ({
+          const fetched: Thread[] = res.data.map((t) => ({
             ...t,
             title: "Conversation",
           }));
           setThreads(fetched);
+
+          // Derive titles for all threads by fetching their history in parallel
+          const titlePromises = fetched.map(async (t) => {
+            try {
+              const hist = await getChatHistory(token, t.thread_id);
+              if (hist.success) {
+                const firstUser = hist.data.find(
+                  (m) => m.role === "user" || m.role === "human",
+                );
+                if (firstUser) {
+                  const text = typeof firstUser.content === "string"
+                    ? firstUser.content
+                    : Array.isArray(firstUser.content)
+                      ? firstUser.content.map((c) => (typeof c === "object" && c !== null && "text" in c ? String((c as { text: unknown }).text) : typeof c === "string" ? c : "")).join("")
+                      : String(firstUser.content ?? "");
+                  return {
+                    thread_id: t.thread_id,
+                    title: text.length > 40 ? text.slice(0, 40) + "..." : text,
+                  };
+                }
+              }
+            } catch {
+              // Non-critical — title stays "Conversation"
+            }
+            return null;
+          });
+
+          const titles = await Promise.all(titlePromises);
+          const titleMap = new Map<string, string>();
+          for (const t of titles) {
+            if (t) titleMap.set(t.thread_id, t.title);
+          }
+          if (titleMap.size > 0) {
+            setThreads((prev) =>
+              prev.map((t) => (titleMap.has(t.thread_id) ? { ...t, title: titleMap.get(t.thread_id)! } : t)),
+            );
+          }
 
           // Restore saved thread if it still exists in the user's thread list
           const savedId = localStorage.getItem(THREAD_STORAGE_KEY);
@@ -242,6 +279,10 @@ export function useChat() {
     [favorites],
   );
 
+  const dismissError = useCallback(() => {
+    setError(null);
+  }, []);
+
   const retryLastMessage = useCallback(async () => {
     if (!lastUserMessage.current) return;
     // Remove the last user message (will be re-added by sendMessage)
@@ -347,6 +388,7 @@ export function useChat() {
     startNewChat,
     sendMessage,
     retryLastMessage,
+    dismissError,
     deleteThread: handleDeleteThread,
     toggleFavorite: handleToggleFavorite,
   };
