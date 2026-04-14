@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { Heart } from "lucide-react";
 import type { Listing } from "@/types/listing";
+import { getListingPhotos } from "@/lib/utils/listing-photos";
 
 interface ChatListingCardProps {
   listing: Listing;
@@ -45,9 +46,9 @@ export function ChatListingCard({
           position: "relative",
         }}
       >
-        {listing.photos.length > 0 ? (
+        {getListingPhotos(listing).length > 0 ? (
           <Image
-            src={listing.photos[0]}
+            src={getListingPhotos(listing)[0]}
             alt={listing.address}
             fill
             style={{ objectFit: "cover" }}

@@ -85,12 +85,6 @@ def get_search_history_collection() -> Collection:
     return db['SearchHistory']
 
 
-def get_agent_traces_collection() -> Collection:
-    """Get the AgentTraces collection from the UserData database."""
-    db = get_userdata_db()
-    return db['AgentTraces']
-
-
 def init_db(app):
     """Initialize database connection with Flask app."""
     with app.app_context():

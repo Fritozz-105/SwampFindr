@@ -64,6 +64,7 @@ export function ChatView() {
     startNewChat,
     sendMessage,
     retryLastMessage,
+    dismissError,
     deleteThread,
     toggleFavorite,
   } = useChat();
@@ -85,13 +86,15 @@ export function ChatView() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isSending]);
 
-  // Auto-select most recent thread on initial load only
+  // Auto-select most recent thread on initial load only (skip if thread restored from localStorage)
   useEffect(() => {
     if (!isLoadingThreads && threads.length > 0 && !hasInitiallyLoaded.current) {
       hasInitiallyLoaded.current = true;
-      selectThread(threads[0].thread_id);
+      if (!activeThreadId) {
+        selectThread(threads[0].thread_id);
+      }
     }
-  }, [isLoadingThreads, threads, selectThread]);
+  }, [isLoadingThreads, threads, selectThread, activeThreadId]);
 
   const hasMessages = messages.length > 0;
   const showEmptyState = !activeThreadId && !isLoadingHistory && !hasMessages;
@@ -281,24 +284,42 @@ export function ChatView() {
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
+                gap: 8,
               }}
             >
-              <span>{error}</span>
-              <button
-                onClick={retryLastMessage}
-                style={{
-                  padding: "4px 10px",
-                  borderRadius: "var(--radius-sm)",
-                  background: "var(--color-error)",
-                  color: "#fff",
-                  border: "none",
-                  fontSize: 12,
-                  fontWeight: 600,
-                  cursor: "pointer",
-                }}
-              >
-                Retry
-              </button>
+              <span style={{ flex: 1 }}>{error}</span>
+              <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+                <button
+                  onClick={retryLastMessage}
+                  style={{
+                    padding: "4px 10px",
+                    borderRadius: "var(--radius-sm)",
+                    background: "var(--color-error)",
+                    color: "#fff",
+                    border: "none",
+                    fontSize: 12,
+                    fontWeight: 600,
+                    cursor: "pointer",
+                  }}
+                >
+                  Retry
+                </button>
+                <button
+                  onClick={dismissError}
+                  style={{
+                    padding: "4px 10px",
+                    borderRadius: "var(--radius-sm)",
+                    background: "transparent",
+                    color: "var(--color-error)",
+                    border: "1px solid rgba(220, 38, 38, 0.3)",
+                    fontSize: 12,
+                    fontWeight: 600,
+                    cursor: "pointer",
+                  }}
+                >
+                  Dismiss
+                </button>
+              </div>
             </div>
           )}
 

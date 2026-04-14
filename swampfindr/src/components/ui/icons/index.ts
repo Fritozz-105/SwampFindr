@@ -9,3 +9,4 @@ export { SettingsIcon } from "./SettingsIcon";
 export { ChevronIcon } from "./ChevronIcon";
 export { LogoutIcon } from "./LogoutIcon";
 export { HeartIcon } from "./HeartIcon";
+export { FavoritesIcon } from "./FavoritesIcon";

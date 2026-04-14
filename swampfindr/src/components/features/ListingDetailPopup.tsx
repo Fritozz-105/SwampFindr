@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { X, Heart, ChevronLeft, ChevronRight } from "lucide-react";
 import type { Listing } from "@/types/listing";
+import { getListingPhotos } from "@/lib/utils/listing-photos";
 
 interface ListingDetailPopupProps {
   listing: Listing;
@@ -46,8 +47,8 @@ export function ListingDetailPopup({
     };
   }, []);
 
-  const hasPhotos = listing.photos.length > 0;
-  const hasMultiplePhotos = listing.photos.length > 1;
+  const hasPhotos = getListingPhotos(listing).length > 0;
+  const hasMultiplePhotos = getListingPhotos(listing).length > 1;
 
   return (
     <div
@@ -87,7 +88,7 @@ export function ListingDetailPopup({
         >
           {hasPhotos ? (
             <Image
-              src={listing.photos[photoIndex]}
+              src={getListingPhotos(listing)[photoIndex]}
               alt={listing.address}
               fill
               style={{ objectFit: "cover" }}
@@ -176,7 +177,7 @@ export function ListingDetailPopup({
               <button
                 onClick={() =>
                   setPhotoIndex((i) =>
-                    i === 0 ? listing.photos.length - 1 : i - 1,
+                    i === 0 ? getListingPhotos(listing).length - 1 : i - 1,
                   )
                 }
                 style={{
@@ -201,7 +202,7 @@ export function ListingDetailPopup({
               <button
                 onClick={() =>
                   setPhotoIndex((i) =>
-                    i === listing.photos.length - 1 ? 0 : i + 1,
+                    i === getListingPhotos(listing).length - 1 ? 0 : i + 1,
                   )
                 }
                 style={{
@@ -238,7 +239,7 @@ export function ListingDetailPopup({
                 gap: 4,
               }}
             >
-              {listing.photos.slice(0, 5).map((_, i) => (
+              {getListingPhotos(listing).slice(0, 5).map((_, i) => (
                 <div
                   key={i}
                   style={{

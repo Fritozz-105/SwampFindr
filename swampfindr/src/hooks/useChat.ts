@@ -29,9 +29,14 @@ function parseHistoryContent(content: string | unknown[]): string {
   return String(content ?? "");
 }
 
+const THREAD_STORAGE_KEY = "swampfindr_active_thread";
+
 export function useChat() {
   const [threads, setThreads] = useState<Thread[]>([]);
-  const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
+  const [activeThreadId, setActiveThreadId] = useState<string | null>(() => {
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem(THREAD_STORAGE_KEY);
+  });
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoadingThreads, setIsLoadingThreads] = useState(true);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
@@ -40,8 +45,19 @@ export function useChat() {
   const [error, setError] = useState<string | null>(null);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const lastUserMessage = useRef<string>("");
+  const activeThreadIdRef = useRef(activeThreadId);
 
-  // Fetch threads on mount
+  // Keep ref in sync so sendMessage always reads the latest value
+  useEffect(() => {
+    activeThreadIdRef.current = activeThreadId;
+    if (activeThreadId) {
+      localStorage.setItem(THREAD_STORAGE_KEY, activeThreadId);
+    } else {
+      localStorage.removeItem(THREAD_STORAGE_KEY);
+    }
+  }, [activeThreadId]);
+
+  // Fetch threads on mount, derive titles from first user message, restore saved thread
   useEffect(() => {
     const fetchThreads = async () => {
       try {
@@ -49,12 +65,56 @@ export function useChat() {
         if (!token) return;
         const res = await getThreads(token);
         if (res.success) {
-          setThreads(
-            res.data.map((t) => ({
-              ...t,
-              title: "Conversation",
-            })),
-          );
+          const fetched: Thread[] = res.data.map((t) => ({
+            ...t,
+            title: "Conversation",
+          }));
+          setThreads(fetched);
+
+          // Derive titles for all threads by fetching their history in parallel
+          const titlePromises = fetched.map(async (t) => {
+            try {
+              const hist = await getChatHistory(token, t.thread_id);
+              if (hist.success) {
+                const firstUser = hist.data.find(
+                  (m) => m.role === "user" || m.role === "human",
+                );
+                if (firstUser) {
+                  const text = typeof firstUser.content === "string"
+                    ? firstUser.content
+                    : Array.isArray(firstUser.content)
+                      ? firstUser.content.map((c) => (typeof c === "object" && c !== null && "text" in c ? String((c as { text: unknown }).text) : typeof c === "string" ? c : "")).join("")
+                      : String(firstUser.content ?? "");
+                  return {
+                    thread_id: t.thread_id,
+                    title: text.length > 40 ? text.slice(0, 40) + "..." : text,
+                  };
+                }
+              }
+            } catch {
+              // Non-critical — title stays "Conversation"
+            }
+            return null;
+          });
+
+          const titles = await Promise.all(titlePromises);
+          const titleMap = new Map<string, string>();
+          for (const t of titles) {
+            if (t) titleMap.set(t.thread_id, t.title);
+          }
+          if (titleMap.size > 0) {
+            setThreads((prev) =>
+              prev.map((t) => (titleMap.has(t.thread_id) ? { ...t, title: titleMap.get(t.thread_id)! } : t)),
+            );
+          }
+
+          // Restore saved thread if it still exists in the user's thread list
+          const savedId = localStorage.getItem(THREAD_STORAGE_KEY);
+          if (savedId && fetched.some((t) => t.thread_id === savedId)) {
+            selectThread(savedId);
+          } else {
+            localStorage.removeItem(THREAD_STORAGE_KEY);
+          }
         }
       } catch {
         // Non-critical, sidebar will be empty
@@ -63,6 +123,7 @@ export function useChat() {
       }
     };
     fetchThreads();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Fetch favorites from profile on mount
@@ -126,6 +187,7 @@ export function useChat() {
   }, []);
 
   const startNewChat = useCallback(() => {
+    activeThreadIdRef.current = null;
     setActiveThreadId(null);
     setMessages([]);
     setError(null);
@@ -151,7 +213,7 @@ export function useChat() {
           return;
         }
 
-        const res = await sendChatMessage(token, content, activeThreadId ?? undefined);
+        const res = await sendChatMessage(token, content, activeThreadIdRef.current ?? undefined);
 
         if (!res.success) {
           setError(res.error ?? "Something went wrong. Try again.");
@@ -179,6 +241,7 @@ export function useChat() {
         // Handle new thread
         if (res.is_new_thread) {
           const title = content.length > 40 ? content.slice(0, 40) + "..." : content;
+          activeThreadIdRef.current = res.thread_id;
           setActiveThreadId(res.thread_id);
           setThreads((prev) => [
             {
@@ -213,8 +276,12 @@ export function useChat() {
         setIsSending(false);
       }
     },
-    [activeThreadId, favorites],
+    [favorites],
   );
+
+  const dismissError = useCallback(() => {
+    setError(null);
+  }, []);
 
   const retryLastMessage = useCallback(async () => {
     if (!lastUserMessage.current) return;
@@ -321,6 +388,7 @@ export function useChat() {
     startNewChat,
     sendMessage,
     retryLastMessage,
+    dismissError,
     deleteThread: handleDeleteThread,
     toggleFavorite: handleToggleFavorite,
   };
