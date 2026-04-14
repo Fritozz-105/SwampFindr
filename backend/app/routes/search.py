@@ -49,7 +49,7 @@ class SearchList(Resource):
         if len(q) > _MAX_QUERY_LENGTH:
             return {"success": False, "error": f"Query exceeds maximum length of {_MAX_QUERY_LENGTH} characters"}, 400
 
-        top_k = request.args.get("top_k", 50, type=int)
+        top_k = request.args.get("top_k", 100, type=int)
         skip_history = request.args.get("skip_history", "0") == "1"
 
         try:

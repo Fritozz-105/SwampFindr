@@ -102,7 +102,7 @@ export function useSearch() {
           return;
         }
 
-        const res = await searchListings(token, q, 50, isRestore);
+        const res = await searchListings(token, q, 100, isRestore);
         setResults(res.data);
         setFilters(defaultFilters);
         setPage(1);

@@ -66,7 +66,7 @@ export async function getListingDetail(
 export async function searchListings(
   token: string,
   query: string,
-  topK: number = 50,
+  topK: number = 100,
   skipHistory: boolean = false,
 ): Promise<SearchResponse> {
   const params = new URLSearchParams({ q: query, top_k: String(topK) });
@@ -76,6 +76,12 @@ export async function searchListings(
 
 export async function getSearchHistory(token: string): Promise<SearchHistoryResponse> {
   return flaskFetch<SearchHistoryResponse>("/search/history", { token });
+}
+
+export async function getFavoriteListings(
+  token: string,
+): Promise<{ success: boolean; data: Listing[]; count: number }> {
+  return flaskFetch(`/profiles/me/favorites/listings`, { token });
 }
 
 export async function sendChatMessage(
