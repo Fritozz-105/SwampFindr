@@ -33,10 +33,7 @@ const THREAD_STORAGE_KEY = "swampfindr_active_thread";
 
 export function useChat() {
   const [threads, setThreads] = useState<Thread[]>([]);
-  const [activeThreadId, setActiveThreadId] = useState<string | null>(() => {
-    if (typeof window === "undefined") return null;
-    return localStorage.getItem(THREAD_STORAGE_KEY);
-  });
+  const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoadingThreads, setIsLoadingThreads] = useState(true);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
@@ -113,7 +110,10 @@ export function useChat() {
           if (savedId && fetched.some((t) => t.thread_id === savedId)) {
             selectThread(savedId);
           } else {
+            // Stale or missing — clear so sendMessage creates a new thread
             localStorage.removeItem(THREAD_STORAGE_KEY);
+            activeThreadIdRef.current = null;
+            setActiveThreadId(null);
           }
         }
       } catch {
