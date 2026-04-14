@@ -6,11 +6,12 @@ import httpx
 import os
 
 from langchain_core.tools import tool
+from langchain_core.runnables import RunnableConfig
 from deepeval.tracing import observe
 from app.services.pinecone_service import query_records
 from app.services.profile_service import PreferencesUpdateRequest, update_preferences, get_profile_by_user_id
 from app.database import get_listings_collection, get_units_collection
-from app.agents.user_context import get_current_user_id
+from app.agents.user_context import get_user_for_thread
 from app.utils.geo import haversine_km
 
 from pathlib import Path
@@ -40,8 +41,9 @@ def _get_openai_client():
         return f"Could not connect to OpenAI {e}"
 
 
-def _require_user_id() -> str:
-    user_id = get_current_user_id()
+def _require_user_id(config: RunnableConfig) -> str:
+    thread_id = config.get("configurable", {}).get("thread_id", "")
+    user_id = get_user_for_thread(thread_id) if thread_id else None
     if not user_id:
         raise ValueError("Authenticated user context is missing")
     return user_id
@@ -125,6 +127,7 @@ def suggest_listing(
     near_lat: float | None = None,
     near_lng: float | None = None,
     max_distance_km: float | None = None,
+    config: RunnableConfig = None,
 ) -> dict:
     """Suggest apartment listings using the user's preference embedding plus optional hard filters.
     Call this when the user asks for recommendations, suggestions, or wants to find apartments.
@@ -153,7 +156,7 @@ def suggest_listing(
             "error": f"top_k must be between 1 and {MAX_SUGGEST_TOP_K}",
         }
 
-    user_id = _require_user_id()
+    user_id = _require_user_id(config)
     try:
         profile = get_profile_by_user_id(user_id)
         if not profile:
@@ -228,12 +231,24 @@ def suggest_listing(
             u["_id"] = str(u["_id"])
             units_by_listing.setdefault(u["listing_id"], []).append(u)
 
+        # Fields the agent needs for reasoning (exclude photos/binary data)
+        _LISTING_FIELDS = {
+            "_id", "listing_id", "property_id",
+            "list_price_max", "list_price_min",
+            "beds_max", "beds_min", "baths_max", "baths_min",
+            "sqft_max", "sqft_min",
+            "address", "postal_code", "city", "state",
+            "cats", "dogs", "details",
+            "latitude", "longitude",
+        }
+
         listings = []
         for lid in hit_ids:
-            listing = listings_docs.get(lid)
-            if not listing:
+            raw = listings_docs.get(lid)
+            if not raw:
                 continue
-            listing["_id"] = str(listing["_id"])
+            listing = {k: v for k, v in raw.items() if k in _LISTING_FIELDS}
+            listing["_id"] = str(listing.get("_id", ""))
             listing["units"] = units_by_listing.get(lid, [])
             listing["match_score"] = score_map.get(lid, 0)
             listings.append(listing)
@@ -281,7 +296,8 @@ def update_preference_embedding(
         distance_from_campus: str = "any",
         roommates: int = 0,
         amenities: list[str] | None = None,
-        excerpt: str = ""
+        excerpt: str = "",
+        config: RunnableConfig = None,
 )-> dict:
     """Update the user's housing preferences and recompile their preferences embedding.
     This should be called when the user implicitly or directly expresses a change in interest
@@ -297,7 +313,7 @@ def update_preference_embedding(
     Returns:
         Dict with 'success' and updated profile data or either an 'error'
     """
-    user_id = _require_user_id()
+    user_id = _require_user_id(config)
     try:
         amenities = amenities or []
         data = PreferencesUpdateRequest(
@@ -328,7 +344,7 @@ def update_preference_embedding(
 
 @tool
 @observe(type="tool")
-def swipe_on_listing(listing_id: str, action: str) -> dict:
+def swipe_on_listing(listing_id: str, action: str, config: RunnableConfig = None) -> dict:
     """
     Track the user's interest via a swipe on a listing (like/dislike/pass)
     This tool should be called when the user reacts to an apartment and it updates the excerpt in the embedding
@@ -341,7 +357,7 @@ def swipe_on_listing(listing_id: str, action: str) -> dict:
     if action.lower() not in ('like', 'dislike', 'pass'):
         return {"success": False, "error": f"Error with parsing user action"}
 
-    user_id = _require_user_id()
+    user_id = _require_user_id(config)
     try:
         listings = get_listings_collection()
         listing = listings.find_one({'listing_id': listing_id})
