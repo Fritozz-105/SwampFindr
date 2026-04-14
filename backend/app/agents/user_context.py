@@ -1,20 +1,29 @@
-"""Per-request user context for agent tool execution."""
+"""Per-request user context for agent tool execution.
 
-from contextvars import ContextVar, Token
+Uses a thread-safe dictionary instead of ContextVar because LangGraph
+dispatches tool calls via ThreadPoolExecutor, and ContextVar values
+do NOT propagate to child threads.
+"""
 
-_current_user_id: ContextVar[str | None] = ContextVar("current_user_id", default=None)
+import threading
 
-
-def set_current_user_id(user_id: str | None) -> Token:
-    # Set the current authenticated user id for tool calls
-    return _current_user_id.set(user_id)
-
-
-def reset_current_user_id(token: Token) -> None:
-    # Reset the current authenticated user id to previous state.
-    _current_user_id.reset(token)
+_lock = threading.Lock()
+_thread_user_map: dict[str, str] = {}
 
 
-def get_current_user_id() -> str | None:
-    # Get the current authenticated user id, if available.
-    return _current_user_id.get()
+def set_user_for_thread(thread_id: str, user_id: str) -> None:
+    """Register user_id for a given agent thread_id."""
+    with _lock:
+        _thread_user_map[thread_id] = user_id
+
+
+def clear_user_for_thread(thread_id: str) -> None:
+    """Remove user_id mapping for a given agent thread_id."""
+    with _lock:
+        _thread_user_map.pop(thread_id, None)
+
+
+def get_user_for_thread(thread_id: str) -> str | None:
+    """Get the user_id associated with a given agent thread_id."""
+    with _lock:
+        return _thread_user_map.get(thread_id)
