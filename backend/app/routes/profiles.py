@@ -262,7 +262,7 @@ class ProfileFavoritesListings(Resource):
         listings_col = get_listings_collection()
         listings = list(listings_col.find(
             {"listing_id": {"$in": favorite_ids}},
-            {"_id": 0},
+            {"_id": 0, "cleaned_photos": 0, "image_cleanup_meta": 0},
         ))
 
         # Get match scores from Pinecone using user preferences
