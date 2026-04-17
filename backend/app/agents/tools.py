@@ -223,7 +223,9 @@ def suggest_listing(
         listings_col = get_listings_collection()
         units_col = get_units_collection()
 
-        listings_docs = {doc["listing_id"]: doc for doc in listings_col.find(mongo_filter)}
+        listings_docs = {doc["listing_id"]: doc for doc in listings_col.find(
+            mongo_filter, {"cleaned_photos": 0, "image_cleanup_meta": 0}
+        )}
         filtered_ids = list(listings_docs.keys())
 
         units_by_listing: dict[str, list] = {}

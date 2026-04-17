@@ -36,7 +36,7 @@ def search_listings(user_id: str, query: str, top_k: int = 50, *, skip_history: 
     listings_collection = get_listings_collection()
     mongo_listings = list(listings_collection.find(
         {"listing_id": {"$in": list(hit_map.keys())}},
-        {"_id": 0},
+        {"_id": 0, "cleaned_photos": 0, "image_cleanup_meta": 0},
     ))
 
     # Get user favorites

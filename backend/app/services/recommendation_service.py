@@ -78,7 +78,7 @@ def get_recommendations(user_id: str, page: int, per_page: int) -> dict:
     listings_collection = get_listings_collection()
     mongo_listings = list(listings_collection.find(
       {"listing_id": {"$in": list(hit_map.keys())}},
-      {"_id": 0},
+      {"_id": 0, "cleaned_photos": 0, "image_cleanup_meta": 0},
     ))
 
     # Attach match scores and sort by score descending
@@ -133,7 +133,7 @@ def _fallback_recommendations(
 
   cursor = (
     listings_collection
-    .find(query, {"_id": 0})
+    .find(query, {"_id": 0, "cleaned_photos": 0, "image_cleanup_meta": 0})
     .sort("list_price_min", 1)
     .skip(skip)
     .limit(per_page)

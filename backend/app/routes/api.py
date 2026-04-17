@@ -56,7 +56,9 @@ class ListingList(Resource):
             
             # Filter by maximum square footage
             # Fetch listings from MongoDB
-            listings = list(listings_collection.find(query).limit(100))
+            listings = list(listings_collection.find(
+                query, {"cleaned_photos": 0, "image_cleanup_meta": 0}
+            ).limit(100))
             
             # Convert ObjectId to string for JSON serialization
             for listing in listings:

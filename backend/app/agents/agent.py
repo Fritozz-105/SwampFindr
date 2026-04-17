@@ -279,16 +279,17 @@ def _extract_listings(messages: list) -> list:
     if not slim_listings:
         return []
 
-    # Re-fetch full listings (with photos) from MongoDB
+    # Re-fetch listings from MongoDB, excluding heavy binary fields
     from app.database import get_listings_collection, get_units_collection
     listing_ids = [l["listing_id"] for l in slim_listings if "listing_id" in l]
     score_map = {l["listing_id"]: l.get("match_score", 0) for l in slim_listings}
 
     try:
         listings_col = get_listings_collection()
+        _EXCLUDE_HEAVY = {"cleaned_photos": 0, "image_cleanup_meta": 0}
         full_docs = {
             doc["listing_id"]: doc
-            for doc in listings_col.find({"listing_id": {"$in": listing_ids}})
+            for doc in listings_col.find({"listing_id": {"$in": listing_ids}}, _EXCLUDE_HEAVY)
         }
         units_col = get_units_collection()
         units_by_listing: dict[str, list] = {}
@@ -368,7 +369,8 @@ def get_history(thread_id: str, limit: int = MAX_HISTORY_MESSAGES) -> list:
         try:
             from app.database import get_listings_collection, get_units_collection
             listings_col = get_listings_collection()
-            for doc in listings_col.find({"listing_id": {"$in": all_listing_ids}}):
+            _EXCLUDE_HEAVY = {"cleaned_photos": 0, "image_cleanup_meta": 0}
+            for doc in listings_col.find({"listing_id": {"$in": all_listing_ids}}, _EXCLUDE_HEAVY):
                 doc["_id"] = str(doc["_id"])
                 full_listing_map[doc["listing_id"]] = _serialize_doc(doc)
             units_col = get_units_collection()
