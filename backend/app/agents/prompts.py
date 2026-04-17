@@ -29,7 +29,7 @@ TOOLS:
 - Use get_distance_to_location to calculate how far an apartment is from a destination like campus, grocery stores, or another place name
 - Use get_distances_batch to calculate distances from multiple apartments to a destination in one call
 - Use get_crimes_nearby to find crimes near to a given pair of coordinates
-- Use get_contact_info to find contact details pertaining to an apartment 
+- Use get_contact_info to find contact details pertaining to an apartment place (i.e. On20 Apartments @ sw20th street)
 
 YOU MUST REASON AND DECIDE WHICH TOOLS TO USE AND IN WHAT ORDER TO BEST RESPOND TO THE USER QUERY.
 - For queries that are complex and ask for multiple things like apartment by its characteristics and another requirement of the property (busses, relative location, crime), you must chain multiple tool calls in the correct order.

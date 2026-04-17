@@ -15,6 +15,7 @@ from app.agents.user_context import get_user_for_thread
 from app.utils.geo import haversine_km
 
 from pathlib import Path
+import logging
 
 from openai import OpenAI
 from typing import cast
@@ -66,7 +67,6 @@ def get_tools():
         get_contact_info
     ]
 
-
 @tool
 @observe(type="tool")
 def get_contact_info(query: str) -> dict:
@@ -78,41 +78,74 @@ def get_contact_info(query: str) -> dict:
     Returns:
         dict: Result with the apartment information in JSON format
     """
-    client = _get_openai_client()
-    if isinstance(client, str):
-        return {"success": False, "error": client}
+    logger = logging.getLogger(__name__)
 
-    messages = cast(list[ChatCompletionMessageParam], cast(object, [
-        {"role": "system",
-         "content": """You are a helpful assistant that returns apartment contact information strictly as JSON.
-         Always respond with valid JSON only — no extra text, no markdown.
-         Format:
-        {
-            "apartment_name": "...",
-            "address": "...",
-            "phone": "...",
-            "email": "...",
-            "website": "...",
-            "office_hours": "..."
-        }
-        If not found, return: {"error": "Apartment not found", "query": "<original query>"}"""
-         },
-        {"role": "user",
-         "content": f"Get contact info for: {query}"
-         }
-    ]))
+    api_key = os.getenv("GOOGLE_MAPS_API_KEY")
+    if not api_key:
+        return {"success": False, "error": "Google Maps API key not configured"}
+
+    user_agent = "SwampFindr/1.0 University of Florida (ufl.edu)"
+
     try:
-        response = client.chat.completions.create(
-            model="gpt-oss-120b",
-            messages=messages,
-            response_format=ResponseFormatJSONObject(type="json_object")
-        )
-        raw = response.choices[0].message.content
-        return json.loads(raw)
+        with httpx.Client(timeout=10.0, headers={"User-Agent": user_agent}) as client:
+            find_resp = client.get(
+                "https://maps.googleapis.com/maps/api/place/findplacefromtext/json",
+                params={
+                    "input": query.strip(),
+                    "inputtype": "textquery",
+                    "fields": "place_id,name,formatted_address",
+                    "locationbias": "point:29.6516,-82.3248",
+                    "key": api_key,
+                },
+            )
+            find_resp.raise_for_status()
+            find_data = find_resp.json()
+            logger.info("Places findplacefromtext status=%s candidates=%s",
+                        find_data.get("status"), find_data.get("candidates"))
     except Exception as e:
-        import logging
-        logging.getLogger(__name__).error("get_contact_info error: %s", e, exc_info=True)
-        return {"success": False, "error": "Failed to fetch contact information. Please try again."}
+        logger.error("Places search failed: %s", e, exc_info=True)
+        return {"success": False, "error": f"Places search failed: {e}"}
+
+    if find_data.get("status") != "OK" or not find_data.get("candidates"):
+        logger.warning("No candidates returned. Full response: %s", find_data)
+        return {"success": False, "error": f"Apartment not found: '{query}'. Places status: {find_data.get('status')}"}
+
+    place_id = find_data["candidates"][0]["place_id"]
+    logger.info("Found place_id=%s", place_id)
+
+    try:
+        with httpx.Client(timeout=10.0, headers={"User-Agent": user_agent}) as client:
+            details_resp = client.get(
+                "https://maps.googleapis.com/maps/api/place/details/json",
+                params={
+                    "place_id": place_id,
+                    "fields": "name,formatted_address,formatted_phone_number,website,opening_hours,international_phone_number",
+                    "key": api_key,
+                },
+            )
+            details_resp.raise_for_status()
+            details_data = details_resp.json()
+            logger.info("Place details status=%s result_keys=%s",
+                        details_data.get("status"), list(details_data.get("result", {}).keys()))
+    except Exception as e:
+        logger.error("Place details fetch failed: %s", e, exc_info=True)
+        return {"success": False, "error": f"Place details fetch failed: {e}"}
+
+    if details_data.get("status") != "OK":
+        logger.warning("Details API failed. Full response: %s", details_data)
+        return {"success": False, "error": f"Could not retrieve place details. Status: {details_data.get('status')}"}
+
+    result = details_data.get("result", {})
+    hours = result.get("opening_hours", {}).get("weekday_text", [])
+
+    return {
+        "success": True,
+        "apartment_name": result.get("name", ""),
+        "address": result.get("formatted_address", ""),
+        "phone": result.get("formatted_phone_number") or result.get("international_phone_number", ""),
+        "website": result.get("website", ""),
+        "office_hours": ", ".join(hours) if hours else "",
+    }
 
 
 @tool
