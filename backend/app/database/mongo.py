@@ -91,6 +91,12 @@ def get_gmail_auth_collection() -> Collection:
     return db['GmailAuth']
 
 
+def get_email_history_collection() -> Collection:
+    """Get the EmailHistory collection from the UserData database."""
+    db = get_userdata_db()
+    return db['EmailHistory']
+
+
 def init_db(app):
     """Initialize database connection with Flask app."""
     with app.app_context():
@@ -98,23 +104,26 @@ def init_db(app):
             client = get_mongo_client()
             # Test connection
             client.admin.command('ping')
-            app.logger.info("✓ Connected to MongoDB Atlas")
+            app.logger.info("Connected to MongoDB")
             # Ensure unique index on Profiles.user_id
             get_profiles_collection().create_index("user_id", unique=True, background=True)
-            app.logger.info("✓ Ensured unique index on Profiles.user_id")
+            app.logger.info("Ensured unique index on Profiles.user_id")
             get_chat_threads_collection().create_index("thread_id", unique=True, background=True)
             get_chat_threads_collection().create_index(
                 [("user_id", 1), ("updated_at", -1)],
                 background=True,
             )
-            app.logger.info("✓ Ensured ChatThreads indexes")
             get_search_history_collection().create_index(
                 [("user_id", 1), ("created_at", -1)],
                 background=True,
             )
-            app.logger.info("Ensured SearchHistory indexes")
             get_gmail_auth_collection().create_index("user_id", unique=True, background=True)
-            app.logger.info("Ensured GmailAuth indexes")
+            get_email_history_collection().create_index("user_id", background=True)
+            get_email_history_collection().create_index("thread_id", background=True)
+            get_email_history_collection().create_index(
+                [("user_id", 1), ("sent_at", -1)],
+                background=True,
+            )
         except Exception as e:
             app.logger.error(f"MongoDB connection failed: {e}")
             raise
