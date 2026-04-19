@@ -13,11 +13,11 @@ from app.services.profile_service import PreferencesUpdateRequest, update_prefer
 from app.database import get_listings_collection, get_units_collection
 from app.agents.user_context import get_user_for_thread
 from app.utils.geo import haversine_km
-
+from app.services.gmail_service import send_email_on_behalf
 from pathlib import Path
 
 from openai import OpenAI
-from typing import cast
+from typing import List, cast
 from openai.types.chat import ChatCompletionMessageParam
 from openai.types.shared_params import ResponseFormatJSONObject
 
@@ -63,7 +63,8 @@ def get_tools():
         get_crimes_nearby,
         get_distance_to_location,
         get_distances_batch,
-        get_contact_info
+        get_contact_info,
+        email_listing_tour_request
     ]
 
 
@@ -1023,3 +1024,52 @@ def semantic_search(query: str):
         }
         for hit in hits
     ]
+
+@tool
+@observe(type="tool")
+def email_listing_tour_request(user_id: str, listing_ids: List[str], user_emails: List[str]) -> dict:
+    """
+    Send an email to a listing or multiple listings expressing interest in touring the apartment(s). This is called when the user wants to schedule a tour.
+    The tool call handles sending the email to the appropriate contacts for the listing(s) on behalf of the user. You will provide the message for the email.
+    Make sure the message is succinct and is clear in the listing that is requested and specific unit and what dates are best for the tour.
+    Args:
+        user_id: The ID of the user requesting the tour
+        listing_ids: List of listing IDs that the user is interested in touring
+        user_emails: List of messages to send in email for the corresponding listing in listing_ids. Each message should include the user's preferred dates for touring and any specific questions about the listing.
+    Returns:
+        Dict with 'success' and either a confirmation message or an error
+    """
+    if not listing_ids or not user_emails or len(listing_ids) != len(user_emails):
+        return {"success": False, "error": "listing_ids and user_emails must be non-empty lists of the same length"}
+
+    try:
+        # Fetch listing contact info from database
+        listings_collection = get_listings_collection()
+        contacts = []
+        for lid in listing_ids:
+            listing = listings_collection.find_one({"listing_id": lid})
+            if not listing:
+                return {"success": False, "error": f"Listing ID {lid} not found"}
+            contact_email = listing.get("email")
+            if not contact_email:
+                return {"success": False, "error": f"No contact email found for listing ID {lid}"}
+            contacts.append((lid, contact_email))
+
+        res = []
+        for (lid, email), message in zip(contacts, user_emails):
+            res.append( send_email_on_behalf(
+                to_address=email,
+                subject=f"Tour Request for Listing {lid}",
+                email_content=message,
+                user_id=user_id
+            ))
+
+        if all(r.get("success") for r in res):
+            return {"success": True, "message": f"Tour request emails sent successfully to {len(res)} listing(s)"}
+        else:
+            return {"success": False, "error":res}
+
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).error("email_listing_tour_request error: %s", e, exc_info=True)
+        return {"success": False, "error": "Failed to send tour request emails"}
