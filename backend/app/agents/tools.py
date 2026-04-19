@@ -13,7 +13,7 @@ from app.services.profile_service import PreferencesUpdateRequest, update_prefer
 from app.database import get_listings_collection, get_units_collection
 from app.agents.user_context import get_user_for_thread
 from app.utils.geo import haversine_km
-from app.services.gmail_service import send_email_on_behalf
+from app.services.gmail_service import send_email_on_behalf, get_email_thread, get_all_tour_email_threads, send_email_reply_to_thread
 from pathlib import Path
 import logging
 
@@ -65,7 +65,10 @@ def get_tools():
         get_distance_to_location,
         get_distances_batch,
         get_contact_info,
-        email_listing_tour_request
+        email_listing_tour_request,
+        get_email_updates,
+        get_email_thread_details,
+        send_email_reply_to_thread_tool
     ]
 
 @tool
@@ -1109,3 +1112,67 @@ def email_listing_tour_request( listing_ids: List[str], user_emails: List[str],c
         import logging
         logging.getLogger(__name__).error("email_listing_tour_request error: %s", e, exc_info=True)
         return {"success": False, "error": "Failed to send tour request emails"}
+
+@tool
+@observe(type="tool")
+def get_email_updates(config: RunnableConfig = None) -> dict:
+    """
+    Get all email threads/conversations started by the user. Shows all tour request emails with latest status.
+    Use this to check for property manager responses and updates about scheduled tours.
+    Returns a list of all active email conversations with thread IDs for follow-up.
+    Returns:
+        Dict with 'success', 'thread_count', and 'threads' (list of conversations)
+    """
+    try:
+        user_id = _require_user_id(config)
+        result = get_all_tour_email_threads(user_id)
+        return result
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).error("get_email_updates error: %s", e, exc_info=True)
+        return {"success": False, "error": "Failed to get email updates"}
+
+
+@tool
+@observe(type="tool")
+def get_email_thread_details(thread_id: str, config: RunnableConfig = None) -> dict:
+    """
+    Get the full conversation thread for a specific tour request email.
+    This shows all messages (sent and received) in the conversation with the property manager.
+    Use this to see the complete back-and-forth communication about a property tour.
+    Args:
+        thread_id: The Gmail thread ID from get_email_updates
+    Returns:
+        Dict with 'success', 'message_count', and 'messages' (full conversation)
+    """
+    try:
+        user_id = _require_user_id(config)
+        result = get_email_thread(user_id, thread_id)
+        return result
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).error("get_email_thread_details error: %s", e, exc_info=True)
+        return {"success": False, "error": "Failed to get email thread details"}
+
+
+@tool
+@observe(type="tool")
+def send_email_reply_to_thread_tool(thread_id: str, reply_message: str, config: RunnableConfig = None) -> dict:
+    """
+    Send a reply to a specific email thread/conversation with a property manager.
+    Use this to respond to property manager messages about tour availability or answer their questions.
+    The reply will be added to the existing conversation thread.
+    Args:
+        thread_id: The Gmail thread ID to reply to
+        reply_message: Your reply message content
+    Returns:
+        Dict with 'success', 'message_id', 'thread_id', or 'error'
+    """
+    try:
+        user_id = _require_user_id(config)
+        result = send_email_reply_to_thread(user_id, thread_id, reply_message)
+        return result
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).error("send_email_reply_to_thread_tool error: %s", e, exc_info=True)
+        return {"success": False, "error": "Failed to send email reply"}
