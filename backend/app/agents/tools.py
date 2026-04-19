@@ -1062,13 +1062,12 @@ def semantic_search(query: str):
 
 @tool
 @observe(type="tool")
-def email_listing_tour_request(user_id: str, listing_ids: List[str], user_emails: List[str]) -> dict:
+def email_listing_tour_request( listing_ids: List[str], user_emails: List[str],config: RunnableConfig = None) -> dict:
     """
     Send an email to a listing or multiple listings expressing interest in touring the apartment(s). This is called when the user wants to schedule a tour.
     The tool call handles sending the email to the appropriate contacts for the listing(s) on behalf of the user. You will provide the message for the email.
     Make sure the message is succinct and is clear in the listing that is requested and specific unit and what dates are best for the tour.
     Args:
-        user_id: The ID of the user requesting the tour
         listing_ids: List of listing IDs that the user is interested in touring
         user_emails: List of messages to send in email for the corresponding listing in listing_ids. Each message should include the user's preferred dates for touring and any specific questions about the listing.
     Returns:
@@ -1078,6 +1077,7 @@ def email_listing_tour_request(user_id: str, listing_ids: List[str], user_emails
         return {"success": False, "error": "listing_ids and user_emails must be non-empty lists of the same length"}
 
     try:
+        user_id = _require_user_id(config)
         # Fetch listing contact info from database
         listings_collection = get_listings_collection()
         contacts = []
@@ -1096,7 +1096,8 @@ def email_listing_tour_request(user_id: str, listing_ids: List[str], user_emails
                 to_address=email,
                 subject=f"Tour Request for Listing {lid}",
                 email_content=message,
-                user_id=user_id
+                user_id=user_id,
+                listing_id=lid
             ))
 
         if all(r.get("success") for r in res):
