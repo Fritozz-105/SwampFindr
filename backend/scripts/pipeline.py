@@ -1,4 +1,4 @@
-"""Pipeline orchestrator: run listing ingestion, embedding, and/or image enhancement."""
+"""Pipeline orchestrator: run listing ingestion, embedding, and/or image enhancement"""
 import argparse
 import subprocess
 import sys
