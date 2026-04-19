@@ -110,6 +110,13 @@ Once the server is running, visit `http://localhost:8080/api/v1/docs` for intera
 - `DELETE /api/v1/listings/<id>` - Delete a listing
 - `GET /api/v1/listings/search` - Search listings
 
+#### Emailing (Google OAuth / Gmail)
+
+- `GET /api/v1/emailing/google/status` - Read current user Gmail-emailing status
+- `POST /api/v1/emailing/google/connect` - Generate Google OAuth consent URL
+- `DELETE /api/v1/emailing/google/disconnect` - Disconnect Gmail emailing for current user
+- `GET /api/v1/emailing/google/callback` - OAuth callback endpoint used by Google
+
 ### Query Parameters
 
 - `city` - Filter by city
@@ -213,4 +220,12 @@ CONFIDENT_API_KEY=optional-for-deepeval-traces
 
 # Add database URL when ready
 # DATABASE_URL=postgresql://user:password@localhost:5432/swampfindr
+
+# Gmail OAuth (send email on behalf of users)
+GOOGLE_OAUTH_CLIENT_ID=your-google-client-id
+GOOGLE_OAUTH_CLIENT_SECRET=your-google-client-secret
+GOOGLE_GMAIL_REDIRECT_URI=http://localhost:8080/api/v1/emailing/google/callback
+GOOGLE_GMAIL_SETTINGS_REDIRECT_URL=http://localhost:3000/settings
+# optional override:
+# GOOGLE_GMAIL_SCOPES=https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/userinfo.email openid
 ```

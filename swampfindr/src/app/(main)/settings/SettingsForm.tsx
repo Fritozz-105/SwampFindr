@@ -10,6 +10,7 @@ import { EditPreferencesSection } from "./sections/EditPreferencesSection";
 import { ChangePasswordSection } from "./sections/ChangePasswordSection";
 import { ChangeEmailSection } from "./sections/ChangeEmailSection";
 import { MfaSection } from "./sections/MfaSection";
+import { GmailEmailSection } from "./sections/GmailEmailSection";
 
 type SettingsFormProps = {
   user: { id: string; email: string; provider: string } | null;
@@ -60,6 +61,10 @@ export function SettingsForm({ user, initialProfile }: SettingsFormProps) {
 
       <SettingsCard title={s.email.title} description={s.email.description}>
         <ChangeEmailSection currentEmail={user.email} />
+      </SettingsCard>
+
+      <SettingsCard title={s.gmail.title} description={s.gmail.description}>
+        <GmailEmailSection />
       </SettingsCard>
 
       <SettingsCard title={s.mfa.title} description={s.mfa.description}>
