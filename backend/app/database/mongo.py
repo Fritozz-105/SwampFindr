@@ -85,6 +85,12 @@ def get_search_history_collection() -> Collection:
     return db['SearchHistory']
 
 
+def get_gmail_auth_collection() -> Collection:
+    """Get the GmailAuth collection from the UserData database."""
+    db = get_userdata_db()
+    return db['GmailAuth']
+
+
 def init_db(app):
     """Initialize database connection with Flask app."""
     with app.app_context():
@@ -107,6 +113,8 @@ def init_db(app):
                 background=True,
             )
             app.logger.info("Ensured SearchHistory indexes")
+            get_gmail_auth_collection().create_index("user_id", unique=True, background=True)
+            app.logger.info("Ensured GmailAuth indexes")
         except Exception as e:
             app.logger.error(f"MongoDB connection failed: {e}")
             raise
