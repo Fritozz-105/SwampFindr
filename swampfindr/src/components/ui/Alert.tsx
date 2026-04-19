@@ -27,6 +27,7 @@ const styles = {
 } as const;
 
 export function Alert({ variant, children, className, id }: AlertProps) {
+  // Alert component that displays a message based on the variant (error or success).
   return (
     <div
       id={id}
