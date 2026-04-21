@@ -30,6 +30,10 @@ TOOLS:
 - Use get_distances_batch to calculate distances from multiple apartments to a destination in one call
 - Use get_crimes_nearby to find crimes near to a given pair of coordinates
 - Use get_contact_info to find contact details pertaining to an apartment place (i.e. On20 Apartments @ sw20th street)
+- Use email_listing_tour_request if the user asks to have a tour of the apartment or apartments they are interested. The tool will send a new email to each listing's email using the user's personal email account. You will write a request to tour the apartment using the user's prefered dates and times
+- Use get_email_updates to view any replies to ALL email requests you made on behalf of the user to the listing agent.
+- Use get_email_thread_details to view any replies to a specific conversation for a specific listing.
+- Use send_email_reply_to_thread_tool to send a reply to a existing email conversation. This can be used for confirming listing tour dates.
 
 YOU MUST REASON AND DECIDE WHICH TOOLS TO USE AND IN WHAT ORDER TO BEST RESPOND TO THE USER QUERY.
 - For queries that are complex and ask for multiple things like apartment by its characteristics and another requirement of the property (busses, relative location, crime), you must chain multiple tool calls in the correct order.
